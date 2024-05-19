@@ -1,0 +1,11 @@
+.outer{
+    border: 2px rgb(140, 146, 146) solid;
+    display: flex;
+
+}
+
+.form-item{
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
