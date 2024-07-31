@@ -2,6 +2,7 @@ import React from 'react'
 import CIcon from '@coreui/icons-react'
 import {cilBell,cilCalculator,cilChartPie,cilCursor,cilDescription,cilDrop,cilNotes,cilPencil,cilPuzzle,cilSpeedometer,cilStar} from '@coreui/icons'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
+import { BsFillGridFill } from 'react-icons/bs'
 
 const _nav = [
   {
@@ -9,6 +10,16 @@ const _nav = [
     name: 'Dashboard',
     to: '/dashboard',
     icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
+    // badge: {
+    //   color: 'info',
+    //   text: 'NEW',
+    // },
+  },
+  {
+    component: CNavItem,
+    name: 'Categories',
+    to: '/categories',
+    icon: <BsFillGridFill className="nav-icon" />,
     // badge: {
     //   color: 'info',
     //   text: 'NEW',
