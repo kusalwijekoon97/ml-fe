@@ -1,8 +1,9 @@
 import React, { Suspense, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { CSpinner, useColorModes } from '@coreui/react';
 import './scss/style.scss';
+import IndexCategory from './views/pages/category/IndexCategory';
 
 // Containers
 const DefaultLayout = React.lazy(() => import('./layout/DefaultLayout'));
@@ -41,12 +42,15 @@ const App = () => {
         }
       >
         <Routes>
-          <Route path="/" name="Home" element={<DefaultLayout />} />
-          <Route path="*" element={<Navigate to="/login" />} />
-          <Route exact path="/login" name="Login Page" element={<Login />} />
-          <Route exact path="/register" name="Register Page" element={<Register />} />
-          <Route exact path="/404" name="Page 404" element={<Page404 />} />
-          <Route exact path="/500" name="Page 500" element={<Page500 />} />
+          <Route path="*" name="Home" element={<DefaultLayout />} />
+          <Route path="/" element={<Navigate to="/login" />} />
+          <Route path="/login" name="Login Page" element={<Login />} />
+          <Route path="/register" name="Register Page" element={<Register />} />
+          <Route path="/404" name="Page 404" element={<Page404 />} />
+          <Route path="/500" name="Page 500" element={<Page500 />} />
+
+          {/* category */}
+          <Route path="/categories" name="categories-all" element={<IndexCategory />} />
         </Routes>
       </Suspense>
     </Router>
