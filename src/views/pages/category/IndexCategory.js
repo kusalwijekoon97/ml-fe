@@ -18,9 +18,14 @@ import {
 } from '@coreui/react';
 import { AppFooter, AppHeader, AppSidebar } from '../../../components';
 import base_url from "../../../utils/api/base_url";
+import CardHeaderWithListCreate from '../../../components/cards/CardHeaderWithListCreate';
+import TableHead from '../../../components/table/TableHead';
+import TableBody from '../../../components/table/TableBody';
 
 const IndexCategory = () => {
   const [categories, setCategories] = useState([]);
+
+  const columns = ["#", "Category Name", "Active Status", "Actions"];
 
   useEffect(() => {
     axios.get(`${base_url}/api/categories/main/all`)
@@ -49,6 +54,11 @@ const IndexCategory = () => {
     console.log(`Change status of category with id: ${id}`);
   };
 
+  const handleAddNewItem = () => {
+    alert(555);
+    console.log('Add new category');
+  };
+
   return (
     <>
       <AppSidebar />
@@ -59,51 +69,21 @@ const IndexCategory = () => {
             <CRow>
               <CCol xs={12}>
                 <CCard className="mb-4">
-                  <CCardHeader>
-                    <strong>Categories</strong> <small>List</small>
-                  </CCardHeader>
+                  <CardHeaderWithListCreate
+                    title="Categories"
+                    subtitle="List"
+                    buttonText="Category"
+                    buttonOnClick={handleAddNewItem}
+                  />
                   <CCardBody>
                     <CTable align="middle" className="mb-0 border" hover responsive>
-                      <CTableHead className="text-nowrap">
-                        <CTableRow>
-                          <CTableHeaderCell className="bg-body-tertiary text-center">
-                            #
-                          </CTableHeaderCell>
-                          <CTableHeaderCell className="bg-body-tertiary">Category Name</CTableHeaderCell>
-                          <CTableHeaderCell className="bg-body-tertiary text-center">
-                            Active Status
-                          </CTableHeaderCell>
-                          <CTableHeaderCell className="bg-body-tertiary">Actions</CTableHeaderCell>
-                        </CTableRow>
-                      </CTableHead>
-                      <CTableBody>
-                        {categories.map((category, index) => (
-                          <CTableRow key={category._id}>
-                            <CTableDataCell className="text-center">
-                              {index + 1}
-                            </CTableDataCell>
-                            <CTableDataCell>
-                              <div>{category.name}</div>
-                            </CTableDataCell>
-                            <CTableDataCell className="text-center">
-                              <CBadge color={category.is_active ? 'success' : 'danger'}>
-                                {category.is_active ? 'Active' : 'Inactive'}
-                              </CBadge>
-                            </CTableDataCell>
-                            <CTableDataCell>
-                              <CButton color="primary" size="sm" onClick={() => handleEdit(category._id)}>
-                                Edit
-                              </CButton>{' '}
-                              <CButton color="danger" size="sm" onClick={() => handleDelete(category._id)}>
-                                Delete
-                              </CButton>{' '}
-                              <CButton color="warning" size="sm" onClick={() => handleChangeStatus(category._id)}>
-                                Change Status
-                              </CButton>
-                            </CTableDataCell>
-                          </CTableRow>
-                        ))}
-                      </CTableBody>
+                      <TableHead columns={columns} />
+                      <TableBody
+                        data={categories}
+                        handleEdit={handleEdit}
+                        handleDelete={handleDelete}
+                        handleChangeStatus={handleChangeStatus}
+                      />
                     </CTable>
                   </CCardBody>
                 </CCard>
