@@ -1,36 +1,34 @@
+// src/views/pages/category/IndexCategory.js
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import {
   CCard,
   CCardBody,
-  CCardHeader,
   CCol,
   CContainer,
   CRow,
   CTable,
-  CTableHead,
-  CTableRow,
-  CTableHeaderCell,
-  CTableBody,
-  CTableDataCell,
-  CButton,
-  CBadge,
 } from '@coreui/react';
+import CIcon from '@coreui/icons-react';
+import { cibAddthis } from '@coreui/icons';
 import { AppFooter, AppHeader, AppSidebar } from '../../../components';
 import base_url from "../../../utils/api/base_url";
-import CardHeaderWithListCreate from '../../../components/cards/CardHeaderWithListCreate';
+import CardHeaderWithTitleBtn from '../../../components/cards/CardHeaderWithTitleBtn';
 import TableHead from '../../../components/table/TableHead';
 import TableBody from '../../../components/table/TableBody';
+import ResponseAlert from '../../../components/notifications/ResponseAlert';
+import { useLocation } from 'react-router-dom';
 
 const IndexCategory = () => {
+  const location = useLocation();
   const [categories, setCategories] = useState([]);
+  const [alert, setAlert] = useState({ visible: false, type: '', message: '' });
 
   const columns = ["#", "Category Name", "Active Status", "Actions"];
 
   useEffect(() => {
     axios.get(`${base_url}/api/categories/main/all`)
       .then(response => {
-        // Ensure response data is an array
         if (Array.isArray(response.data)) {
           setCategories(response.data);
         } else {
@@ -41,6 +39,13 @@ const IndexCategory = () => {
         console.error('There was an error fetching the categories!', error);
       });
   }, []);
+
+  useEffect(() => {
+    // Retrieve the alert state from the location object if present
+    if (location.state?.alert) {
+      setAlert(location.state.alert);
+    }
+  }, [location.state]);
 
   const handleEdit = (id) => {
     console.log(`Edit category with id: ${id}`);
@@ -54,26 +59,28 @@ const IndexCategory = () => {
     console.log(`Change status of category with id: ${id}`);
   };
 
-  const handleAddNewItem = () => {
-    alert(555);
-    console.log('Add new category');
-  };
-
   return (
     <>
       <AppSidebar />
       <div className="wrapper d-flex flex-column min-vh-100">
-        <AppHeader />
+        <AppHeader title="Categories" />
         <div className="body flex-grow-1">
+          <ResponseAlert
+            visible={alert.visible}
+            type={alert.type}
+            message={alert.message}
+            onClose={() => setAlert({ ...alert, visible: false })}
+          />
           <CContainer className="px-1" lg>
             <CRow>
               <CCol xs={12}>
-                <CCard className="mb-4">
-                  <CardHeaderWithListCreate
+                <CCard className="mb-4  border-top-primary border-top-3">
+                  <CardHeaderWithTitleBtn
                     title="Categories"
                     subtitle="List"
+                    buttonIcon={<CIcon icon={cibAddthis} />}
                     buttonText="Category"
-                    buttonOnClick={handleAddNewItem}
+                    linkTo="/categories/create"
                   />
                   <CCardBody>
                     <CTable align="middle" className="mb-0 border" hover responsive>

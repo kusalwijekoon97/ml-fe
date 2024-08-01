@@ -8,7 +8,7 @@ import {cilBell,cilContrast,cilEnvelopeOpen,cilList,cilMenu,cilMoon,cilSun} from
 import { AppBreadcrumb } from './index'
 import { AppHeaderDropdown } from './header/index'
 
-const AppHeader = () => {
+const AppHeader = ({title}) => {
   const headerRef = useRef()
   const { colorMode, setColorMode } = useColorModes('coreui-free-react-admin-template-theme')
 
@@ -34,7 +34,7 @@ const AppHeader = () => {
         <CHeaderNav className="d-none d-md-flex">
           <CNavItem>
             <CNavLink to="/dashboard" as={NavLink}>
-              Dashboard
+              {title}
             </CNavLink>
           </CNavItem>
           {/* <CNavItem>
