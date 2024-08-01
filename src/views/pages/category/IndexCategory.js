@@ -3,22 +3,16 @@ import axios from 'axios';
 import {
   CCard,
   CCardBody,
-  CCardHeader,
   CCol,
   CContainer,
   CRow,
   CTable,
-  CTableHead,
-  CTableRow,
-  CTableHeaderCell,
-  CTableBody,
-  CTableDataCell,
-  CButton,
-  CBadge,
 } from '@coreui/react';
+import CIcon from '@coreui/icons-react';
+import { cibAddthis } from '@coreui/icons';
 import { AppFooter, AppHeader, AppSidebar } from '../../../components';
 import base_url from "../../../utils/api/base_url";
-import CardHeaderWithListCreate from '../../../components/cards/CardHeaderWithListCreate';
+import CardHeaderWithTitleBtn from '../../../components/cards/CardHeaderWithTitleBtn';
 import TableHead from '../../../components/table/TableHead';
 import TableBody from '../../../components/table/TableBody';
 
@@ -54,26 +48,22 @@ const IndexCategory = () => {
     console.log(`Change status of category with id: ${id}`);
   };
 
-  const handleAddNewItem = () => {
-    alert(555);
-    console.log('Add new category');
-  };
-
   return (
     <>
-      <AppSidebar/>
+      <AppSidebar />
       <div className="wrapper d-flex flex-column min-vh-100">
         <AppHeader title="Categories" />
         <div className="body flex-grow-1">
           <CContainer className="px-1" lg>
             <CRow>
               <CCol xs={12}>
-                <CCard className="mb-4">
-                  <CardHeaderWithListCreate
+                <CCard className="mb-4  border-top-primary border-top-3">
+                  <CardHeaderWithTitleBtn
                     title="Categories"
                     subtitle="List"
+                    buttonIcon={<CIcon icon={cibAddthis} />}
                     buttonText="Category"
-                    buttonOnClick={handleAddNewItem}
+                    linkTo="/categories/create"
                   />
                   <CCardBody>
                     <CTable align="middle" className="mb-0 border" hover responsive>
