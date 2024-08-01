@@ -61,9 +61,9 @@ const IndexCategory = () => {
 
   return (
     <>
-      <AppSidebar />
+      <AppSidebar/>
       <div className="wrapper d-flex flex-column min-vh-100">
-        <AppHeader />
+        <AppHeader title="Categories" />
         <div className="body flex-grow-1">
           <CContainer className="px-1" lg>
             <CRow>
