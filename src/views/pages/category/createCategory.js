@@ -20,6 +20,7 @@ import CIcon from '@coreui/icons-react';
 import { cilList } from '@coreui/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import base_url from "../../../utils/api/base_url";
+import ResponseAlert from '../../../components/notifications/ResponseAlert';
 
 const CreateCategory = () => {
   const navigate = useNavigate();
@@ -30,6 +31,7 @@ const CreateCategory = () => {
   });
 
   const [loading, setLoading] = useState(false); // Add loading state
+  const [alert, setAlert] = useState({ visible: false, type: '', message: '' });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -38,19 +40,28 @@ const CreateCategory = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setLoading(true); // Start loading
-
+    setLoading(true);
     axios.post(`${base_url}/api/categories/main/store`, form)
       .then(response => {
-        console.log(response.data);
-        // handle success
+        setLoading(false);
+        navigate("/categories", {
+          state: {
+            alert: {
+              visible: true,
+              type: 'success',
+              message: 'Category created successfully!'
+            }
+          }
+        });
       })
       .catch(error => {
+        setLoading(false);
+        setAlert({
+          visible: true,
+          type: 'failure',
+          message: 'Category creation failed. Please try again.'
+        });
         console.error(error);
-        // handle error
-      })
-      .finally(() => {
-        setLoading(false); // Stop loading
       });
   };
 
@@ -64,6 +75,12 @@ const CreateCategory = () => {
       <div className="wrapper d-flex flex-column min-vh-100">
         <AppHeader title="Categories" />
         <div className="body flex-grow-1">
+          <ResponseAlert
+            visible={alert.visible}
+            type={alert.type}
+            message={alert.message}
+            onClose={() => setAlert({ ...alert, visible: false })}
+          />
           <CContainer className="px-1" lg>
             <CRow>
               <CCol xs={12}>
