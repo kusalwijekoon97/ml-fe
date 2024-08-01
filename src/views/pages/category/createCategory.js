@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import {
   CCard,
   CCardBody,
-  CCardHeader,
   CForm,
   CFormLabel,
   CFormInput,
@@ -11,7 +10,8 @@ import {
   CContainer,
   CRow,
   CCol,
-  CSpinner
+  CSpinner,
+  CFormFeedback
 } from '@coreui/react';
 import axios from 'axios';
 import { AppFooter, AppHeader, AppSidebar } from '../../../components';
@@ -30,16 +30,42 @@ const CreateCategory = () => {
     library: ''
   });
 
-  const [loading, setLoading] = useState(false); // Add loading state
+  const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState({ visible: false, type: '', message: '' });
+
+  const [errors, setErrors] = useState({
+    name: '',
+    library: ''
+  });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
+
+    // Clear error when the user starts typing
+    setErrors({ ...errors, [name]: '' });
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!form.name) {
+      newErrors.name = 'Category name is mandatory.';
+    }
+
+    if (!form.library) {
+      newErrors.library = 'Library is mandatory.';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (!validateForm()) return;
+
     setLoading(true);
     axios.post(`${base_url}/api/categories/main/store`, form)
       .then(response => {
@@ -103,7 +129,9 @@ const CreateCategory = () => {
                           placeholder="Enter category name"
                           value={form.name}
                           onChange={handleChange}
+                          invalid={!!errors.name}
                         />
+                        <CFormFeedback>{errors.name}</CFormFeedback>
                       </div>
                       <div className="mb-3">
                         <CFormLabel htmlFor="library">Library</CFormLabel>
@@ -114,7 +142,9 @@ const CreateCategory = () => {
                           placeholder="Enter library"
                           value={form.library}
                           onChange={handleChange}
+                          invalid={!!errors.library}
                         />
+                        <CFormFeedback>{errors.library}</CFormFeedback>
                       </div>
                       <div className="text-end">
                         <Link to="/dashboard">
