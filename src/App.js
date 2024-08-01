@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import { CSpinner, useColorModes } from '@coreui/react';
 import './scss/style.scss';
 import IndexCategory from './views/pages/category/IndexCategory';
+import CreateCategory from './views/pages/category/createCategory';
 
 // Containers
 const DefaultLayout = React.lazy(() => import('./layout/DefaultLayout'));
@@ -51,6 +52,7 @@ const App = () => {
 
           {/* category */}
           <Route path="/categories" name="categories-all" element={<IndexCategory />} />
+          <Route path="/categories/create" name="categories-create" element={<CreateCategory />} />
         </Routes>
       </Suspense>
     </Router>
