@@ -24,7 +24,7 @@ const IndexCategory = () => {
   const [categories, setCategories] = useState([]);
   const [alert, setAlert] = useState({ visible: false, type: '', message: '' });
 
-  const columns = ["#", "Category Name", "Active Status", "Actions"];
+  const columns = ["#", "Category Name", "Sub Categories","Active Status", "Actions"];
 
   useEffect(() => {
     axios.get(`${base_url}/api/categories/main/all`)
