@@ -1,17 +1,13 @@
 // src/views/pages/category/CreateCategory.js
+
 import React, { useState } from 'react';
 import {
   CCard,
   CCardBody,
-  CForm,
-  CFormLabel,
-  CFormInput,
-  CButton,
   CContainer,
   CRow,
   CCol,
-  CSpinner,
-  CFormFeedback
+  CSpinner
 } from '@coreui/react';
 import axios from 'axios';
 import { AppFooter, AppHeader, AppSidebar } from '../../../components';
@@ -21,13 +17,15 @@ import { cilList } from '@coreui/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import base_url from "../../../utils/api/base_url";
 import ResponseAlert from '../../../components/notifications/ResponseAlert';
+import CategoryForm from '../../../components/forms/CategoryForm';
 
 const CreateCategory = () => {
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
     name: '',
-    library: ''
+    library: [],
+    subCategories: [{ id: Date.now(), name: '' }]
   });
 
   const [loading, setLoading] = useState(false);
@@ -35,15 +33,49 @@ const CreateCategory = () => {
 
   const [errors, setErrors] = useState({
     name: '',
-    library: ''
+    library: '',
+    subCategories: []
   });
+
+  const libraryOptions = [
+    { value: 'EN', label: 'EN' },
+    { value: 'SI', label: 'SI' },
+    { value: 'TA', label: 'TA' }
+  ];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
-
-    // Clear error when the user starts typing
     setErrors({ ...errors, [name]: '' });
+  };
+
+  const handleLibraryChange = (selectedOptions) => {
+    setForm({ ...form, library: selectedOptions });
+    setErrors({ ...errors, library: '' });
+  };
+
+  const handleSubCategoryChange = (index, event) => {
+    const newSubCategories = form.subCategories.map((subCategory, subIndex) => {
+      if (index === subIndex) {
+        return { ...subCategory, name: event.target.value };
+      }
+      return subCategory;
+    });
+    setForm({ ...form, subCategories: newSubCategories });
+  };
+
+  const addSubCategory = () => {
+    setForm({
+      ...form,
+      subCategories: [...form.subCategories, { id: Date.now(), name: '' }]
+    });
+  };
+
+  const removeSubCategory = (id) => {
+    setForm({
+      ...form,
+      subCategories: form.subCategories.filter(subCategory => subCategory.id !== id)
+    });
   };
 
   const validateForm = () => {
@@ -53,12 +85,19 @@ const CreateCategory = () => {
       newErrors.name = 'Category name is mandatory.';
     }
 
-    if (!form.library) {
+    if (form.library.length === 0) {
       newErrors.library = 'Library is mandatory.';
     }
 
+    form.subCategories.forEach((subCategory, index) => {
+      if (!subCategory.name) {
+        newErrors.subCategories = newErrors.subCategories || [];
+        newErrors.subCategories[index] = 'Sub category name is mandatory.';
+      }
+    });
+
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return Object.keys(newErrors).length === 0 && (!newErrors.subCategories || newErrors.subCategories.length === 0);
   };
 
   const handleSubmit = (e) => {
@@ -67,7 +106,13 @@ const CreateCategory = () => {
     if (!validateForm()) return;
 
     setLoading(true);
-    axios.post(`${base_url}/api/categories/main/store`, form)
+    const formattedForm = {
+      ...form,
+      library: form.library.map(option => option.value),
+      subCategories: form.subCategories.map(subCategory => subCategory.name)
+    };
+
+    axios.post(`${base_url}/api/categories/main/store`, formattedForm)
       .then(response => {
         setLoading(false);
         navigate("/categories", {
@@ -119,63 +164,19 @@ const CreateCategory = () => {
                     linkTo="/categories"
                   />
                   <CCardBody>
-                    <CForm onSubmit={handleSubmit}>
-                      <div className="mb-3">
-                        <CFormLabel htmlFor="name">Category Name</CFormLabel>
-                        <CFormInput
-                          type="text"
-                          id="name"
-                          name="name"
-                          placeholder="Enter category name"
-                          value={form.name}
-                          onChange={handleChange}
-                          invalid={!!errors.name}
-                        />
-                        <CFormFeedback>{errors.name}</CFormFeedback>
-                      </div>
-                      <div className="mb-3">
-                        <CFormLabel htmlFor="library">Library</CFormLabel>
-                        <CFormInput
-                          type="text"
-                          id="library"
-                          name="library"
-                          placeholder="Enter library"
-                          value={form.library}
-                          onChange={handleChange}
-                          invalid={!!errors.library}
-                        />
-                        <CFormFeedback>{errors.library}</CFormFeedback>
-                      </div>
-                      <div className="text-end">
-                        <Link to="/dashboard">
-                          <CButton type="button"
-                            size='sm'
-                            color="danger"
-                            className="me-2"
-                            disabled={loading}>Cancel</CButton>
-                        </Link>
-                        <CButton type="button"
-                          size='sm'
-                          color="secondary"
-                          className="me-2"
-                          onClick={handlePrevious}
-                          disabled={loading}>Previous</CButton>
-                        <CButton
-                          type="submit"
-                          size='sm'
-                          color="success"
-                          disabled={loading}
-                        >
-                          {loading ? (
-                            <>
-                              <CSpinner as="span" size="sm" aria-hidden="true" /> Submitting...
-                            </>
-                          ) : (
-                            'Submit'
-                          )}
-                        </CButton>
-                      </div>
-                    </CForm>
+                    <CategoryForm
+                      form={form}
+                      errors={errors}
+                      libraryOptions={libraryOptions}
+                      handleChange={handleChange}
+                      handleLibraryChange={handleLibraryChange}
+                      handleSubCategoryChange={handleSubCategoryChange}
+                      addSubCategory={addSubCategory}
+                      removeSubCategory={removeSubCategory}
+                      handleSubmit={handleSubmit}
+                      handlePrevious={handlePrevious}
+                      loading={loading}
+                    />
                   </CCardBody>
                 </CCard>
               </CCol>

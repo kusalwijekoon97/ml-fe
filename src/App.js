@@ -40,8 +40,7 @@ const App = () => {
           <div className="pt-3 text-center">
             <CSpinner color="primary" variant="grow" />
           </div>
-        }
-      >
+        }>
         <Routes>
           <Route path="*" name="Home" element={<DefaultLayout />} />
           <Route path="/" element={<Navigate to="/login" />} />
