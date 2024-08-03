@@ -5,6 +5,7 @@ import { CSpinner, useColorModes } from '@coreui/react';
 import './scss/style.scss';
 import IndexCategory from './views/pages/category/IndexCategory';
 import CreateCategory from './views/pages/category/createCategory';
+import EditCategory from './views/pages/category/editCategory';
 
 // Containers
 const DefaultLayout = React.lazy(() => import('./layout/DefaultLayout'));
@@ -52,6 +53,7 @@ const App = () => {
           {/* category */}
           <Route path="/categories" name="categories-all" element={<IndexCategory />} />
           <Route path="/categories/create" name="categories-create" element={<CreateCategory />} />
+          <Route path="/categories/:catid/edit" name="categories-edit" element={<EditCategory />} />
         </Routes>
       </Suspense>
     </Router>
