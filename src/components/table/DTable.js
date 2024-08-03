@@ -55,11 +55,11 @@ const DTable = ({ columns, data, handleEdit, handleDelete, handleChangeStatus })
               </CBadge>
             </CTableDataCell>
             <CTableDataCell>
-              <CButton className='me-1' color="primary" size="sm" onClick={() => handleEdit(item._id)}>
+              <CButton className='me-1' color="warning" size="sm" onClick={() => handleEdit(item._id)}>
                 <PencilSquare /> Edit
               </CButton>
-              <CButton className='me-1' color="warning" size="sm" onClick={() => handleChangeStatus(item._id)}>
-                <Eye /> Change Status
+              <CButton className='me-1' color="info" size="sm" onClick={() => handleChangeStatus(item._id)}>
+                <Eye /> Status
               </CButton>
 
               <CButton className='me-1' color="danger" size="sm" onClick={() => handleDelete(item._id)}>
