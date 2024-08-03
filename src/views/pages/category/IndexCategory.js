@@ -17,12 +17,13 @@ import CardHeaderWithTitleBtn from '../../../components/cards/CardHeaderWithTitl
 import TableHead from '../../../components/table/TableHead';
 import TableBody from '../../../components/table/TableBody';
 import ResponseAlert from '../../../components/notifications/ResponseAlert';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import alertify from 'alertifyjs';
 import 'alertifyjs/build/css/alertify.css';
 
 const IndexCategory = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [alert, setAlert] = useState({ visible: false, type: '', message: '' });
 
@@ -51,6 +52,7 @@ const IndexCategory = () => {
 
   const handleEdit = (id) => {
     console.log(`Edit category with id: ${id}`);
+    navigate(`/categories/${id}/edit`);
   };
 
   const handleDelete = (id) => {
