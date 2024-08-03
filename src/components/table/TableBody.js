@@ -1,5 +1,9 @@
 import React from 'react';
 import { CTableBody, CTableRow, CTableDataCell, CButton, CBadge } from '@coreui/react';
+import CIcon from '@coreui/icons-react';
+import { cilWarning } from '@coreui/icons';
+import { Eye, PencilSquare, Trash } from 'react-bootstrap-icons';
+
 
 const TableBody = ({ data, handleEdit, handleDelete, handleChangeStatus }) => {
   return (
@@ -17,23 +21,26 @@ const TableBody = ({ data, handleEdit, handleDelete, handleChangeStatus }) => {
                   ))}
                 </ul>
               ) : (
-                'No Subcategories'
+                <span className="d-flex align-items-center">
+                  <CIcon icon={cilWarning} className="me-2 text-warning" /> No Subcategories
+                </span>
               )}
             </CTableDataCell>
             <CTableDataCell className="text-center">
               <CBadge color={item.is_active ? 'success' : 'danger'}>
-                {item.is_active ? 'Active' : 'Inactive'}
+                {item.is_active ? 'active' : 'inactive'}
               </CBadge>
             </CTableDataCell>
             <CTableDataCell>
               <CButton color="primary" size="sm" onClick={() => handleEdit(item._id)}>
-                Edit
-              </CButton>{' '}
-              <CButton color="danger" size="sm" onClick={() => handleDelete(item._id)}>
-                Delete
+                <PencilSquare /> Edit
               </CButton>{' '}
               <CButton color="warning" size="sm" onClick={() => handleChangeStatus(item._id)}>
-                Change Status
+                <Eye /> Change Status
+              </CButton>
+              {' '}
+              <CButton color="danger" size="sm" onClick={() => handleDelete(item._id)}>
+                <Trash /> Delete
               </CButton>
             </CTableDataCell>
           </CTableRow>

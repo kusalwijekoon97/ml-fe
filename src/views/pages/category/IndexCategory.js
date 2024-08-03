@@ -18,13 +18,15 @@ import TableHead from '../../../components/table/TableHead';
 import TableBody from '../../../components/table/TableBody';
 import ResponseAlert from '../../../components/notifications/ResponseAlert';
 import { useLocation } from 'react-router-dom';
+import alertify from 'alertifyjs';
+import 'alertifyjs/build/css/alertify.css';
 
 const IndexCategory = () => {
   const location = useLocation();
   const [categories, setCategories] = useState([]);
   const [alert, setAlert] = useState({ visible: false, type: '', message: '' });
 
-  const columns = ["#", "Category Name", "Sub Categories","Active Status", "Actions"];
+  const columns = ["#", "Category Name", "Sub Categories", "Active Status", "Actions"];
 
   useEffect(() => {
     axios.get(`${base_url}/api/categories/main/all`)
@@ -52,13 +54,76 @@ const IndexCategory = () => {
   };
 
   const handleDelete = (id) => {
-    console.log(`Delete category with id: ${id}`);
+    alertify.confirm(
+      'Confirm Delete',
+      'Are you sure you want to delete this category?',
+      () => {
+        axios.post(`${base_url}/api/categories/main/delete/${id}`)
+          .then(response => {
+            // Remove the deleted category from the state
+            setCategories(categories.filter(category => category._id !== id));
+
+            // Show a success message
+            setAlert({
+              visible: true,
+              type: 'success',
+              message: 'Category deleted successfully!'
+            });
+          })
+          .catch(error => {
+            console.error('There was an error deleting the category!', error);
+
+            // Show an error message
+            setAlert({
+              visible: true,
+              type: 'failure',
+              message: 'Failed to delete the category. Please try again.'
+            });
+          });
+      },
+      () => {
+        // User clicked "Cancel" - no action needed
+      }
+    );
   };
 
   const handleChangeStatus = (id) => {
-    console.log(`Change status of category with id: ${id}`);
-  };
+    // Confirm the action using alertifyjs
+    alertify.confirm(
+      'Confirm Status Change',
+      'Are you sure you want to change the status of this category?',
+      () => {
+        // If confirmed, make the API call
+        axios.post(`${base_url}/api/categories/main/change-status/${id}`)
+          .then(response => {
+            // Update the category status in the state
+            setCategories(categories.map(category =>
+              category._id === id ? { ...category, is_active: !category.is_active } : category
+            ));
 
+            setAlert({
+              visible: true,
+              type: 'success',
+              message: 'Category status changed successfully!'
+            });
+          })
+          .catch(error => {
+            console.error('There was an error changing the category status!', error);
+
+            // Show an error message
+            setAlert({
+              visible: true,
+              type: 'failure',
+              message: 'Failed to change the category status. Please try again.'
+            });
+          });
+      },
+      () => {
+        // If cancelled, do nothing
+        alertify.message('Status change cancelled');
+      }
+    )
+  };
   return (
     <>
       <AppSidebar />
