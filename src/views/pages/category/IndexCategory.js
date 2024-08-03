@@ -1,3 +1,4 @@
+// src\views\pages\category\IndexCategory.js
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import {
@@ -6,15 +7,13 @@ import {
   CCol,
   CContainer,
   CRow,
-  CTable,
 } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
 import { cibAddthis } from '@coreui/icons';
 import { AppFooter, AppHeader, AppSidebar } from '../../../components';
 import base_url from "../../../utils/api/base_url";
 import CardHeaderWithTitleBtn from '../../../components/cards/CardHeaderWithTitleBtn';
-import TableHead from '../../../components/table/TableHead';
-import TableBody from '../../../components/table/TableBody';
+import DTable from '../../../components/table/DTable'; // Updated import
 import ResponseAlert from '../../../components/notifications/ResponseAlert';
 import { useLocation, useNavigate } from 'react-router-dom';
 import alertify from 'alertifyjs';
@@ -26,7 +25,7 @@ const IndexCategory = () => {
   const [categories, setCategories] = useState([]);
   const [alert, setAlert] = useState({ visible: false, type: '', message: '' });
 
-  const columns = ["#", "Category Name", "Sub Categories", "Active Status", "Actions"];
+  const columns = ["#", "Category Name", "Sub Categories", "Library", "Status", "Actions"];
 
   useEffect(() => {
     axios.get(`${base_url}/api/categories/main/all`)
@@ -134,15 +133,13 @@ const IndexCategory = () => {
                     linkTo="/categories/create"
                   />
                   <CCardBody>
-                    <CTable align="middle" className="mb-0 border" hover responsive>
-                      <TableHead columns={columns} />
-                      <TableBody
-                        data={categories}
-                        handleEdit={handleEdit}
-                        handleDelete={handleDelete}
-                        handleChangeStatus={handleChangeStatus}
-                      />
-                    </CTable>
+                    <DTable
+                      columns={columns}
+                      data={categories}
+                      handleEdit={handleEdit}
+                      handleDelete={handleDelete}
+                      handleChangeStatus={handleChangeStatus}
+                    />
                   </CCardBody>
                 </CCard>
               </CCol>
