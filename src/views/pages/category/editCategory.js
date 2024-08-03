@@ -1,6 +1,4 @@
-// src/views/pages/category/CreateCategory.js
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   CCard,
   CCardBody,
@@ -14,18 +12,19 @@ import { AppFooter, AppHeader, AppSidebar } from '../../../components';
 import CardHeaderWithTitleBtn from '../../../components/cards/CardHeaderWithTitleBtn';
 import CIcon from '@coreui/icons-react';
 import { cilList } from '@coreui/icons';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import base_url from "../../../utils/api/base_url";
 import ResponseAlert from '../../../components/notifications/ResponseAlert';
-import CategoryForm from '../../../components/forms/CategoryForm';
+import CategoryFormEdit from '../../../components/forms/CategoryFormEdit';
 
-const CreateCategory = () => {
+const EditCategory = () => {
   const navigate = useNavigate();
+  const { catid } = useParams(); // Get the category ID from the route parameters
 
   const [form, setForm] = useState({
     name: '',
     library: [],
-    subCategories: [{ id: Date.now(), name: '' }]
+    subCategories: []
   });
 
   const [loading, setLoading] = useState(false);
@@ -42,6 +41,35 @@ const CreateCategory = () => {
     { value: 'SI', label: 'SI' },
     { value: 'TA', label: 'TA' }
   ];
+
+  // Fetch category data when component mounts
+  useEffect(() => {
+    const fetchCategoryData = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(`${base_url}/api/categories/main/${catid}`);
+        setForm({
+          name: response.data.name,
+          library: response.data.library.map(lib => ({ value: lib, label: lib })),
+          subCategories: response.data.subCategories.map(subCat => ({
+            id: subCat._id,
+            name: subCat.name
+          }))
+        });
+        setLoading(false);
+      } catch (error) {
+        setLoading(false);
+        setAlert({
+          visible: true,
+          type: 'failure',
+          message: 'Failed to load category data. Please try again.'
+        });
+        console.error(error);
+      }
+    };
+
+    fetchCategoryData();
+  }, [catid]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -100,6 +128,7 @@ const CreateCategory = () => {
     return Object.keys(newErrors).length === 0 && (!newErrors.subCategories || newErrors.subCategories.length === 0);
   };
 
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -109,10 +138,13 @@ const CreateCategory = () => {
     const formattedForm = {
       ...form,
       library: form.library.map(option => option.value),
-      subCategories: form.subCategories.map(subCategory => subCategory.name)
+      subCategories: form.subCategories.map(subCategory => ({
+        _id: subCategory.id, // Include ID if it's an existing subcategory
+        name: subCategory.name
+      }))
     };
 
-    axios.post(`${base_url}/api/categories/main/store`, formattedForm)
+    axios.post(`${base_url}/api/categories/main/update/${catid}`, formattedForm)
       .then(response => {
         setLoading(false);
         navigate("/categories", {
@@ -120,7 +152,7 @@ const CreateCategory = () => {
             alert: {
               visible: true,
               type: 'success',
-              message: 'Category created successfully!'
+              message: 'Category updated successfully!'
             }
           }
         });
@@ -130,11 +162,12 @@ const CreateCategory = () => {
         setAlert({
           visible: true,
           type: 'failure',
-          message: 'Category creation failed. Please try again.'
+          message: 'Category update failed. Please try again.'
         });
         console.error(error);
       });
   };
+
 
   const handlePrevious = () => {
     navigate(-1);
@@ -158,13 +191,13 @@ const CreateCategory = () => {
                 <CCard className="mb-4 border-top-primary border-top-3">
                   <CardHeaderWithTitleBtn
                     title="Category"
-                    subtitle="create"
+                    subtitle="edit"
                     buttonIcon={<CIcon icon={cilList} />}
                     buttonText="Categories"
                     linkTo="/categories"
                   />
                   <CCardBody>
-                    <CategoryForm
+                    <CategoryFormEdit
                       form={form}
                       errors={errors}
                       libraryOptions={libraryOptions}
@@ -189,4 +222,4 @@ const CreateCategory = () => {
   );
 };
 
-export default CreateCategory;
+export default EditCategory;

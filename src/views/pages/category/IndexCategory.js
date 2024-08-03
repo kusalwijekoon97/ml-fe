@@ -1,4 +1,4 @@
-// src/views/pages/category/IndexCategory.js
+// src\views\pages\category\IndexCategory.js
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import {
@@ -7,24 +7,25 @@ import {
   CCol,
   CContainer,
   CRow,
-  CTable,
 } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
 import { cibAddthis } from '@coreui/icons';
 import { AppFooter, AppHeader, AppSidebar } from '../../../components';
 import base_url from "../../../utils/api/base_url";
 import CardHeaderWithTitleBtn from '../../../components/cards/CardHeaderWithTitleBtn';
-import TableHead from '../../../components/table/TableHead';
-import TableBody from '../../../components/table/TableBody';
+import DTable from '../../../components/table/DTable'; // Updated import
 import ResponseAlert from '../../../components/notifications/ResponseAlert';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import alertify from 'alertifyjs';
+import 'alertifyjs/build/css/alertify.css';
 
 const IndexCategory = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [alert, setAlert] = useState({ visible: false, type: '', message: '' });
 
-  const columns = ["#", "Category Name", "Active Status", "Actions"];
+  const columns = ["#", "Category Name", "Sub Categories", "Library", "Status", "Actions"];
 
   useEffect(() => {
     axios.get(`${base_url}/api/categories/main/all`)
@@ -41,22 +42,71 @@ const IndexCategory = () => {
   }, []);
 
   useEffect(() => {
-    // Retrieve the alert state from the location object if present
     if (location.state?.alert) {
       setAlert(location.state.alert);
     }
   }, [location.state]);
 
   const handleEdit = (id) => {
-    console.log(`Edit category with id: ${id}`);
+    navigate(`/categories/${id}/edit`);
   };
 
   const handleDelete = (id) => {
-    console.log(`Delete category with id: ${id}`);
+    alertify.confirm(
+      'Confirm Delete',
+      'Are you sure you want to delete this category?',
+      () => {
+        axios.post(`${base_url}/api/categories/main/delete/${id}`)
+          .then(response => {
+            setCategories(categories.filter(category => category._id !== id));
+            setAlert({
+              visible: true,
+              type: 'success',
+              message: 'Category deleted successfully!'
+            });
+          })
+          .catch(error => {
+            console.error('There was an error deleting the category!', error);
+            setAlert({
+              visible: true,
+              type: 'failure',
+              message: 'Failed to delete the category. Please try again.'
+            });
+          });
+      },
+      () => {}
+    );
   };
 
   const handleChangeStatus = (id) => {
-    console.log(`Change status of category with id: ${id}`);
+    alertify.confirm(
+      'Confirm Status Change',
+      'Are you sure you want to change the status of this category?',
+      () => {
+        axios.post(`${base_url}/api/categories/main/change-status/${id}`)
+          .then(response => {
+            setCategories(categories.map(category =>
+              category._id === id ? { ...category, is_active: !category.is_active } : category
+            ));
+            setAlert({
+              visible: true,
+              type: 'success',
+              message: 'Category status changed successfully!'
+            });
+          })
+          .catch(error => {
+            console.error('There was an error changing the category status!', error);
+            setAlert({
+              visible: true,
+              type: 'failure',
+              message: 'Failed to change the category status. Please try again.'
+            });
+          });
+      },
+      () => {
+        alertify.message('Status change cancelled');
+      }
+    )
   };
 
   return (
@@ -74,7 +124,7 @@ const IndexCategory = () => {
           <CContainer className="px-1" lg>
             <CRow>
               <CCol xs={12}>
-                <CCard className="mb-4  border-top-primary border-top-3">
+                <CCard className="mb-4 border-top-primary border-top-3">
                   <CardHeaderWithTitleBtn
                     title="Categories"
                     subtitle="List"
@@ -83,15 +133,13 @@ const IndexCategory = () => {
                     linkTo="/categories/create"
                   />
                   <CCardBody>
-                    <CTable align="middle" className="mb-0 border" hover responsive>
-                      <TableHead columns={columns} />
-                      <TableBody
-                        data={categories}
-                        handleEdit={handleEdit}
-                        handleDelete={handleDelete}
-                        handleChangeStatus={handleChangeStatus}
-                      />
-                    </CTable>
+                    <DTable
+                      columns={columns}
+                      data={categories}
+                      handleEdit={handleEdit}
+                      handleDelete={handleDelete}
+                      handleChangeStatus={handleChangeStatus}
+                    />
                   </CCardBody>
                 </CCard>
               </CCol>
