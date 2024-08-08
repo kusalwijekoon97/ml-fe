@@ -30,10 +30,10 @@ const IndexCategory = () => {
   useEffect(() => {
     axios.get(`${base_url}/api/categories/main/all`)
       .then(response => {
-        if (Array.isArray(response.data)) {
-          setCategories(response.data);
+        if (response.data && response.data.data && Array.isArray(response.data.data)) {
+          setCategories(response.data.data);
         } else {
-          console.error('API response is not an array', response.data);
+          console.error('API response is not in the expected format', response.data);
         }
       })
       .catch(error => {
