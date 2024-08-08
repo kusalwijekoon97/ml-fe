@@ -49,9 +49,9 @@ const EditCategory = () => {
         setLoading(true);
         const response = await axios.get(`${base_url}/api/categories/main/${catid}`);
         setForm({
-          name: response.data.name,
-          library: response.data.library.map(lib => ({ value: lib, label: lib })),
-          subCategories: response.data.subCategories.map(subCat => ({
+          name: response.data.data.name,
+          library: response.data.data.library.map(lib => ({ value: lib, label: lib })),
+          subCategories: response.data.data.subCategories.map(subCat => ({
             id: subCat._id,
             name: subCat.name
           }))
