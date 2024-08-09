@@ -13,7 +13,7 @@ import { cibAddthis } from '@coreui/icons';
 import { AppFooter, AppHeader, AppSidebar } from '../../../components';
 import base_url from "../../../utils/api/base_url";
 import CardHeaderWithTitleBtn from '../../../components/cards/CardHeaderWithTitleBtn';
-import DTable from '../../../components/table/DTable'; // Updated import
+import CategoriesTable from '../../../components/table/CategoriesTable'; // Updated import
 import ResponseAlert from '../../../components/notifications/ResponseAlert';
 import { useLocation, useNavigate } from 'react-router-dom';
 import alertify from 'alertifyjs';
@@ -133,7 +133,7 @@ const IndexCategory = () => {
                     linkTo="/categories/create"
                   />
                   <CCardBody>
-                    <DTable
+                    <CategoriesTable
                       columns={columns}
                       data={categories}
                       handleEdit={handleEdit}

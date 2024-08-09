@@ -1,5 +1,3 @@
-// src/views/pages/category/CreateAuthor.js
-
 import React, { useState } from 'react';
 import {
   CCard,
@@ -17,31 +15,55 @@ import { cilList } from '@coreui/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import base_url from "../../../utils/api/base_url";
 import ResponseAlert from '../../../components/notifications/ResponseAlert';
-import CategoryForm from '../../../components/forms/CategoryForm';
+import AuthorForm from '../../../components/forms/AuthorForm';
 
 const CreateAuthor = () => {
   const navigate = useNavigate();
 
+  const diedOptions = [
+    { value: '', label: 'Select...' },
+    { value: 'yes', label: 'Yes' },
+    { value: 'no', label: 'No' }
+  ];
+
+  // Handle change for the react-select component
+  const handleDiedChange = (selectedOption) => {
+    handleChange({
+      target: {
+        name: 'died',
+        value: selectedOption ? selectedOption.value : ''
+      }
+    });
+  };
+
   const [form, setForm] = useState({
-    name: '',
-    library: [],
-    subCategories: [{ id: Date.now(), name: '' }]
+    firstname: '',
+    lastname: '',
+    died: 'no',
+    penName: '',
+    nationality: '',
+    firstPublishDate: '',
+    description: '',
+    profileImage: null,
+    position: '',
+    income: ''
   });
 
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState({ visible: false, type: '', message: '' });
 
   const [errors, setErrors] = useState({
-    name: '',
-    library: '',
-    subCategories: []
+    firstname: '',
+    lastname: '',
+    died: '',
+    penName: '',
+    nationality: '',
+    firstPublishDate: '',
+    description: '',
+    profileImage: '',
+    position: '',
+    income: ''
   });
-
-  const libraryOptions = [
-    { value: 'EN', label: 'EN' },
-    { value: 'SI', label: 'SI' },
-    { value: 'TA', label: 'TA' }
-  ];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -49,55 +71,25 @@ const CreateAuthor = () => {
     setErrors({ ...errors, [name]: '' });
   };
 
-  const handleLibraryChange = (selectedOptions) => {
-    setForm({ ...form, library: selectedOptions });
-    setErrors({ ...errors, library: '' });
-  };
-
-  const handleSubCategoryChange = (index, event) => {
-    const newSubCategories = form.subCategories.map((subCategory, subIndex) => {
-      if (index === subIndex) {
-        return { ...subCategory, name: event.target.value };
-      }
-      return subCategory;
-    });
-    setForm({ ...form, subCategories: newSubCategories });
-  };
-
-  const addSubCategory = () => {
-    setForm({
-      ...form,
-      subCategories: [...form.subCategories, { id: Date.now(), name: '' }]
-    });
-  };
-
-  const removeSubCategory = (id) => {
-    setForm({
-      ...form,
-      subCategories: form.subCategories.filter(subCategory => subCategory.id !== id)
-    });
+  const handleFileChange = (e) => {
+    setForm({ ...form, profileImage: e.target.files[0] });
   };
 
   const validateForm = () => {
     const newErrors = {};
 
-    if (!form.name) {
-      newErrors.name = 'Category name is mandatory.';
-    }
-
-    if (form.library.length === 0) {
-      newErrors.library = 'Library is mandatory.';
-    }
-
-    form.subCategories.forEach((subCategory, index) => {
-      if (!subCategory.name) {
-        newErrors.subCategories = newErrors.subCategories || [];
-        newErrors.subCategories[index] = 'Sub category name is mandatory.';
-      }
-    });
+    if (!form.firstname) newErrors.firstname = 'First name is mandatory.';
+    if (!form.lastname) newErrors.lastname = 'Last name is mandatory.';
+    if (!form.penName) newErrors.penName = 'Pen name is mandatory.';
+    if (!form.nationality) newErrors.nationality = 'Nationality is mandatory.';
+    if (!form.firstPublishDate) newErrors.firstPublishDate = 'First publish date is mandatory.';
+    if (!form.description) newErrors.description = 'Description is mandatory.';
+    if (!form.profileImage) newErrors.profileImage = 'Profile image is mandatory.';
+    if (!form.position) newErrors.position = 'Position is mandatory.';
+    if (!form.income) newErrors.income = 'Income is mandatory.';
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0 && (!newErrors.subCategories || newErrors.subCategories.length === 0);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = (e) => {
@@ -106,34 +98,45 @@ const CreateAuthor = () => {
     if (!validateForm()) return;
 
     setLoading(true);
-    const formattedForm = {
-      ...form,
-      library: form.library.map(option => option.value),
-      subCategories: form.subCategories.map(subCategory => subCategory.name)
-    };
 
-    axios.post(`${base_url}/api/categories/main/store`, formattedForm)
-      .then(response => {
-        setLoading(false);
-        navigate("/categories", {
-          state: {
-            alert: {
-              visible: true,
-              type: 'success',
-              message: 'Category created successfully!'
-            }
+    const formData = new FormData();
+    formData.append('firstname', form.firstname);
+    formData.append('lastname', form.lastname);
+    formData.append('died', form.died);
+    formData.append('penName', form.penName);
+    formData.append('nationality', form.nationality);
+    formData.append('firstPublishDate', form.firstPublishDate);
+    formData.append('description', form.description);
+    formData.append('profileImage', form.profileImage);
+    formData.append('position', form.position);
+    formData.append('income', form.income);
+
+    axios.post(`${base_url}/api/authors/store`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+    .then(response => {
+      setLoading(false);
+      navigate("/authors", {
+        state: {
+          alert: {
+            visible: true,
+            type: 'success',
+            message: 'Author created successfully!'
           }
-        });
-      })
-      .catch(error => {
-        setLoading(false);
-        setAlert({
-          visible: true,
-          type: 'failure',
-          message: 'Category creation failed. Please try again.'
-        });
-        console.error(error);
+        }
       });
+    })
+    .catch(error => {
+      setLoading(false);
+      setAlert({
+        visible: true,
+        type: 'failure',
+        message: 'Author creation failed. Please try again.'
+      });
+      console.error(error);
+    });
   };
 
   const handlePrevious = () => {
@@ -144,7 +147,7 @@ const CreateAuthor = () => {
     <>
       <AppSidebar />
       <div className="wrapper d-flex flex-column min-vh-100">
-        <AppHeader title="Categories" />
+        <AppHeader title="Authors" />
         <div className="body flex-grow-1">
           <ResponseAlert
             visible={alert.visible}
@@ -157,22 +160,20 @@ const CreateAuthor = () => {
               <CCol xs={12}>
                 <CCard className="mb-4 border-top-primary border-top-3">
                   <CardHeaderWithTitleBtn
-                    title="Category"
+                    title="Author"
                     subtitle="create"
                     buttonIcon={<CIcon icon={cilList} />}
-                    buttonText="Categories"
-                    linkTo="/categories"
+                    buttonText="Authors"
+                    linkTo="/authors"
                   />
                   <CCardBody>
-                    <CategoryForm
+                    <AuthorForm
                       form={form}
                       errors={errors}
-                      libraryOptions={libraryOptions}
+                      diedOptions={diedOptions}
+                      handleDiedChange={handleDiedChange}
                       handleChange={handleChange}
-                      handleLibraryChange={handleLibraryChange}
-                      handleSubCategoryChange={handleSubCategoryChange}
-                      addSubCategory={addSubCategory}
-                      removeSubCategory={removeSubCategory}
+                      handleFileChange={handleFileChange}
                       handleSubmit={handleSubmit}
                       handlePrevious={handlePrevious}
                       loading={loading}

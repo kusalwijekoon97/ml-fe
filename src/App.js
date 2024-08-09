@@ -60,7 +60,7 @@ const App = () => {
           {/* author */}
           <Route path="/authors" name="authors-all" element={<IndexAuthor />} />
           <Route path="/authors/create" name="authors-create" element={<CreateAuthor />} />
-          <Route path="/authors/:autid/edit" name="authors-edit" element={<EditAuthor />} />
+          <Route path="/authors/:authorId/edit" name="authors-edit" element={<EditAuthor />} />
         </Routes>
       </Suspense>
     </Router>

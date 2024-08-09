@@ -19,7 +19,7 @@ import CategoryFormEdit from '../../../components/forms/CategoryFormEdit';
 
 const EditCategory = () => {
   const navigate = useNavigate();
-  const { catid } = useParams(); // Get the category ID from the route parameters
+  const { catid } = useParams();
 
   const [form, setForm] = useState({
     name: '',

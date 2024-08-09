@@ -15,46 +15,62 @@ import { cilList } from '@coreui/icons';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import base_url from "../../../utils/api/base_url";
 import ResponseAlert from '../../../components/notifications/ResponseAlert';
-import CategoryFormEdit from '../../../components/forms/CategoryFormEdit';
+import AuthorFormEdit from '../../../components/forms/AuthorFormEdit';
 
 const EditAuthor = () => {
   const navigate = useNavigate();
-  const { catid } = useParams(); // Get the category ID from the route parameters
+  const { authorId } = useParams();
+
+  const diedOptions = [
+    { value: 'yes', label: 'Yes' },
+    { value: 'no', label: 'No' }
+  ];
 
   const [form, setForm] = useState({
-    name: '',
-    library: [],
-    subCategories: []
+    firstname: '',
+    lastname: '',
+    died: '',
+    penName: '',
+    nationality: '',
+    firstPublishDate: '',
+    description: '',
+    profileImage: null,
+    position: '',
+    income: ''
   });
 
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState({ visible: false, type: '', message: '' });
 
   const [errors, setErrors] = useState({
-    name: '',
-    library: '',
-    subCategories: []
+    firstname: '',
+    lastname: '',
+    died: '',
+    penName: '',
+    nationality: '',
+    firstPublishDate: '',
+    description: '',
+    profileImage: '',
+    position: '',
+    income: ''
   });
 
-  const libraryOptions = [
-    { value: 'EN', label: 'EN' },
-    { value: 'SI', label: 'SI' },
-    { value: 'TA', label: 'TA' }
-  ];
-
-  // Fetch category data when component mounts
   useEffect(() => {
-    const fetchCategoryData = async () => {
+    const fetchAuthorData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${base_url}/api/categories/main/${catid}`);
+        const response = await axios.get(`${base_url}/api/authors/${authorId}`);
+        const data = response.data.data;
         setForm({
-          name: response.data.data.name,
-          library: response.data.data.library.map(lib => ({ value: lib, label: lib })),
-          subCategories: response.data.data.subCategories.map(subCat => ({
-            id: subCat._id,
-            name: subCat.name
-          }))
+          firstname: data.firstname,
+          lastname: data.lastname,
+          died: data.died,
+          penName: data.penName,
+          nationality: data.nationality,
+          firstPublishDate: data.firstPublishDate,
+          description: data.description,
+          position: data.position,
+          income: data.income
         });
         setLoading(false);
       } catch (error) {
@@ -62,14 +78,14 @@ const EditAuthor = () => {
         setAlert({
           visible: true,
           type: 'failure',
-          message: 'Failed to load category data. Please try again.'
+          message: 'Failed to load author data. Please try again.'
         });
         console.error(error);
       }
     };
 
-    fetchCategoryData();
-  }, [catid]);
+    fetchAuthorData();
+  }, [authorId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -77,57 +93,35 @@ const EditAuthor = () => {
     setErrors({ ...errors, [name]: '' });
   };
 
-  const handleLibraryChange = (selectedOptions) => {
-    setForm({ ...form, library: selectedOptions });
-    setErrors({ ...errors, library: '' });
+  const handleFileChange = (e) => {
+    setForm({ ...form, profileImage: e.target.files[0] });
   };
 
-  const handleSubCategoryChange = (index, event) => {
-    const newSubCategories = form.subCategories.map((subCategory, subIndex) => {
-      if (index === subIndex) {
-        return { ...subCategory, name: event.target.value };
+  const handleDiedChange = (selectedOption) => {
+    handleChange({
+      target: {
+        name: 'died',
+        value: selectedOption ? selectedOption.value : ''
       }
-      return subCategory;
-    });
-    setForm({ ...form, subCategories: newSubCategories });
-  };
-
-  const addSubCategory = () => {
-    setForm({
-      ...form,
-      subCategories: [...form.subCategories, { id: Date.now(), name: '' }]
-    });
-  };
-
-  const removeSubCategory = (id) => {
-    setForm({
-      ...form,
-      subCategories: form.subCategories.filter(subCategory => subCategory.id !== id)
     });
   };
 
   const validateForm = () => {
     const newErrors = {};
 
-    if (!form.name) {
-      newErrors.name = 'Category name is mandatory.';
-    }
-
-    if (form.library.length === 0) {
-      newErrors.library = 'Library is mandatory.';
-    }
-
-    form.subCategories.forEach((subCategory, index) => {
-      if (!subCategory.name) {
-        newErrors.subCategories = newErrors.subCategories || [];
-        newErrors.subCategories[index] = 'Sub category name is mandatory.';
-      }
-    });
+    if (!form.firstname) newErrors.firstname = 'First name is mandatory.';
+    if (!form.lastname) newErrors.lastname = 'Last name is mandatory.';
+    if (!form.penName) newErrors.penName = 'Pen name is mandatory.';
+    if (!form.nationality) newErrors.nationality = 'Nationality is mandatory.';
+    if (!form.firstPublishDate) newErrors.firstPublishDate = 'First publish date is mandatory.';
+    if (!form.description) newErrors.description = 'Description is mandatory.';
+    // if (!form.profileImage && !form.profileImage) newErrors.profileImage = 'Profile image is mandatory.';
+    if (!form.position) newErrors.position = 'Position is mandatory.';
+    if (!form.income) newErrors.income = 'Income is mandatory.';
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0 && (!newErrors.subCategories || newErrors.subCategories.length === 0);
+    return Object.keys(newErrors).length === 0;
   };
-
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -135,24 +129,32 @@ const EditAuthor = () => {
     if (!validateForm()) return;
 
     setLoading(true);
-    const formattedForm = {
-      ...form,
-      library: form.library.map(option => option.value),
-      subCategories: form.subCategories.map(subCategory => ({
-        _id: subCategory.id, // Include ID if it's an existing subcategory
-        name: subCategory.name
-      }))
-    };
 
-    axios.post(`${base_url}/api/categories/main/update/${catid}`, formattedForm)
+    const formData = new FormData();
+    formData.append('firstname', form.firstname);
+    formData.append('lastname', form.lastname);
+    formData.append('died', form.died);
+    formData.append('penName', form.penName);
+    formData.append('nationality', form.nationality);
+    formData.append('firstPublishDate', form.firstPublishDate);
+    formData.append('description', form.description);
+    if (form.profileImage) formData.append('profileImage', form.profileImage);
+    formData.append('position', form.position);
+    formData.append('income', form.income);
+
+    axios.post(`${base_url}/api/authors/update/${authorId}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
       .then(response => {
         setLoading(false);
-        navigate("/categories", {
+        navigate("/authors", {
           state: {
             alert: {
               visible: true,
               type: 'success',
-              message: 'Category updated successfully!'
+              message: 'Author updated successfully!'
             }
           }
         });
@@ -162,12 +164,11 @@ const EditAuthor = () => {
         setAlert({
           visible: true,
           type: 'failure',
-          message: 'Category update failed. Please try again.'
+          message: 'Author update failed. Please try again.'
         });
         console.error(error);
       });
   };
-
 
   const handlePrevious = () => {
     navigate(-1);
@@ -177,7 +178,7 @@ const EditAuthor = () => {
     <>
       <AppSidebar />
       <div className="wrapper d-flex flex-column min-vh-100">
-        <AppHeader title="Categories" />
+        <AppHeader title="Authors" />
         <div className="body flex-grow-1">
           <ResponseAlert
             visible={alert.visible}
@@ -190,22 +191,20 @@ const EditAuthor = () => {
               <CCol xs={12}>
                 <CCard className="mb-4 border-top-primary border-top-3">
                   <CardHeaderWithTitleBtn
-                    title="Category"
+                    title="Author"
                     subtitle="edit"
                     buttonIcon={<CIcon icon={cilList} />}
-                    buttonText="Categories"
-                    linkTo="/categories"
+                    buttonText="Authors"
+                    linkTo="/authors"
                   />
                   <CCardBody>
-                    <CategoryFormEdit
+                    <AuthorFormEdit
                       form={form}
                       errors={errors}
-                      libraryOptions={libraryOptions}
+                      diedOptions={diedOptions}
+                      handleDiedChange={handleDiedChange}
                       handleChange={handleChange}
-                      handleLibraryChange={handleLibraryChange}
-                      handleSubCategoryChange={handleSubCategoryChange}
-                      addSubCategory={addSubCategory}
-                      removeSubCategory={removeSubCategory}
+                      handleFileChange={handleFileChange}
                       handleSubmit={handleSubmit}
                       handlePrevious={handlePrevious}
                       loading={loading}

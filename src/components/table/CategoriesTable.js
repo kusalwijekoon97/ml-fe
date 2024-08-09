@@ -6,7 +6,7 @@ import { cilWarning } from '@coreui/icons';
 import { Eye, PencilSquare, Trash } from 'react-bootstrap-icons';
 import alertify from 'alertifyjs';
 
-const DTable = ({ columns, data, handleEdit, handleDelete, handleChangeStatus }) => {
+const CategoriesTable = ({ columns, data, handleEdit, handleDelete, handleChangeStatus }) => {
   return (
     <CTable align="middle" className="mb-0 border" hover responsive>
       <CTableHead className="text-nowrap">
@@ -73,4 +73,4 @@ const DTable = ({ columns, data, handleEdit, handleDelete, handleChangeStatus })
   );
 };
 
-export default DTable;
+export default CategoriesTable;
