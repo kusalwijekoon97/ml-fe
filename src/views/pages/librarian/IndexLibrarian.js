@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { CCard, CCardBody, CCardFooter, CCol, CContainer, CFormInput, CInputGroup, CInputGroupText, CPagination, CPaginationItem, CRow } from '@coreui/react';
-import {CIcon } from '@coreui/icons-react';
+import { CIcon } from '@coreui/icons-react';
 import { cibAddthis, cilSearch } from '@coreui/icons';
 import { AppFooter, AppHeader, AppSidebar } from '../../../components';
 import base_url from "../../../utils/api/base_url";
@@ -151,19 +151,19 @@ const IndexLibrarian = () => {
                   <CCardBody>
                     <CRow className='mb-2'>
                       <CCol xs={4}>
-                      <CInputGroup>
-    <CInputGroupText>
-      <CIcon icon={cilSearch} />
-      </CInputGroupText>
-    <CFormInput
-                          type="text"
-                          id="_search"
-                          name="_search"
-                          placeholder="Search here..."
-                          value={search}
-                          onChange={handleSearchChange}
-                        />
-  </CInputGroup>
+                        <CInputGroup>
+                          <CInputGroupText>
+                            <CIcon icon={cilSearch} />
+                          </CInputGroupText>
+                          <CFormInput
+                            type="text"
+                            id="_search"
+                            name="_search"
+                            placeholder="Search here..."
+                            value={search}
+                            onChange={handleSearchChange}
+                          />
+                        </CInputGroup>
                       </CCol>
                     </CRow>
                     <LibrariansTable
