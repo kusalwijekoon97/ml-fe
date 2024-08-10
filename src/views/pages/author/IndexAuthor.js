@@ -1,64 +1,49 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import {
-  CCard,
-  CCardBody,
-  CCol,
-  CContainer,
-  CRow,
-  CPagination,
-  CPaginationItem,
-  CInputGroup,
-  CFormInput,
-  CButton,
-  CInputGroupText,
-} from '@coreui/react';
+import { CCard, CCardBody, CCol, CContainer, CInputGroup, CInputGroupText, CFormInput, CPagination, CPaginationItem, CRow } from '@coreui/react';
 import { CIcon } from '@coreui/icons-react';
 import { cibAddthis, cilSearch } from '@coreui/icons';
 import { AppFooter, AppHeader, AppSidebar } from '../../../components';
 import base_url from "../../../utils/api/base_url";
 import CardHeaderWithTitleBtn from '../../../components/cards/CardHeaderWithTitleBtn';
-import CategoriesTable from '../../../components/table/CategoriesTable';
+import AuthorsTable from '../../../components/table/AuthorsTable';
 import ResponseAlert from '../../../components/notifications/ResponseAlert';
 import { useLocation, useNavigate } from 'react-router-dom';
 import alertify from 'alertifyjs';
 import 'alertifyjs/build/css/alertify.css';
 
-const IndexCategory = () => {
+const IndexAuthor = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [categories, setCategories] = useState([]);
+  const [authors, setAuthors] = useState([]);
   const [alert, setAlert] = useState({ visible: false, type: '', message: '' });
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [search, setSearch] = useState('');
 
-  const columns = ["#", "Category Name", "Sub Categories", "Library", "Status", "Actions"];
+  const columns = ["#", "Name", "Pen Name", "Nationality", "Income", "First Published", "Position", "Status", "Actions"];
 
-  const fetchCategories = (page = 1, search = '') => {
-    axios.get(`${base_url}/api/categories/main/all`, {
+  useEffect(() => {
+    axios.get(`${base_url}/api/authors/all`, {
       params: {
-        page,
-        search,
-      },
+        page: currentPage,
+        limit: itemsPerPage,
+        search: search,
+      }
     })
       .then(response => {
         if (response.data && response.data.data && Array.isArray(response.data.data)) {
-          setCategories(response.data.data);
+          setAuthors(response.data.data);
           setTotalPages(response.data.totalPages);
-          setCurrentPage(response.data.currentPage);
         } else {
           console.error('API response is not in the expected format', response.data);
         }
       })
       .catch(error => {
-        console.error('There was an error fetching the categories!', error);
+        console.error('There was an error fetching the authors!', error);
       });
-  };
-
-  useEffect(() => {
-    fetchCategories(currentPage, search);
-  }, [currentPage, search]);
+  }, [currentPage, itemsPerPage, search]);
 
   useEffect(() => {
     if (location.state?.alert) {
@@ -67,29 +52,29 @@ const IndexCategory = () => {
   }, [location.state]);
 
   const handleEdit = (id) => {
-    navigate(`/categories/${id}/edit`);
+    navigate(`/authors/${id}/edit`);
   };
 
   const handleDelete = (id) => {
     alertify.confirm(
       'Confirm Delete',
-      'Are you sure you want to delete this category?',
+      'Are you sure you want to delete this author?',
       () => {
-        axios.post(`${base_url}/api/categories/main/delete/${id}`)
+        axios.post(`${base_url}/api/authors/delete/${id}`)
           .then(response => {
-            setCategories(categories.filter(category => category._id !== id));
+            setAuthors(authors.filter(author => author._id !== id));
             setAlert({
               visible: true,
               type: 'success',
-              message: 'Category deleted successfully!'
+              message: 'Author deleted successfully!'
             });
           })
           .catch(error => {
-            console.error('There was an error deleting the category!', error);
+            console.error('There was an error deleting the author!', error);
             setAlert({
               visible: true,
               type: 'failure',
-              message: 'Failed to delete the category. Please try again.'
+              message: 'Failed to delete the author. Please try again.'
             });
           });
       },
@@ -100,25 +85,25 @@ const IndexCategory = () => {
   const handleChangeStatus = (id) => {
     alertify.confirm(
       'Confirm Status Change',
-      'Are you sure you want to change the status of this category?',
+      'Are you sure you want to change the status of this author?',
       () => {
-        axios.post(`${base_url}/api/categories/main/change-status/${id}`)
+        axios.post(`${base_url}/api/authors/change-status/${id}`)
           .then(response => {
-            setCategories(categories.map(category =>
-              category._id === id ? { ...category, is_active: !category.is_active } : category
+            setAuthors(authors.map(author =>
+              author._id === id ? { ...author, is_active: !author.is_active } : author
             ));
             setAlert({
               visible: true,
               type: 'success',
-              message: 'Category status changed successfully!'
+              message: 'Author status changed successfully!'
             });
           })
           .catch(error => {
-            console.error('There was an error changing the category status!', error);
+            console.error('There was an error changing the author status!', error);
             setAlert({
               visible: true,
               type: 'failure',
-              message: 'Failed to change the category status. Please try again.'
+              message: 'Failed to change the author status. Please try again.'
             });
           });
       },
@@ -128,22 +113,20 @@ const IndexCategory = () => {
     )
   };
 
-  const handlePageChange = (page) => {
-    if (page !== currentPage) {
-      setCurrentPage(page);
-    }
+  const handleSearchChange = (event) => {
+    setSearch(event.target.value);
+    setCurrentPage(1);  // Reset to the first page when a new search is initiated
   };
 
-  const handleSearchChange = (e) => {
-    e.preventDefault();
-    setSearch(e.target.value);
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
   };
 
   return (
     <>
       <AppSidebar />
       <div className="wrapper d-flex flex-column min-vh-100">
-        <AppHeader title="Categories" />
+        <AppHeader title="Authors" />
         <div className="body flex-grow-1">
           <ResponseAlert
             visible={alert.visible}
@@ -156,14 +139,14 @@ const IndexCategory = () => {
               <CCol xs={12}>
                 <CCard className="mb-4 border-top-primary border-top-3">
                   <CardHeaderWithTitleBtn
-                    title="Categories"
+                    title="Authors"
                     subtitle="List"
                     buttonIcon={<CIcon icon={cibAddthis} />}
-                    buttonText="Category"
-                    linkTo="/categories/create"
+                    buttonText="Add Author"
+                    linkTo="/authors/create"
                   />
                   <CCardBody>
-                  <CRow className='mb-2'>
+                    <CRow className='mb-2'>
                       <CCol xs={4}>
                         <CInputGroup>
                           <CInputGroupText>
@@ -180,9 +163,9 @@ const IndexCategory = () => {
                         </CInputGroup>
                       </CCol>
                     </CRow>
-                    <CategoriesTable
+                    <AuthorsTable
                       columns={columns}
-                      data={categories}
+                      data={authors}
                       handleEdit={handleEdit}
                       handleDelete={handleDelete}
                       handleChangeStatus={handleChangeStatus}
@@ -224,4 +207,4 @@ const IndexCategory = () => {
   );
 };
 
-export default IndexCategory;
+export default IndexAuthor;

@@ -6,6 +6,12 @@ import './scss/style.scss';
 import IndexCategory from './views/pages/category/IndexCategory';
 import CreateCategory from './views/pages/category/createCategory';
 import EditCategory from './views/pages/category/editCategory';
+import IndexAuthor from './views/pages/author/IndexAuthor';
+import CreateAuthor from './views/pages/author/createAuthor';
+import EditAuthor from './views/pages/author/editAuthor';
+import IndexLibrarian from './views/pages/librarian/IndexLibrarian';
+import CreateLibrarian from './views/pages/librarian/createLibrarian';
+import EditLibrarian from './views/pages/librarian/editLibrarian';
 
 // Containers
 const DefaultLayout = React.lazy(() => import('./layout/DefaultLayout'));
@@ -54,6 +60,14 @@ const App = () => {
           <Route path="/categories" name="categories-all" element={<IndexCategory />} />
           <Route path="/categories/create" name="categories-create" element={<CreateCategory />} />
           <Route path="/categories/:catid/edit" name="categories-edit" element={<EditCategory />} />
+          {/* author */}
+          <Route path="/authors" name="authors-all" element={<IndexAuthor />} />
+          <Route path="/authors/create" name="authors-create" element={<CreateAuthor />} />
+          <Route path="/authors/:authorId/edit" name="authors-edit" element={<EditAuthor />} />
+          {/* librarian */}
+          <Route path="/librarians" name="librarians-all" element={<IndexLibrarian />} />
+          <Route path="/librarians/create" name="librarians-create" element={<CreateLibrarian />} />
+          <Route path="/librarians/:librarianId/edit" name="librarians-edit" element={<EditLibrarian />} />
         </Routes>
       </Suspense>
     </Router>
