@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { CCard, CCardBody, CCol, CContainer, CRow } from '@coreui/react';
+import { CCard, CCardBody, CCardFooter, CCol, CContainer, CPagination, CPaginationItem, CRow } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
 import { cibAddthis } from '@coreui/icons';
 import { AppFooter, AppHeader, AppSidebar } from '../../../components';
@@ -17,24 +17,34 @@ const IndexLibrarian = () => {
   const navigate = useNavigate();
   const [librarians, setLibrarians] = useState([]);
   const [alert, setAlert] = useState({ visible: false, type: '', message: '' });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const columns = ["#", "Name", "NIC", "Address", "Phone", "Email", "Status", "Actions"];
 
   useEffect(() => {
-    axios.get(`${base_url}/api/librarians/all`)
-      .then(response => {
-        if (response.data && response.data.data && Array.isArray(response.data.data)) {
-          // Exclude the restrictions field from the data
-          const filteredLibrarians = response.data.data.map(({ restrictions, ...rest }) => rest);
-          setLibrarians(filteredLibrarians);
-        } else {
-          console.error('API response is not in the expected format', response.data);
-        }
-      })
-      .catch(error => {
-        console.error('There was an error fetching the librarians!', error);
-      });
-  }, []);
+    // Fetch librarians with pagination
+    axios.get(`${base_url}/api/librarians/all`, {
+      params: {
+        page: currentPage,
+        limit: itemsPerPage
+      }
+    })
+    .then(response => {
+      if (response.data && response.data.data && Array.isArray(response.data.data)) {
+        // Exclude the restrictions field from the data
+        const filteredLibrarians = response.data.data.map(({ restrictions, ...rest }) => rest);
+        setLibrarians(filteredLibrarians);
+        setTotalPages(response.data.totalPages);
+      } else {
+        console.error('API response is not in the expected format', response.data);
+      }
+    })
+    .catch(error => {
+      console.error('There was an error fetching the librarians!', error);
+    });
+  }, [currentPage, itemsPerPage]);
 
   useEffect(() => {
     if (location.state?.alert) {
@@ -101,7 +111,11 @@ const IndexLibrarian = () => {
       () => {
         alertify.message('Status change cancelled');
       }
-    )
+    );
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
   };
 
   return (
@@ -136,6 +150,35 @@ const IndexLibrarian = () => {
                       handleChangeStatus={handleChangeStatus}
                     />
                   </CCardBody>
+                  <CCardFooter>
+                    <div className='d-flex justify-content-end'>
+                      <CPagination aria-label="Page navigation example">
+                        <CPaginationItem
+                          aria-label="Previous"
+                          onClick={() => handlePageChange(currentPage - 1)}
+                          disabled={currentPage === 1}
+                        >
+                          <span aria-hidden="true">&laquo;</span>
+                        </CPaginationItem>
+                        {[...Array(totalPages)].map((_, index) => (
+                          <CPaginationItem
+                            key={index + 1}
+                            onClick={() => handlePageChange(index + 1)}
+                            active={currentPage === index + 1}
+                          >
+                            {index + 1}
+                          </CPaginationItem>
+                        ))}
+                        <CPaginationItem
+                          aria-label="Next"
+                          onClick={() => handlePageChange(currentPage + 1)}
+                          disabled={currentPage === totalPages}
+                        >
+                          <span aria-hidden="true">&raquo;</span>
+                        </CPaginationItem>
+                      </CPagination>
+                    </div>
+                  </CCardFooter>
                 </CCard>
               </CCol>
             </CRow>
