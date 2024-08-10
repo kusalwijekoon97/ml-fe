@@ -122,7 +122,7 @@ const IndexLibrarian = () => {
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
-    setCurrentPage(1); // Reset to the first page when search changes
+    setCurrentPage(1);
   };
 
   return (
