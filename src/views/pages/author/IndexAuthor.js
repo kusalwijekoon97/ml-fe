@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { CCard, CCardBody, CCol, CContainer, CRow } from '@coreui/react';
-import CIcon from '@coreui/icons-react';
-import { cibAddthis } from '@coreui/icons';
+import { CCard, CCardBody, CCol, CContainer, CInputGroup, CInputGroupText, CFormInput, CPagination, CPaginationItem, CRow } from '@coreui/react';
+import { CIcon } from '@coreui/icons-react';
+import { cibAddthis, cilSearch } from '@coreui/icons';
 import { AppFooter, AppHeader, AppSidebar } from '../../../components';
 import base_url from "../../../utils/api/base_url";
 import CardHeaderWithTitleBtn from '../../../components/cards/CardHeaderWithTitleBtn';
-import AuthorsTable from '../../../components/table/AuthorsTable'; // Updated import
+import AuthorsTable from '../../../components/table/AuthorsTable';
 import ResponseAlert from '../../../components/notifications/ResponseAlert';
 import { useLocation, useNavigate } from 'react-router-dom';
 import alertify from 'alertifyjs';
@@ -17,14 +17,25 @@ const IndexAuthor = () => {
   const navigate = useNavigate();
   const [authors, setAuthors] = useState([]);
   const [alert, setAlert] = useState({ visible: false, type: '', message: '' });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [search, setSearch] = useState('');
 
   const columns = ["#", "Name", "Pen Name", "Nationality", "Income", "First Published", "Position", "Status", "Actions"];
 
   useEffect(() => {
-    axios.get(`${base_url}/api/authors/all`)
+    axios.get(`${base_url}/api/authors/all`, {
+      params: {
+        page: currentPage,
+        limit: itemsPerPage,
+        search: search,
+      }
+    })
       .then(response => {
         if (response.data && response.data.data && Array.isArray(response.data.data)) {
           setAuthors(response.data.data);
+          setTotalPages(response.data.totalPages);
         } else {
           console.error('API response is not in the expected format', response.data);
         }
@@ -32,7 +43,7 @@ const IndexAuthor = () => {
       .catch(error => {
         console.error('There was an error fetching the authors!', error);
       });
-  }, []);
+  }, [currentPage, itemsPerPage, search]);
 
   useEffect(() => {
     if (location.state?.alert) {
@@ -102,6 +113,15 @@ const IndexAuthor = () => {
     )
   };
 
+  const handleSearchChange = (event) => {
+    setSearch(event.target.value);
+    setCurrentPage(1);  // Reset to the first page when a new search is initiated
+  };
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+
   return (
     <>
       <AppSidebar />
@@ -126,6 +146,23 @@ const IndexAuthor = () => {
                     linkTo="/authors/create"
                   />
                   <CCardBody>
+                    <CRow className='mb-2'>
+                      <CCol xs={4}>
+                        <CInputGroup>
+                          <CInputGroupText>
+                            <CIcon icon={cilSearch} />
+                          </CInputGroupText>
+                          <CFormInput
+                            type="text"
+                            id="_search"
+                            name="_search"
+                            placeholder="Search here..."
+                            value={search}
+                            onChange={handleSearchChange}
+                          />
+                        </CInputGroup>
+                      </CCol>
+                    </CRow>
                     <AuthorsTable
                       columns={columns}
                       data={authors}
@@ -133,6 +170,31 @@ const IndexAuthor = () => {
                       handleDelete={handleDelete}
                       handleChangeStatus={handleChangeStatus}
                     />
+                    <CPagination className='d-flex justify-content-end mt-2'>
+                      <CPaginationItem
+                        aria-label="Previous"
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                      >
+                        &laquo;
+                      </CPaginationItem>
+                      {[...Array(totalPages)].map((_, index) => (
+                        <CPaginationItem
+                          key={index + 1}
+                          active={index + 1 === currentPage}
+                          onClick={() => handlePageChange(index + 1)}
+                        >
+                          {index + 1}
+                        </CPaginationItem>
+                      ))}
+                      <CPaginationItem
+                        aria-label="Next"
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                      >
+                        &raquo;
+                      </CPaginationItem>
+                    </CPagination>
                   </CCardBody>
                 </CCard>
               </CCol>

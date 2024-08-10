@@ -1,4 +1,3 @@
-// src\views\pages\category\IndexCategory.js
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import {
@@ -7,13 +6,19 @@ import {
   CCol,
   CContainer,
   CRow,
+  CPagination,
+  CPaginationItem,
+  CInputGroup,
+  CFormInput,
+  CButton,
+  CInputGroupText,
 } from '@coreui/react';
-import CIcon from '@coreui/icons-react';
-import { cibAddthis } from '@coreui/icons';
+import { CIcon } from '@coreui/icons-react';
+import { cibAddthis, cilSearch } from '@coreui/icons';
 import { AppFooter, AppHeader, AppSidebar } from '../../../components';
 import base_url from "../../../utils/api/base_url";
 import CardHeaderWithTitleBtn from '../../../components/cards/CardHeaderWithTitleBtn';
-import CategoriesTable from '../../../components/table/CategoriesTable'; // Updated import
+import CategoriesTable from '../../../components/table/CategoriesTable';
 import ResponseAlert from '../../../components/notifications/ResponseAlert';
 import { useLocation, useNavigate } from 'react-router-dom';
 import alertify from 'alertifyjs';
@@ -24,14 +29,24 @@ const IndexCategory = () => {
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [alert, setAlert] = useState({ visible: false, type: '', message: '' });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [search, setSearch] = useState('');
 
   const columns = ["#", "Category Name", "Sub Categories", "Library", "Status", "Actions"];
 
-  useEffect(() => {
-    axios.get(`${base_url}/api/categories/main/all`)
+  const fetchCategories = (page = 1, search = '') => {
+    axios.get(`${base_url}/api/categories/main/all`, {
+      params: {
+        page,
+        search,
+      },
+    })
       .then(response => {
         if (response.data && response.data.data && Array.isArray(response.data.data)) {
           setCategories(response.data.data);
+          setTotalPages(response.data.totalPages);
+          setCurrentPage(response.data.currentPage);
         } else {
           console.error('API response is not in the expected format', response.data);
         }
@@ -39,7 +54,11 @@ const IndexCategory = () => {
       .catch(error => {
         console.error('There was an error fetching the categories!', error);
       });
-  }, []);
+  };
+
+  useEffect(() => {
+    fetchCategories(currentPage, search);
+  }, [currentPage, search]);
 
   useEffect(() => {
     if (location.state?.alert) {
@@ -74,7 +93,7 @@ const IndexCategory = () => {
             });
           });
       },
-      () => {}
+      () => { }
     );
   };
 
@@ -109,6 +128,17 @@ const IndexCategory = () => {
     )
   };
 
+  const handlePageChange = (page) => {
+    if (page !== currentPage) {
+      setCurrentPage(page);
+    }
+  };
+
+  const handleSearchChange = (e) => {
+    e.preventDefault();
+    setSearch(e.target.value);
+  };
+
   return (
     <>
       <AppSidebar />
@@ -133,6 +163,23 @@ const IndexCategory = () => {
                     linkTo="/categories/create"
                   />
                   <CCardBody>
+                  <CRow className='mb-2'>
+                      <CCol xs={4}>
+                        <CInputGroup>
+                          <CInputGroupText>
+                            <CIcon icon={cilSearch} />
+                          </CInputGroupText>
+                          <CFormInput
+                            type="text"
+                            id="_search"
+                            name="_search"
+                            placeholder="Search here..."
+                            value={search}
+                            onChange={handleSearchChange}
+                          />
+                        </CInputGroup>
+                      </CCol>
+                    </CRow>
                     <CategoriesTable
                       columns={columns}
                       data={categories}
@@ -140,6 +187,31 @@ const IndexCategory = () => {
                       handleDelete={handleDelete}
                       handleChangeStatus={handleChangeStatus}
                     />
+                    <CPagination className='d-flex justify-content-end mt-2'>
+                      <CPaginationItem
+                        aria-label="Previous"
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                      >
+                        &laquo;
+                      </CPaginationItem>
+                      {[...Array(totalPages)].map((_, index) => (
+                        <CPaginationItem
+                          key={index + 1}
+                          active={index + 1 === currentPage}
+                          onClick={() => handlePageChange(index + 1)}
+                        >
+                          {index + 1}
+                        </CPaginationItem>
+                      ))}
+                      <CPaginationItem
+                        aria-label="Next"
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                      >
+                        &raquo;
+                      </CPaginationItem>
+                    </CPagination>
                   </CCardBody>
                 </CCard>
               </CCol>
