@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { CCard, CCardBody, CCol, CContainer, CRow } from '@coreui/react';
-import CIcon from '@coreui/icons-react';
-import { cibAddthis } from '@coreui/icons';
+import { CCard, CCardBody, CCardFooter, CCol, CContainer, CFormInput, CInputGroup, CInputGroupText, CPagination, CPaginationItem, CRow } from '@coreui/react';
+import { CIcon } from '@coreui/icons-react';
+import { cibAddthis, cilSearch } from '@coreui/icons';
 import { AppFooter, AppHeader, AppSidebar } from '../../../components';
 import base_url from "../../../utils/api/base_url";
 import CardHeaderWithTitleBtn from '../../../components/cards/CardHeaderWithTitleBtn';
@@ -17,16 +17,28 @@ const IndexLibrarian = () => {
   const navigate = useNavigate();
   const [librarians, setLibrarians] = useState([]);
   const [alert, setAlert] = useState({ visible: false, type: '', message: '' });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [search, setSearch] = useState('');
 
   const columns = ["#", "Name", "NIC", "Address", "Phone", "Email", "Status", "Actions"];
 
   useEffect(() => {
-    axios.get(`${base_url}/api/librarians/all`)
+    // Fetch librarians with pagination and search
+    axios.get(`${base_url}/api/librarians/all`, {
+      params: {
+        page: currentPage,
+        limit: itemsPerPage,
+        search: search
+      }
+    })
       .then(response => {
         if (response.data && response.data.data && Array.isArray(response.data.data)) {
           // Exclude the restrictions field from the data
           const filteredLibrarians = response.data.data.map(({ restrictions, ...rest }) => rest);
           setLibrarians(filteredLibrarians);
+          setTotalPages(response.data.totalPages);
         } else {
           console.error('API response is not in the expected format', response.data);
         }
@@ -34,7 +46,7 @@ const IndexLibrarian = () => {
       .catch(error => {
         console.error('There was an error fetching the librarians!', error);
       });
-  }, []);
+  }, [currentPage, itemsPerPage, search]);
 
   useEffect(() => {
     if (location.state?.alert) {
@@ -101,7 +113,16 @@ const IndexLibrarian = () => {
       () => {
         alertify.message('Status change cancelled');
       }
-    )
+    );
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+    setCurrentPage(1); // Reset to the first page when search changes
   };
 
   return (
@@ -128,6 +149,23 @@ const IndexLibrarian = () => {
                     linkTo="/librarians/create"
                   />
                   <CCardBody>
+                    <CRow className='mb-2'>
+                      <CCol xs={4}>
+                        <CInputGroup>
+                          <CInputGroupText>
+                            <CIcon icon={cilSearch} />
+                          </CInputGroupText>
+                          <CFormInput
+                            type="text"
+                            id="_search"
+                            name="_search"
+                            placeholder="Search here..."
+                            value={search}
+                            onChange={handleSearchChange}
+                          />
+                        </CInputGroup>
+                      </CCol>
+                    </CRow>
                     <LibrariansTable
                       columns={columns}
                       data={librarians}
@@ -135,6 +173,31 @@ const IndexLibrarian = () => {
                       handleDelete={handleDelete}
                       handleChangeStatus={handleChangeStatus}
                     />
+                    <CPagination className='d-flex justify-content-end mt-2'>
+                      <CPaginationItem
+                        aria-label="Previous"
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                      >
+                        <span aria-hidden="true">&laquo;</span>
+                      </CPaginationItem>
+                      {[...Array(totalPages)].map((_, index) => (
+                        <CPaginationItem
+                          key={index + 1}
+                          onClick={() => handlePageChange(index + 1)}
+                          active={currentPage === index + 1}
+                        >
+                          {index + 1}
+                        </CPaginationItem>
+                      ))}
+                      <CPaginationItem
+                        aria-label="Next"
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                      >
+                        <span aria-hidden="true">&raquo;</span>
+                      </CPaginationItem>
+                    </CPagination>
                   </CCardBody>
                 </CCard>
               </CCol>
