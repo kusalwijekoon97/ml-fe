@@ -1,12 +1,5 @@
-import React, { useState } from 'react';
-import {
-  CCard,
-  CCardBody,
-  CContainer,
-  CRow,
-  CCol,
-  CSpinner
-} from '@coreui/react';
+import React, { useEffect, useState } from 'react';
+import {CCard,CCardBody,CContainer,CRow,CCol,CSpinner} from '@coreui/react';
 import axios from 'axios';
 import { AppFooter, AppHeader, AppSidebar } from '../../../components';
 import CardHeaderWithTitleBtn from '../../../components/cards/CardHeaderWithTitleBtn';
@@ -26,7 +19,8 @@ const CreateLibrarian = () => {
     nic: '',
     email: '',
     phone: '',
-    address: ''
+    address: '',
+    library: [],
   });
 
   const [loading, setLoading] = useState(false);
@@ -38,8 +32,26 @@ const CreateLibrarian = () => {
     nic: '',
     email: '',
     phone: '',
-    address: ''
+    address: '',
+    library: '',
   });
+
+  const [libraryOptions, setLibraryOptions] = useState([]);
+
+  useEffect(() => {
+    // Fetch libraries from API
+    axios.get(`${base_url}/api/libraries/all-open`)
+      .then(response => {
+        const libraries = response.data.data.map(library => ({
+          value: library._id,
+          label: library.name
+        }));
+        setLibraryOptions(libraries);
+      })
+      .catch(error => {
+        console.error("There was an error fetching the libraries!", error);
+      });
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -47,8 +59,17 @@ const CreateLibrarian = () => {
     setErrors({ ...errors, [name]: '' });
   };
 
+  const handleLibraryChange = (selectedOptions) => {
+    setForm({ ...form, library: selectedOptions });
+    setErrors({ ...errors, library: '' });
+  };
+
   const validateForm = () => {
     const newErrors = {};
+
+    if (form.library.length === 0) {
+      newErrors.library = 'Library is mandatory.';
+    }
 
     if (!form.firstName) newErrors.firstName = 'First name is mandatory.';
     if (!form.lastName) newErrors.lastName = 'Last name is mandatory.';
@@ -67,8 +88,12 @@ const CreateLibrarian = () => {
     if (!validateForm()) return;
 
     setLoading(true);
+    const formattedForm = {
+      ...form,
+      library: form.library.map(option => option.value)
+    };
 
-    axios.post(`${base_url}/api/librarians/store`, form)
+    axios.post(`${base_url}/api/librarians/store`, formattedForm)
       .then(response => {
         setLoading(false);
         navigate("/librarians", {
@@ -123,7 +148,9 @@ const CreateLibrarian = () => {
                     <LibrarianForm
                       form={form}
                       errors={errors}
+                      libraryOptions={libraryOptions}
                       handleChange={handleChange}
+                      handleLibraryChange={handleLibraryChange}
                       handleSubmit={handleSubmit}
                       handlePrevious={handlePrevious}
                       loading={loading}
