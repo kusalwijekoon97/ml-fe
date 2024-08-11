@@ -1,6 +1,9 @@
 import React from 'react';
 import { CTable, CTableHead, CTableBody, CTableRow, CTableHeaderCell, CTableDataCell, CButton, CBadge } from '@coreui/react';
 import { PencilSquare, Trash, Eye } from 'react-bootstrap-icons';
+import CIcon from '@coreui/icons-react';
+
+import { cilWarning } from '@coreui/icons';
 
 const LibrariesTable = ({ columns, data, handleEdit, handleDelete, handleChangeStatus }) => {
   return (
@@ -19,9 +22,22 @@ const LibrariesTable = ({ columns, data, handleEdit, handleDelete, handleChangeS
           <CTableRow key={library._id}>
             <CTableDataCell>{index + 1}</CTableDataCell>
             <CTableDataCell>{library.name}</CTableDataCell>
-            <CTableDataCell>{library.librarian ?? "N/A"}</CTableDataCell>
             <CTableDataCell>
-            <CBadge color={library.is_active ? 'success' : 'danger'}>
+              {library.librarian ? (
+                <>
+                  <div>{library.librarian.firstName} {library.librarian.lastName}</div>
+                  <div>{library.librarian.email}</div>
+                </>
+              ) : (
+                <>
+                  <span className="d-flex align-items-center">
+                    <CIcon icon={cilWarning} className="me-2 text-warning" /> No Librarian assigned
+                  </span>
+                </>
+              )}
+            </CTableDataCell>
+            <CTableDataCell>
+              <CBadge color={library.is_active ? 'success' : 'danger'}>
                 {library.is_active ? 'active' : 'inactive'}
               </CBadge>
             </CTableDataCell>
