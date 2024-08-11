@@ -1,14 +1,5 @@
 import React from 'react';
-import {
-  CForm,
-  CFormLabel,
-  CButton,
-  CFormFeedback,
-  CFormInput,
-  CRow,
-  CCol,
-  CSpinner
-} from '@coreui/react';
+import {CForm,CFormLabel,CButton,CFormFeedback,CFormInput,CRow,CCol,CSpinner} from '@coreui/react';
 import { Link } from 'react-router-dom';
 
 const LibrarianForm = ({
@@ -104,6 +95,7 @@ const LibrarianForm = ({
               <CFormFeedback>{errors.phone}</CFormFeedback>
             </div>
           </CCol>
+
           <CCol xs={6}>
             <div className="mb-3">
               <CFormLabel htmlFor="address">Address <span className='text-danger'>*</span></CFormLabel>

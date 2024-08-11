@@ -22,7 +22,7 @@ const IndexLibrary = () => {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [search, setSearch] = useState('');
 
-  const columns = ["#", "Name", "Librarian", "Status", "Actions"];
+  const columns = ["#", "Name", "Library", "Status", "Actions"];
 
   useEffect(() => {
     // Fetch libraries with pagination and search
@@ -61,23 +61,23 @@ const IndexLibrary = () => {
   const handleDelete = (id) => {
     alertify.confirm(
       'Confirm Delete',
-      'Are you sure you want to delete this librarian?',
+      'Are you sure you want to delete this library?',
       () => {
         axios.post(`${base_url}/api/libraries/delete/${id}`)
           .then(response => {
-            setLibraries(libraries.filter(librarian => librarian._id !== id));
+            setLibraries(libraries.filter(library => library._id !== id));
             setAlert({
               visible: true,
               type: 'success',
-              message: 'Librarian deleted successfully!'
+              message: 'Library deleted successfully!'
             });
           })
           .catch(error => {
-            console.error('There was an error deleting the librarian!', error);
+            console.error('There was an error deleting the library!', error);
             setAlert({
               visible: true,
               type: 'failure',
-              message: 'Failed to delete the librarian. Please try again.'
+              message: 'Failed to delete the library. Please try again.'
             });
           });
       },
@@ -88,25 +88,25 @@ const IndexLibrary = () => {
   const handleChangeStatus = (id) => {
     alertify.confirm(
       'Confirm Status Change',
-      'Are you sure you want to change the status of this librarian?',
+      'Are you sure you want to change the status of this library?',
       () => {
         axios.post(`${base_url}/api/libraries/change-status/${id}`)
           .then(response => {
-            setLibraries(libraries.map(librarian =>
-              librarian._id === id ? { ...librarian, status: !librarian.status } : librarian
+            setLibraries(libraries.map(library =>
+              library._id === id ? { ...library, status: !library.status } : library
             ));
             setAlert({
               visible: true,
               type: 'success',
-              message: 'Librarian status changed successfully!'
+              message: 'Library status changed successfully!'
             });
           })
           .catch(error => {
-            console.error('There was an error changing the librarian status!', error);
+            console.error('There was an error changing the library status!', error);
             setAlert({
               visible: true,
               type: 'failure',
-              message: 'Failed to change the librarian status. Please try again.'
+              message: 'Failed to change the library status. Please try again.'
             });
           });
       },
@@ -145,7 +145,7 @@ const IndexLibrary = () => {
                     title="Libraries"
                     subtitle="List"
                     buttonIcon={<CIcon icon={cibAddthis} />}
-                    buttonText="Add Librarian"
+                    buttonText="Add Library"
                     linkTo="/libraries/create"
                   />
                   <CCardBody>
