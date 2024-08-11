@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {CCard,CCardBody,CContainer,CRow,CCol,CSpinner} from '@coreui/react';
+import { CCard, CCardBody, CContainer, CRow, CCol, CSpinner } from '@coreui/react';
 import axios from 'axios';
 import { AppFooter, AppHeader, AppSidebar } from '../../../components';
 import CardHeaderWithTitleBtn from '../../../components/cards/CardHeaderWithTitleBtn';
@@ -15,13 +15,16 @@ const EditLibrary = () => {
   const { libraryId } = useParams();
 
   const [form, setForm] = useState({
-    name: ''
+    name: '',
+    librarian: null, // Add librarian to form state
   });
 
+  const [librarians, setLibrarians] = useState([]); // State to hold all librarians
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState({ visible: false, type: '', message: '' });
   const [errors, setErrors] = useState({
-    name: ''
+    name: '',
+    librarian: '', // Add librarian to errors state
   });
 
   useEffect(() => {
@@ -29,9 +32,15 @@ const EditLibrary = () => {
       try {
         setLoading(true);
         const response = await axios.get(`${base_url}/api/libraries/${libraryId}`);
-        const data = response.data.data; // Ensure you access the correct data property
+        const data = response.data.data;
+
+        // Set the form state with the library data and the current librarian
         setForm({
-          name: data.name || ''
+          name: data.name || '',
+          librarian: data.librarian ? {
+            value: data.librarian._id,
+            label: `${data.librarian.firstName} ${data.librarian.lastName}`
+          } : null, // Set the librarian field with the correct format for react-select
         });
         setLoading(false);
       } catch (error) {
@@ -45,7 +54,17 @@ const EditLibrary = () => {
       }
     };
 
+    const fetchLibrarians = async () => {
+      try {
+        const response = await axios.get(`${base_url}/api/librarians/all-open`);
+        setLibrarians(response.data.data);
+      } catch (error) {
+        console.error('Failed to load librarians:', error);
+      }
+    };
+
     fetchLibraryData();
+    fetchLibrarians();
   }, [libraryId]);
 
   const handleChange = (e) => {
@@ -54,10 +73,16 @@ const EditLibrary = () => {
     setErrors({ ...errors, [name]: '' });
   };
 
+  const handleSelectChange = (selectedOption) => {
+    setForm({ ...form, librarian: selectedOption });
+    setErrors({ ...errors, librarian: '' });
+  };
+
   const validateForm = () => {
     const newErrors = {};
 
-    if (!form.name) newErrors.name = 'First name is mandatory.';
+    if (!form.name) newErrors.name = 'Library name is mandatory.';
+    if (!form.librarian) newErrors.librarian = 'Librarian selection is mandatory.';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -70,7 +95,10 @@ const EditLibrary = () => {
 
     setLoading(true);
 
-    axios.post(`${base_url}/api/libraries/update/${libraryId}`, form)
+    axios.post(`${base_url}/api/libraries/update/${libraryId}`, {
+      ...form,
+      librarian: form.librarian ? form.librarian.value : null, // Send the selected librarian ID
+    })
       .then(response => {
         setLoading(false);
         navigate("/libraries", {
@@ -126,9 +154,11 @@ const EditLibrary = () => {
                       form={form}
                       errors={errors}
                       handleChange={handleChange}
+                      handleSelectChange={handleSelectChange}
                       handleSubmit={handleSubmit}
                       handlePrevious={handlePrevious}
                       loading={loading}
+                      librarians={librarians} // Pass the librarians data to the form
                     />
                   </CCardBody>
                 </CCard>

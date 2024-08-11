@@ -1,17 +1,24 @@
 import React from 'react';
-import {CForm,CFormLabel,CButton,CFormFeedback,CFormInput,CFormTextarea,CRow,CCol,CSpinner} from '@coreui/react';
+import { CForm, CFormLabel, CButton, CFormFeedback, CFormInput, CRow, CCol, CSpinner } from '@coreui/react';
 import Select from 'react-select';
-import CIcon from '@coreui/icons-react';
 import { Link } from 'react-router-dom';
 
-const AuthorFormEdit = ({
+const LibraryFormEdit = ({
   form,
   errors,
   handleChange,
+  handleSelectChange,
   handleSubmit,
   handlePrevious,
-  loading
+  loading,
+  librarians, // Receive librarians prop
 }) => {
+  // Convert librarians to the format expected by react-select
+  const librarianOptions = librarians.map(lib => ({
+    value: lib._id,
+    label: `${lib.firstName} ${lib.lastName}`,
+  }));
+
   return (
     <>
       <CForm onSubmit={handleSubmit}>
@@ -32,22 +39,22 @@ const AuthorFormEdit = ({
             </div>
           </CCol>
 
-
-          {/* <CCol xs={6}>
+          <CCol xs={12}>
             <div className="mb-3">
-              <CFormLabel htmlFor="position">Position <span className='text-danger'>*</span></CFormLabel>
-              <CFormInput
-                type="text"
-                id="position"
-                name="position"
-                placeholder="Enter position"
-                value={form.position}
-                onChange={handleChange}
-                invalid={!!errors.position}
+              <CFormLabel htmlFor="librarian">Librarian <span className='text-danger'>*</span></CFormLabel>
+              <Select
+                id="librarian"
+                name="librarian"
+                placeholder="Select a librarian"
+                value={form.librarian}
+                onChange={handleSelectChange}
+                options={librarianOptions}
+                isClearable
+                isDisabled={loading}
               />
-              <CFormFeedback>{errors.position}</CFormFeedback>
+              <CFormFeedback>{errors.librarian}</CFormFeedback>
             </div>
-          </CCol> */}
+          </CCol>
         </CRow>
 
         <div className="text-end">
@@ -92,4 +99,4 @@ const AuthorFormEdit = ({
   );
 };
 
-export default AuthorFormEdit;
+export default LibraryFormEdit;
