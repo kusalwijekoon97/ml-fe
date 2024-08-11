@@ -37,12 +37,10 @@ const CategoriesTable = ({ columns, data, handleEdit, handleDelete, handleChange
               )}
             </CTableDataCell>
             <CTableDataCell>
-              {item.library.length > 0 ? (
-                <ul>
-                  {item.library.map((lib, index) => (
-                    <CBadge color="secondary" className='me-1' key={index}>{lib}</CBadge>
-                  ))}
-                </ul>
+              {item.library && item.library.length > 0 ? (
+                item.library.map((lib, index) => (
+                  <CBadge key={lib._id} color="secondary" className="me-1">{lib.name}</CBadge>
+                ))
               ) : (
                 <span className="d-flex align-items-center">
                   <CIcon icon={cilWarning} className="me-2 text-warning" /> No Libraries
