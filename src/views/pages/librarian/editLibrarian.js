@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  CCard,
-  CCardBody,
-  CContainer,
-  CRow,
-  CCol,
-  CSpinner
-} from '@coreui/react';
+import { CCard, CCardBody, CContainer, CRow, CCol, CSpinner } from '@coreui/react';
 import axios from 'axios';
 import { AppFooter, AppHeader, AppSidebar } from '../../../components';
 import CardHeaderWithTitleBtn from '../../../components/cards/CardHeaderWithTitleBtn';
@@ -20,8 +13,7 @@ import LibrarianFormEdit from '../../../components/forms/LibrarianFormEdit';
 const EditLibrarian = () => {
   const navigate = useNavigate();
   const { librarianId } = useParams();
-  const [selectedLibrarian, setSelectedLibrarian] = useState(null);
-const [libraryOptions, setLibraryOptions] = useState([]);
+  const [libraryOptions, setLibraryOptions] = useState([]);
 
 
   const [form, setForm] = useState({
@@ -30,7 +22,8 @@ const [libraryOptions, setLibraryOptions] = useState([]);
     nic: '',
     email: '',
     phone: '',
-    address: ''
+    address: '',
+    libraries: [],
   });
 
   const [loading, setLoading] = useState(false);
@@ -41,23 +34,40 @@ const [libraryOptions, setLibraryOptions] = useState([]);
     nic: '',
     email: '',
     phone: '',
-    address: ''
+    address: '',
+    libraries: '',
   });
 
   useEffect(() => {
     const fetchLibrarianData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${base_url}/api/librarians/${librarianId}`);
-        const data = response.data.data; // Ensure you access the correct data property
+        const [librarianResponse, librariesResponse] = await Promise.all([
+          axios.get(`${base_url}/api/librarians/${librarianId}`),
+          axios.get(`${base_url}/api/libraries/all-open`)
+        ]);
+
+        const libraries = librariesResponse.data.data.map(lib => ({
+          value: lib._id,
+          label: lib.name
+        }));
+
+        setLibraryOptions(libraries);
+
+        const data = librarianResponse.data.data;
         setForm({
           firstName: data.firstName || '',
           lastName: data.lastName || '',
           nic: data.nic || '',
           email: data.email || '',
           phone: data.phone || '',
-          address: data.address || ''
+          address: data.address || '',
+          libraries: data.libraries.map(lib => ({
+            value: lib._id,
+            label: lib.name
+          })),
         });
+
         setLoading(false);
       } catch (error) {
         setLoading(false);
@@ -73,10 +83,16 @@ const [libraryOptions, setLibraryOptions] = useState([]);
     fetchLibrarianData();
   }, [librarianId]);
 
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
     setErrors({ ...errors, [name]: '' });
+  };
+
+  const handleLibraryChange = (selectedOptions) => {
+    setForm({ ...form, libraries: selectedOptions });
+    setErrors({ ...errors, libraries: '' });
   };
 
   const validateForm = () => {
@@ -155,7 +171,9 @@ const [libraryOptions, setLibraryOptions] = useState([]);
                     <LibrarianFormEdit
                       form={form}
                       errors={errors}
+                      libraryOptions={libraryOptions}
                       handleChange={handleChange}
+                      handleLibraryChange={handleLibraryChange}
                       handleSubmit={handleSubmit}
                       handlePrevious={handlePrevious}
                       loading={loading}
