@@ -15,11 +15,14 @@ import { cilList } from '@coreui/icons';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import base_url from "../../../utils/api/base_url";
 import ResponseAlert from '../../../components/notifications/ResponseAlert';
-import LibrarianForm from '../../../components/forms/LibrarianForm';
+import LibrarianFormEdit from '../../../components/forms/LibrarianFormEdit';
 
 const EditLibrarian = () => {
   const navigate = useNavigate();
   const { librarianId } = useParams();
+  const [selectedLibrarian, setSelectedLibrarian] = useState(null);
+const [libraryOptions, setLibraryOptions] = useState([]);
+
 
   const [form, setForm] = useState({
     firstName: '',
@@ -149,7 +152,7 @@ const EditLibrarian = () => {
                     linkTo="/librarians"
                   />
                   <CCardBody>
-                    <LibrarianForm
+                    <LibrarianFormEdit
                       form={form}
                       errors={errors}
                       handleChange={handleChange}
