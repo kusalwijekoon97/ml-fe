@@ -1,22 +1,15 @@
 import React from 'react';
-import {
-  CForm,
-  CFormLabel,
-  CButton,
-  CFormFeedback,
-  CFormInput,
-  CFormTextarea,
-  CRow,
-  CCol,
-  CSpinner
-} from '@coreui/react';
+import { CForm, CFormLabel, CButton, CFormFeedback, CFormInput, CRow, CCol, CSpinner } from '@coreui/react';
 import { Link } from 'react-router-dom';
+import Select from 'react-select';
 
-const LibrarianForm = ({
+const Edit = ({
   form,
   errors,
-  handleSubmit,
+  libraryOptions,
   handleChange,
+  handleLibraryChange,
+  handleSubmit,
   handlePrevious,
   loading
 }) => {
@@ -55,6 +48,7 @@ const LibrarianForm = ({
             </div>
           </CCol>
         </CRow>
+
         <CRow>
           <CCol xs={6}>
             <div className="mb-3">
@@ -87,6 +81,7 @@ const LibrarianForm = ({
             </div>
           </CCol>
         </CRow>
+
         <CRow>
           <CCol xs={6}>
             <div className="mb-3">
@@ -103,14 +98,15 @@ const LibrarianForm = ({
               <CFormFeedback>{errors.phone}</CFormFeedback>
             </div>
           </CCol>
+
           <CCol xs={6}>
             <div className="mb-3">
               <CFormLabel htmlFor="address">Address <span className='text-danger'>*</span></CFormLabel>
-              <CFormTextarea
+              <CFormInput
+                type="text"
                 id="address"
                 name="address"
                 placeholder="Enter address"
-                rows="3"
                 value={form.address}
                 onChange={handleChange}
                 invalid={!!errors.address}
@@ -118,7 +114,26 @@ const LibrarianForm = ({
               <CFormFeedback>{errors.address}</CFormFeedback>
             </div>
           </CCol>
+
+          <CCol xs={6}>
+            <div className="mb-3">
+              <CFormLabel htmlFor="library">Library <span className='text-danger'>*</span></CFormLabel>
+              <Select
+                id="library"
+                name="library"
+                options={libraryOptions}
+                isMulti
+                value={form.libraries}
+                onChange={handleLibraryChange}
+                className={errors.libraries ? 'is-invalid' : ''}
+              />
+              {errors.libraries && <CFormFeedback>{errors.libraries}</CFormFeedback>}
+            </div>
+          </CCol>
+
+
         </CRow>
+
         <div className="text-end">
           <Link to="/dashboard">
             <CButton
@@ -149,10 +164,10 @@ const LibrarianForm = ({
           >
             {loading ? (
               <>
-                <CSpinner as="span" size="sm" aria-hidden="true" /> Updating...
+                <CSpinner as="span" size="sm" aria-hidden="true" /> Submitting...
               </>
             ) : (
-              'Update'
+              'Submit'
             )}
           </CButton>
         </div>
@@ -161,4 +176,4 @@ const LibrarianForm = ({
   );
 };
 
-export default LibrarianForm;
+export default Edit;

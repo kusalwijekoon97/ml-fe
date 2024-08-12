@@ -1,14 +1,7 @@
 // src/views/pages/category/CreateCategory.js
 
-import React, { useState } from 'react';
-import {
-  CCard,
-  CCardBody,
-  CContainer,
-  CRow,
-  CCol,
-  CSpinner
-} from '@coreui/react';
+import React, { useEffect, useState } from 'react';
+import {CCard,CCardBody,CContainer,CRow,CCol,CSpinner} from '@coreui/react';
 import axios from 'axios';
 import { AppFooter, AppHeader, AppSidebar } from '../../../components';
 import CardHeaderWithTitleBtn from '../../../components/cards/CardHeaderWithTitleBtn';
@@ -37,11 +30,22 @@ const CreateCategory = () => {
     subCategories: []
   });
 
-  const libraryOptions = [
-    { value: 'EN', label: 'EN' },
-    { value: 'SI', label: 'SI' },
-    { value: 'TA', label: 'TA' }
-  ];
+  const [libraryOptions, setLibraryOptions] = useState([]);
+
+  useEffect(() => {
+    // Fetch libraries from API
+    axios.get(`${base_url}/api/libraries/all-open`)
+      .then(response => {
+        const libraries = response.data.data.map(library => ({
+          value: library._id,
+          label: library.name
+        }));
+        setLibraryOptions(libraries);
+      })
+      .catch(error => {
+        console.error("There was an error fetching the libraries!", error);
+      });
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

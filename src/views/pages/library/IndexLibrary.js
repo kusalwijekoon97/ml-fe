@@ -6,27 +6,27 @@ import { cibAddthis, cilSearch } from '@coreui/icons';
 import { AppFooter, AppHeader, AppSidebar } from '../../../components';
 import base_url from "../../../utils/api/base_url";
 import CardHeaderWithTitleBtn from '../../../components/cards/CardHeaderWithTitleBtn';
-import LibrariansTable from '../../../components/table/LibrariansTable';
+import LibrariesTable from '../../../components/table/LibrariesTable';
 import ResponseAlert from '../../../components/notifications/ResponseAlert';
 import { useLocation, useNavigate } from 'react-router-dom';
 import alertify from 'alertifyjs';
 import 'alertifyjs/build/css/alertify.css';
 
-const IndexLibrarian = () => {
+const IndexLibrary = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [librarians, setLibrarians] = useState([]);
+  const [libraries, setLibraries] = useState([]);
   const [alert, setAlert] = useState({ visible: false, type: '', message: '' });
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [search, setSearch] = useState('');
 
-  const columns = ["#", "Name", "NIC", "Address", "Phone", "Email", "Status", "Actions"];
+  const columns = ["#", "Name", "Library", "Status", "Actions"];
 
   useEffect(() => {
-    // Fetch librarians with pagination and search
-    axios.get(`${base_url}/api/librarians/all`, {
+    // Fetch libraries with pagination and search
+    axios.get(`${base_url}/api/libraries/all`, {
       params: {
         page: currentPage,
         limit: itemsPerPage,
@@ -36,15 +36,15 @@ const IndexLibrarian = () => {
       .then(response => {
         if (response.data && response.data.data && Array.isArray(response.data.data)) {
           // Exclude the restrictions field from the data
-          const filteredLibrarians = response.data.data.map(({ restrictions, ...rest }) => rest);
-          setLibrarians(filteredLibrarians);
+          const filteredLibraries = response.data.data.map(({ restrictions, ...rest }) => rest);
+          setLibraries(filteredLibraries);
           setTotalPages(response.data.totalPages);
         } else {
           console.error('API response is not in the expected format', response.data);
         }
       })
       .catch(error => {
-        console.error('There was an error fetching the librarians!', error);
+        console.error('There was an error fetching the libraries!', error);
       });
   }, [currentPage, itemsPerPage, search]);
 
@@ -55,29 +55,29 @@ const IndexLibrarian = () => {
   }, [location.state]);
 
   const handleEdit = (id) => {
-    navigate(`/librarians/${id}/edit`);
+    navigate(`/libraries/${id}/edit`);
   };
 
   const handleDelete = (id) => {
     alertify.confirm(
       'Confirm Delete',
-      'Are you sure you want to delete this librarian?',
+      'Are you sure you want to delete this library?',
       () => {
-        axios.post(`${base_url}/api/librarians/delete/${id}`)
+        axios.post(`${base_url}/api/libraries/delete/${id}`)
           .then(response => {
-            setLibrarians(librarians.filter(librarian => librarian._id !== id));
+            setLibraries(libraries.filter(library => library._id !== id));
             setAlert({
               visible: true,
               type: 'success',
-              message: 'Librarian deleted successfully!'
+              message: 'Library deleted successfully!'
             });
           })
           .catch(error => {
-            console.error('There was an error deleting the librarian!', error);
+            console.error('There was an error deleting the library!', error);
             setAlert({
               visible: true,
               type: 'failure',
-              message: 'Failed to delete the librarian. Please try again.'
+              message: 'Failed to delete the library. Please try again.'
             });
           });
       },
@@ -88,25 +88,25 @@ const IndexLibrarian = () => {
   const handleChangeStatus = (id) => {
     alertify.confirm(
       'Confirm Status Change',
-      'Are you sure you want to change the status of this librarian?',
+      'Are you sure you want to change the status of this library?',
       () => {
-        axios.post(`${base_url}/api/librarians/change-status/${id}`)
+        axios.post(`${base_url}/api/libraries/change-status/${id}`)
           .then(response => {
-            setLibrarians(librarians.map(librarian =>
-              librarian._id === id ? { ...librarian, status: !librarian.status } : librarian
+            setLibraries(libraries.map(library =>
+              library._id === id ? { ...library, status: !library.status } : library
             ));
             setAlert({
               visible: true,
               type: 'success',
-              message: 'Librarian status changed successfully!'
+              message: 'Library status changed successfully!'
             });
           })
           .catch(error => {
-            console.error('There was an error changing the librarian status!', error);
+            console.error('There was an error changing the library status!', error);
             setAlert({
               visible: true,
               type: 'failure',
-              message: 'Failed to change the librarian status. Please try again.'
+              message: 'Failed to change the library status. Please try again.'
             });
           });
       },
@@ -129,7 +129,7 @@ const IndexLibrarian = () => {
     <>
       <AppSidebar />
       <div className="wrapper d-flex flex-column min-vh-100">
-        <AppHeader title="Librarians" />
+        <AppHeader title="Libraries" />
         <div className="body flex-grow-1">
           <ResponseAlert
             visible={alert.visible}
@@ -142,11 +142,11 @@ const IndexLibrarian = () => {
               <CCol xs={12}>
                 <CCard className="mb-4 border-top-primary border-top-3">
                   <CardHeaderWithTitleBtn
-                    title="Librarians"
+                    title="Libraries"
                     subtitle="List"
                     buttonIcon={<CIcon icon={cibAddthis} />}
-                    buttonText="Add Librarian"
-                    linkTo="/librarians/create"
+                    buttonText="Add Library"
+                    linkTo="/libraries/create"
                   />
                   <CCardBody>
                     <CRow className='mb-2'>
@@ -166,9 +166,9 @@ const IndexLibrarian = () => {
                         </CInputGroup>
                       </CCol>
                     </CRow>
-                    <LibrariansTable
+                    <LibrariesTable
                       columns={columns}
-                      data={librarians}
+                      data={libraries}
                       handleEdit={handleEdit}
                       handleDelete={handleDelete}
                       handleChangeStatus={handleChangeStatus}
@@ -210,4 +210,4 @@ const IndexLibrarian = () => {
   );
 };
 
-export default IndexLibrarian;
+export default IndexLibrary;
