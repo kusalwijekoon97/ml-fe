@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  CCard,
-  CCardBody,
-  CContainer,
-  CRow,
-  CCol,
-  CSpinner
-} from '@coreui/react';
+import { CCard, CCardBody, CContainer, CRow, CCol, CSpinner } from '@coreui/react';
 import axios from 'axios';
 import { AppFooter, AppHeader, AppSidebar } from '../../../components';
 import CardHeaderWithTitleBtn from '../../../components/cards/CardHeaderWithTitleBtn';
@@ -15,48 +8,39 @@ import { cilList } from '@coreui/icons';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import base_url from "../../../utils/api/base_url";
 import ResponseAlert from '../../../components/notifications/ResponseAlert';
-import LibrarianFormEdit from '../../../components/forms/LibrarianFormEdit';
+import LibraryFormEdit from '../../../components/forms/LibraryFormEdit';
 
-const EditLibrarian = () => {
+const EditLibrary = () => {
   const navigate = useNavigate();
-  const { librarianId } = useParams();
-  const [selectedLibrarian, setSelectedLibrarian] = useState(null);
-const [libraryOptions, setLibraryOptions] = useState([]);
-
+  const { libraryId } = useParams();
 
   const [form, setForm] = useState({
-    firstName: '',
-    lastName: '',
-    nic: '',
-    email: '',
-    phone: '',
-    address: ''
+    name: '',
+    librarian: null, // Add librarian to form state
   });
 
+  const [librarians, setLibrarians] = useState([]); // State to hold all librarians
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState({ visible: false, type: '', message: '' });
   const [errors, setErrors] = useState({
-    firstName: '',
-    lastName: '',
-    nic: '',
-    email: '',
-    phone: '',
-    address: ''
+    name: '',
+    librarian: '', // Add librarian to errors state
   });
 
   useEffect(() => {
-    const fetchLibrarianData = async () => {
+    const fetchLibraryData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${base_url}/api/librarians/${librarianId}`);
-        const data = response.data.data; // Ensure you access the correct data property
+        const response = await axios.get(`${base_url}/api/libraries/${libraryId}`);
+        const data = response.data.data;
+
+        // Set the form state with the library data and the current librarian
         setForm({
-          firstName: data.firstName || '',
-          lastName: data.lastName || '',
-          nic: data.nic || '',
-          email: data.email || '',
-          phone: data.phone || '',
-          address: data.address || ''
+          name: data.name || '',
+          librarian: data.librarian ? {
+            value: data.librarian._id,
+            label: `${data.librarian.firstName} ${data.librarian.lastName}`
+          } : null, // Set the librarian field with the correct format for react-select
         });
         setLoading(false);
       } catch (error) {
@@ -64,14 +48,24 @@ const [libraryOptions, setLibraryOptions] = useState([]);
         setAlert({
           visible: true,
           type: 'failure',
-          message: 'Failed to load librarian data. Please try again.'
+          message: 'Failed to load library data. Please try again.'
         });
         console.error(error);
       }
     };
 
-    fetchLibrarianData();
-  }, [librarianId]);
+    const fetchLibrarians = async () => {
+      try {
+        const response = await axios.get(`${base_url}/api/librarians/all-open`);
+        setLibrarians(response.data.data);
+      } catch (error) {
+        console.error('Failed to load librarians:', error);
+      }
+    };
+
+    fetchLibraryData();
+    fetchLibrarians();
+  }, [libraryId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -79,15 +73,16 @@ const [libraryOptions, setLibraryOptions] = useState([]);
     setErrors({ ...errors, [name]: '' });
   };
 
+  const handleSelectChange = (selectedOption) => {
+    setForm({ ...form, librarian: selectedOption });
+    setErrors({ ...errors, librarian: '' });
+  };
+
   const validateForm = () => {
     const newErrors = {};
 
-    if (!form.firstName) newErrors.firstName = 'First name is mandatory.';
-    if (!form.lastName) newErrors.lastName = 'Last name is mandatory.';
-    if (!form.nic) newErrors.nic = 'NIC is mandatory.';
-    if (!form.email) newErrors.email = 'Email is mandatory.';
-    if (!form.phone) newErrors.phone = 'Phone number is mandatory.';
-    if (!form.address) newErrors.address = 'Address is mandatory.';
+    if (!form.name) newErrors.name = 'Library name is mandatory.';
+    if (!form.librarian) newErrors.librarian = 'Librarian selection is mandatory.';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -100,15 +95,18 @@ const [libraryOptions, setLibraryOptions] = useState([]);
 
     setLoading(true);
 
-    axios.post(`${base_url}/api/librarians/update/${librarianId}`, form)
+    axios.post(`${base_url}/api/libraries/update/${libraryId}`, {
+      ...form,
+      librarian: form.librarian ? form.librarian.value : null, // Send the selected librarian ID
+    })
       .then(response => {
         setLoading(false);
-        navigate("/librarians", {
+        navigate("/libraries", {
           state: {
             alert: {
               visible: true,
               type: 'success',
-              message: 'Librarian updated successfully!'
+              message: 'Library updated successfully!'
             }
           }
         });
@@ -118,7 +116,7 @@ const [libraryOptions, setLibraryOptions] = useState([]);
         setAlert({
           visible: true,
           type: 'failure',
-          message: 'Librarian update failed. Please try again.'
+          message: 'Library update failed. Please try again.'
         });
         console.error(error);
       });
@@ -132,7 +130,7 @@ const [libraryOptions, setLibraryOptions] = useState([]);
     <>
       <AppSidebar />
       <div className="wrapper d-flex flex-column min-vh-100">
-        <AppHeader title="Librarians" />
+        <AppHeader title="Libraries" />
         <div className="body flex-grow-1">
           <ResponseAlert
             visible={alert.visible}
@@ -145,20 +143,22 @@ const [libraryOptions, setLibraryOptions] = useState([]);
               <CCol xs={12}>
                 <CCard className="mb-4 border-top-primary border-top-3">
                   <CardHeaderWithTitleBtn
-                    title="Librarian"
+                    title="Library"
                     subtitle="edit"
                     buttonIcon={<CIcon icon={cilList} />}
-                    buttonText="Librarians"
-                    linkTo="/librarians"
+                    buttonText="Libraries"
+                    linkTo="/libraries"
                   />
                   <CCardBody>
-                    <LibrarianFormEdit
+                    <LibraryFormEdit
                       form={form}
                       errors={errors}
                       handleChange={handleChange}
+                      handleSelectChange={handleSelectChange}
                       handleSubmit={handleSubmit}
                       handlePrevious={handlePrevious}
                       loading={loading}
+                      librarians={librarians} // Pass the librarians data to the form
                     />
                   </CCardBody>
                 </CCard>
@@ -172,4 +172,4 @@ const [libraryOptions, setLibraryOptions] = useState([]);
   );
 };
 
-export default EditLibrarian;
+export default EditLibrary;
