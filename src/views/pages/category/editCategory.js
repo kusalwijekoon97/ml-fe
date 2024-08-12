@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  CCard,
-  CCardBody,
-  CContainer,
-  CRow,
-  CCol
-} from '@coreui/react';
+import {CCard,CCardBody,CContainer,CRow,CCol} from '@coreui/react';
 import axios from 'axios';
 import { AppFooter, AppHeader, AppSidebar } from '../../../components';
 import CardHeaderWithTitleBtn from '../../../components/cards/CardHeaderWithTitleBtn';
