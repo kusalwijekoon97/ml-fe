@@ -1,20 +1,14 @@
 import React from 'react';
-import {
-  CForm,
-  CFormLabel,
-  CButton,
-  CFormFeedback,
-  CFormInput,
-  CRow,
-  CCol,
-  CSpinner
-} from '@coreui/react';
+import { CForm, CFormLabel, CButton, CFormFeedback, CFormInput, CRow, CCol, CSpinner } from '@coreui/react';
 import { Link } from 'react-router-dom';
+import Select from 'react-select';
 
 const LibrarianForm = ({
   form,
   errors,
+  libraryOptions,
   handleChange,
+  handleLibraryChange,
   handleSubmit,
   handlePrevious,
   loading
@@ -104,6 +98,7 @@ const LibrarianForm = ({
               <CFormFeedback>{errors.phone}</CFormFeedback>
             </div>
           </CCol>
+
           <CCol xs={6}>
             <div className="mb-3">
               <CFormLabel htmlFor="address">Address <span className='text-danger'>*</span></CFormLabel>
@@ -119,6 +114,22 @@ const LibrarianForm = ({
               <CFormFeedback>{errors.address}</CFormFeedback>
             </div>
           </CCol>
+
+          <CCol xs={6}>
+            <div className="mb-3">
+              <CFormLabel htmlFor="library">Library <span className='text-danger'>*</span></CFormLabel>
+              <Select
+                id="library"
+                name="library"
+                options={libraryOptions}
+                isMulti
+                value={form.library}
+                onChange={handleLibraryChange}
+                className={errors.library ? 'is-invalid' : ''} />
+              {errors.library && <CFormFeedback>{errors.library}</CFormFeedback>}
+            </div>
+          </CCol>
+
         </CRow>
 
         <div className="text-end">

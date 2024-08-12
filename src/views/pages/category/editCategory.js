@@ -4,15 +4,14 @@ import {
   CCardBody,
   CContainer,
   CRow,
-  CCol,
-  CSpinner
+  CCol
 } from '@coreui/react';
 import axios from 'axios';
 import { AppFooter, AppHeader, AppSidebar } from '../../../components';
 import CardHeaderWithTitleBtn from '../../../components/cards/CardHeaderWithTitleBtn';
 import CIcon from '@coreui/icons-react';
 import { cilList } from '@coreui/icons';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import base_url from "../../../utils/api/base_url";
 import ResponseAlert from '../../../components/notifications/ResponseAlert';
 import CategoryFormEdit from '../../../components/forms/CategoryFormEdit';
@@ -23,39 +22,49 @@ const EditCategory = () => {
 
   const [form, setForm] = useState({
     name: '',
-    library: [],
+    library: [], // Initially empty
     subCategories: []
   });
 
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState({ visible: false, type: '', message: '' });
-
   const [errors, setErrors] = useState({
     name: '',
     library: '',
     subCategories: []
   });
+  const [libraryOptions, setLibraryOptions] = useState([]);
 
-  const libraryOptions = [
-    { value: 'EN', label: 'EN' },
-    { value: 'SI', label: 'SI' },
-    { value: 'TA', label: 'TA' }
-  ];
-
-  // Fetch category data when component mounts
+  // Fetch category data and libraries when component mounts
   useEffect(() => {
     const fetchCategoryData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${base_url}/api/categories/main/${catid}`);
+        const [categoryResponse, librariesResponse] = await Promise.all([
+          axios.get(`${base_url}/api/categories/main/${catid}`),
+          axios.get(`${base_url}/api/libraries/all-open`)
+        ]);
+
+        const libraries = librariesResponse.data.data.map(lib => ({
+          value: lib._id,
+          label: lib.name
+        }));
+
+        setLibraryOptions(libraries);
+
+        const categoryData = categoryResponse.data.data;
         setForm({
-          name: response.data.data.name,
-          library: response.data.data.library.map(lib => ({ value: lib, label: lib })),
-          subCategories: response.data.data.subCategories.map(subCat => ({
+          name: categoryData.name,
+          library: categoryData.library.map(lib => ({
+            value: lib._id,
+            label: lib.name
+          })),
+          subCategories: categoryData.subCategories.map(subCat => ({
             id: subCat._id,
             name: subCat.name
           }))
         });
+
         setLoading(false);
       } catch (error) {
         setLoading(false);
@@ -128,7 +137,6 @@ const EditCategory = () => {
     return Object.keys(newErrors).length === 0 && (!newErrors.subCategories || newErrors.subCategories.length === 0);
   };
 
-
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -167,7 +175,6 @@ const EditCategory = () => {
         console.error(error);
       });
   };
-
 
   const handlePrevious = () => {
     navigate(-1);

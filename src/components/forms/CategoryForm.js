@@ -1,17 +1,7 @@
 // src\components\forms\CategoryForm.js
 
 import React from 'react';
-import {
-  CForm,
-  CFormLabel,
-  CButton,
-  CFormFeedback,
-  CFormInput,
-  CInputGroup,
-  CRow,
-  CCol,
-  CSpinner
-} from '@coreui/react';
+import {CForm,CFormLabel,CButton,CFormFeedback,CFormInput,CInputGroup,CRow,CCol,CSpinner} from '@coreui/react';
 import Select from 'react-select';
 import CIcon from '@coreui/icons-react';
 import { cilDelete } from '@coreui/icons';
