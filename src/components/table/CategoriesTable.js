@@ -23,11 +23,12 @@ const CategoriesTable = ({ columns, data, handleEdit, handleDelete, handleChange
           <CTableRow key={item._id}>
             <CTableDataCell className="text-center">{index + 1}</CTableDataCell>
             <CTableDataCell>{item.name}</CTableDataCell>
+            <CTableDataCell>{item.main_slug}</CTableDataCell>
             <CTableDataCell>
               {item.subCategories.length > 0 ? (
                 <ul>
                   {item.subCategories.map((sub) => (
-                    <li key={sub._id}>{sub.name}</li>
+                    <li key={sub._id}>{sub.name}-{sub.sub_slug}</li>
                   ))}
                 </ul>
               ) : (
