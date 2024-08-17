@@ -39,6 +39,19 @@ const CategoryForm = ({
               <CFormFeedback>{errors.name}</CFormFeedback>
             </div>
             <div className="mb-3">
+              <CFormLabel htmlFor="main_slug">Category Slug <span className='text-danger'>*</span></CFormLabel>
+              <CFormInput
+                type="text"
+                id="main_slug"
+                name="main_slug"
+                placeholder="Enter category slug"
+                value={form.main_slug}
+                onChange={handleChange}
+                invalid={!!errors.main_slug}
+              />
+              <CFormFeedback>{errors.main_slug}</CFormFeedback>
+            </div>
+            <div className="mb-3">
               <CFormLabel htmlFor="library">Library <span className='text-danger'>*</span></CFormLabel>
               <Select
                 id="library"
@@ -69,27 +82,34 @@ const CategoryForm = ({
             </CRow>
 
             <CRow className='mt-1'>
-              {form.subCategories.map((subCategory, index) => (
+            {form.subCategories.map((subCategory, index) => (
                 <CCol xs={12} key={subCategory.id}>
                   <CInputGroup className="mt-2">
                     <CFormInput
                       placeholder="Sub category name"
+                      name="name"
                       value={subCategory.name}
                       onChange={(e) => handleSubCategoryChange(index, e)}
-                      invalid={errors.subCategories && !!errors.subCategories[index]}
+                      invalid={!!errors.subCategories && !!errors.subCategories[index]}
+                    />
+                    <CFormInput
+                      placeholder="Sub category slug"
+                      name="sub_slug"
+                      value={subCategory.sub_slug}
+                      onChange={(e) => handleSubCategoryChange(index, e)}
+                      invalid={!!errors.subCategories && !!errors.subCategories[index]}
                     />
                     <CButton
                       type="button"
                       color="danger"
-                      variant="outline"
                       onClick={() => removeSubCategory(subCategory.id)}
                     >
                       <CIcon icon={cilDelete} />
                     </CButton>
+                    {errors.subCategories && errors.subCategories[index] && (
+                      <CFormFeedback>{errors.subCategories[index]}</CFormFeedback>
+                    )}
                   </CInputGroup>
-                  {errors.subCategories && errors.subCategories[index] && (
-                    <CFormFeedback>{errors.subCategories[index]}</CFormFeedback>
-                  )}
                 </CCol>
               ))}
             </CRow>

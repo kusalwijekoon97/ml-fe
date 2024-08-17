@@ -1,7 +1,7 @@
 // src/views/pages/category/CreateCategory.js
 
 import React, { useEffect, useState } from 'react';
-import {CCard,CCardBody,CContainer,CRow,CCol,CSpinner} from '@coreui/react';
+import { CCard, CCardBody, CContainer, CRow, CCol, CSpinner } from '@coreui/react';
 import axios from 'axios';
 import { AppFooter, AppHeader, AppSidebar } from '../../../components';
 import CardHeaderWithTitleBtn from '../../../components/cards/CardHeaderWithTitleBtn';
@@ -17,8 +17,9 @@ const CreateCategory = () => {
 
   const [form, setForm] = useState({
     name: '',
+    main_slug: '',
     library: [],
-    subCategories: [{ id: Date.now(), name: '' }]
+    subCategories: [{ id: Date.now(), name: '', sub_slug: '' }]
   });
 
   const [loading, setLoading] = useState(false);
@@ -26,6 +27,7 @@ const CreateCategory = () => {
 
   const [errors, setErrors] = useState({
     name: '',
+    main_slug: '',
     library: '',
     subCategories: []
   });
@@ -59,9 +61,10 @@ const CreateCategory = () => {
   };
 
   const handleSubCategoryChange = (index, event) => {
+    const { name, value } = event.target;
     const newSubCategories = form.subCategories.map((subCategory, subIndex) => {
       if (index === subIndex) {
-        return { ...subCategory, name: event.target.value };
+        return { ...subCategory, [name]: value };
       }
       return subCategory;
     });
@@ -71,7 +74,7 @@ const CreateCategory = () => {
   const addSubCategory = () => {
     setForm({
       ...form,
-      subCategories: [...form.subCategories, { id: Date.now(), name: '' }]
+      subCategories: [...form.subCategories, { id: Date.now(), name: '', sub_slug: '' }]
     });
   };
 
@@ -89,6 +92,10 @@ const CreateCategory = () => {
       newErrors.name = 'Category name is mandatory.';
     }
 
+    if (!form.main_slug) {
+      newErrors.main_slug = 'Category slug is mandatory.';
+    }
+
     if (form.library.length === 0) {
       newErrors.library = 'Library is mandatory.';
     }
@@ -97,6 +104,10 @@ const CreateCategory = () => {
       if (!subCategory.name) {
         newErrors.subCategories = newErrors.subCategories || [];
         newErrors.subCategories[index] = 'Sub category name is mandatory.';
+      }
+      if (!subCategory.sub_slug) {
+        newErrors.subCategories = newErrors.subCategories || [];
+        newErrors.subCategories[index] = 'Sub category slug is mandatory.';
       }
     });
 
@@ -113,7 +124,10 @@ const CreateCategory = () => {
     const formattedForm = {
       ...form,
       library: form.library.map(option => option.value),
-      subCategories: form.subCategories.map(subCategory => subCategory.name)
+      subCategories: form.subCategories.map(subCategory => ({
+        name: subCategory.name,
+        sub_slug: subCategory.sub_slug
+      }))
     };
 
     axios.post(`${base_url}/api/categories/main/store`, formattedForm)
