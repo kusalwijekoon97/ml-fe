@@ -16,7 +16,8 @@ const EditCategory = () => {
 
   const [form, setForm] = useState({
     name: '',
-    library: [], // Initially empty
+    main_slug: '',
+    library: [],
     subCategories: []
   });
 
@@ -24,6 +25,7 @@ const EditCategory = () => {
   const [alert, setAlert] = useState({ visible: false, type: '', message: '' });
   const [errors, setErrors] = useState({
     name: '',
+    main_slug: '',
     library: '',
     subCategories: []
   });
@@ -49,13 +51,15 @@ const EditCategory = () => {
         const categoryData = categoryResponse.data.data;
         setForm({
           name: categoryData.name,
+          main_slug: categoryData.main_slug,
           library: categoryData.library.map(lib => ({
             value: lib._id,
             label: lib.name
           })),
           subCategories: categoryData.subCategories.map(subCat => ({
             id: subCat._id,
-            name: subCat.name
+            name: subCat.name,
+            sub_slug: subCat.sub_slug
           }))
         });
 
@@ -86,9 +90,10 @@ const EditCategory = () => {
   };
 
   const handleSubCategoryChange = (index, event) => {
+    const { name, value } = event.target;
     const newSubCategories = form.subCategories.map((subCategory, subIndex) => {
       if (index === subIndex) {
-        return { ...subCategory, name: event.target.value };
+        return { ...subCategory, [name]: value };
       }
       return subCategory;
     });
@@ -98,7 +103,7 @@ const EditCategory = () => {
   const addSubCategory = () => {
     setForm({
       ...form,
-      subCategories: [...form.subCategories, { id: Date.now(), name: '' }]
+      subCategories: [...form.subCategories, { id: Date.now(), name: '', sub_slug: '' }]
     });
   };
 
@@ -116,6 +121,10 @@ const EditCategory = () => {
       newErrors.name = 'Category name is mandatory.';
     }
 
+    if (!form.main_slug) {
+      newErrors.main_slug = 'Category slug is mandatory.';
+    }
+
     if (form.library.length === 0) {
       newErrors.library = 'Library is mandatory.';
     }
@@ -124,6 +133,10 @@ const EditCategory = () => {
       if (!subCategory.name) {
         newErrors.subCategories = newErrors.subCategories || [];
         newErrors.subCategories[index] = 'Sub category name is mandatory.';
+      }
+      if (!subCategory.sub_slug) {
+        newErrors.subCategories = newErrors.subCategories || [];
+        newErrors.subCategories[index] = 'Sub category slug is mandatory.';
       }
     });
 
@@ -142,7 +155,8 @@ const EditCategory = () => {
       library: form.library.map(option => option.value),
       subCategories: form.subCategories.map(subCategory => ({
         _id: subCategory.id, // Include ID if it's an existing subcategory
-        name: subCategory.name
+        name: subCategory.name,
+        sub_slug: subCategory.sub_slug
       }))
     };
 
