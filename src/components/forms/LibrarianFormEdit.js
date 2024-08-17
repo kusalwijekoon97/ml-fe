@@ -123,12 +123,14 @@ const Edit = ({
                 name="library"
                 options={libraryOptions}
                 isMulti
-                value={form.library}
+                value={form.libraries}
                 onChange={handleLibraryChange}
-                className={errors.library ? 'is-invalid' : ''} />
-              {errors.library && <CFormFeedback>{errors.library}</CFormFeedback>}
+                className={errors.libraries ? 'is-invalid' : ''}
+              />
+              {errors.libraries && <CFormFeedback>{errors.libraries}</CFormFeedback>}
             </div>
           </CCol>
+
 
         </CRow>
 
