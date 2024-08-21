@@ -4,13 +4,8 @@ import './LibraryToggle.css';
 const LibraryToggle = ({ checked, onChange }) => {
   const [state, setState] = useState(checked || 'All'); // Initialize with the passed checked prop or 'All'
 
-  const handleStateChange = () => {
-    // Cycle through the states: All -> SI -> EN -> All
-    let newState;
-    if (state === 'All') newState = 'SI';
-    else if (state === 'SI') newState = 'EN';
-    else newState = 'All';
-
+  const handleStateChange = (newState) => {
+    // Update the state and call the onChange callback
     setState(newState);
     if (onChange) onChange(newState);
     console.log(newState);
@@ -19,14 +14,21 @@ const LibraryToggle = ({ checked, onChange }) => {
   return (
     <div className="three-state-toggle">
       <div className="options">
-        <span className={`option-item ${state === 'All' ? 'active' : ''}`}>All</span>
-        <span className={`option-item ${state === 'SI' ? 'active' : ''}`}>SI</span>
-        <span className={`option-item ${state === 'EN' ? 'active' : ''}`}>EN</span>
+        <span className={`option-item ${state === 'All' ? 'active' : ''}`}
+          onClick={() => handleStateChange('All')}>
+          All
+        </span>
+        <span className={`option-item ${state === 'SI' ? 'active' : ''}`}
+          onClick={() => handleStateChange('SI')}>
+          SI
+        </span>
+        <span className={`option-item ${state === 'EN' ? 'active' : ''}`}
+          onClick={() => handleStateChange('EN')}>
+          EN
+        </span>
       </div>
-      <div
-        className={`toggle-switch ${state === 'All' ? 'left' : state === 'SI' ? 'center' : 'right'}`}
-        onClick={handleStateChange}
-      >
+      <div className={`toggle-switch ${state === 'All' ? 'left' : state === 'SI' ? 'center' : 'right'}`}
+        onClick={() => handleStateChange(state === 'All' ? 'SI' : state === 'SI' ? 'EN' : 'All')}>
         <span className="slider-label">{state}</span>
       </div>
     </div>

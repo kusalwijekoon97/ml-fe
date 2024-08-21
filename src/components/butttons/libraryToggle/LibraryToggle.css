@@ -35,7 +35,6 @@
   justify-content: center;
   color: white;
   font-weight: bold;
-  cursor: pointer;
   transition: transform 0.4s ease;
 }
 
@@ -51,6 +50,11 @@
   transform: translateX(100%);
 }
 
+
 .slider-label {
+  cursor: pointer;
+}
+
+.option-item {
   cursor: pointer;
 }
