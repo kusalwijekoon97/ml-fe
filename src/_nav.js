@@ -3,10 +3,8 @@ import CIcon from '@coreui/icons-react'
 import { cilSpeedometer, cilUser, cilPeople, cilBook, cilLayers, cibNintendoSwitch } from '@coreui/icons'
 import { CNavGroup, CNavItem } from '@coreui/react'
 import { BsFillGridFill } from 'react-icons/bs'
-import LibraryToggle from './butttons/libraryToggle/LibraryToggle';
 
-const _nav = () => [
-  const selectedLibrary = useSelector((state) => state.selectedLibrary);
+const _nav = (sel_lib) => [
   {
     component: CNavItem,
     name: 'Dashboard',
