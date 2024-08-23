@@ -1,0 +1,60 @@
+.three-state-toggle {
+  position: relative;
+  height: 40px;
+  background-color: #616161;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 10px;
+  padding: 0 20px;
+}
+
+.options {
+  position: absolute;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 10px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.options span.active {
+  color: white;
+}
+
+.toggle-switch {
+  position: absolute;
+  width: calc(100% / 3); /* Adjust width based on the number of states */
+  height: 30px;
+  background-color: #2196F3;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  transition: transform 0.4s ease;
+}
+
+.toggle-switch.left {
+  transform: translateX(-100%);
+}
+
+.toggle-switch.center {
+  transform: translateX(0%);
+}
+
+.toggle-switch.right {
+  transform: translateX(100%);
+}
+
+
+.slider-label {
+  cursor: pointer;
+}
+
+.option-item {
+  cursor: pointer;
+}
