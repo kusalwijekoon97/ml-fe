@@ -8,12 +8,13 @@ import base_url from "../../../utils/api/base_url";
 import CardHeaderWithTitleBtn from '../../../components/cards/CardHeaderWithTitleBtn';
 import AuthorsTable from '../../../components/table/AuthorsTable';
 import ResponseAlert from '../../../components/notifications/ResponseAlert';
-import { useLocation, useNavigate } from 'react-router-dom';
+import {useParams, useLocation, useNavigate } from 'react-router-dom';
 import alertify from 'alertifyjs';
 import 'alertifyjs/build/css/alertify.css';
 
 const IndexAuthor = () => {
   const location = useLocation();
+  const { sel_lib } = useParams();
   const navigate = useNavigate();
   const [authors, setAuthors] = useState([]);
   const [alert, setAlert] = useState({ visible: false, type: '', message: '' });

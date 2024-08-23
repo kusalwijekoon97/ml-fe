@@ -1,18 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import {
-  CCard,
-  CCardBody,
-  CCol,
-  CContainer,
-  CRow,
-  CPagination,
-  CPaginationItem,
-  CInputGroup,
-  CFormInput,
-  CButton,
-  CInputGroupText,
-} from '@coreui/react';
+import {CCard,CCardBody,CCol,CContainer,CRow,CPagination,CPaginationItem,CInputGroup,CFormInput,CButton,CInputGroupText} from '@coreui/react';
 import { CIcon } from '@coreui/icons-react';
 import { cibAddthis, cilSearch } from '@coreui/icons';
 import { AppFooter, AppHeader, AppSidebar } from '../../../components';
@@ -20,18 +8,21 @@ import base_url from "../../../utils/api/base_url";
 import CardHeaderWithTitleBtn from '../../../components/cards/CardHeaderWithTitleBtn';
 import CategoriesTable from '../../../components/table/CategoriesTable';
 import ResponseAlert from '../../../components/notifications/ResponseAlert';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import alertify from 'alertifyjs';
 import 'alertifyjs/build/css/alertify.css';
 
 const IndexCategory = () => {
   const location = useLocation();
+  const { sel_lib } = useParams();
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [alert, setAlert] = useState({ visible: false, type: '', message: '' });
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [search, setSearch] = useState('');
+
+  console.log(sel_lib);
 
   const columns = ["#", "Category Name","Slug", "Sub Categories", "Library", "Status", "Actions"];
 

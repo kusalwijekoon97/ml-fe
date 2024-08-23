@@ -64,17 +64,17 @@ const App = () => {
           <Route path="/libraries/create" name="libraries-create" element={<CreateLibrary />} />
           <Route path="/libraries/:libraryId/edit" name="libraries-edit" element={<EditLibrary />} />
           {/* category */}
-          <Route path="/categories" name="categories-all" element={<IndexCategory />} />
-          <Route path="/categories/create" name="categories-create" element={<CreateCategory />} />
-          <Route path="/categories/:catid/edit" name="categories-edit" element={<EditCategory />} />
+          <Route path="/:sel_lib/categories" name="categories-all" element={<IndexCategory />} />
+          <Route path="/:sel_lib/categories/create" name="categories-create" element={<CreateCategory />} />
+          <Route path="/:sel_lib/categories/:catid/edit" name="categories-edit" element={<EditCategory />} />
           {/* author */}
-          <Route path="/authors" name="authors-all" element={<IndexAuthor />} />
-          <Route path="/authors/create" name="authors-create" element={<CreateAuthor />} />
-          <Route path="/authors/:authorId/edit" name="authors-edit" element={<EditAuthor />} />
+          <Route path="/:sel_lib/authors" name="authors-all" element={<IndexAuthor />} />
+          <Route path="/:sel_lib/authors/create" name="authors-create" element={<CreateAuthor />} />
+          <Route path="/:sel_lib/authors/:authorId/edit" name="authors-edit" element={<EditAuthor />} />
           {/* librarian */}
-          <Route path="/librarians" name="librarians-all" element={<IndexLibrarian />} />
-          <Route path="/librarians/create" name="librarians-create" element={<CreateLibrarian />} />
-          <Route path="/librarians/:librarianId/edit" name="librarians-edit" element={<EditLibrarian />} />
+          <Route path="/:sel_lib/librarians" name="librarians-all" element={<IndexLibrarian />} />
+          <Route path="/:sel_lib/librarians/create" name="librarians-create" element={<CreateLibrarian />} />
+          <Route path="/:sel_lib/librarians/:librarianId/edit" name="librarians-edit" element={<EditLibrarian />} />
         </Routes>
       </Suspense>
     </Router>

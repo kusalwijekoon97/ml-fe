@@ -1,58 +1,51 @@
 import React, { useEffect, useState } from 'react';
 import './LibraryToggle.css';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 
 const LibraryToggle = ({ checked, onChange }) => {
-  const [state, setState] = useState('All');
+  const [state, setState] = useState('all'); // Use lowercase for state
   const navigate = useNavigate();
-
-  // useEffect((newState) => {
-  //   if (onChange) onChange(state);
-  //   console.log(state);
-  //   navigate(`/${newState}/`);
-  // }, [state, onChange]);
-
-  // const handleStateChange = (newState) => {
-  //   // Update the state and call the onChange callback
-  //   setState(newState);
-  //   if (onChange) onChange(newState);
-  //   navigate(`/${newState}/`);
-  //   console.log(newState);
-  // };
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    // Update URL when state changes
     if (state) {
       console.log(state);
-      navigate(`/${state}/`);
+      navigate(`/${state}`); // Navigate to lowercase state
+      dispatch({ type: 'set', selectedLibrary: state });
       if (onChange) onChange(state);
     }
-  }, [state, navigate, onChange]);
+  }, [state, dispatch, navigate, onChange]);
 
   const handleStateChange = (newState) => {
-    setState(newState.toLowerCase());
-    console.log(newState);
+    const formattedState = newState.toLowerCase(); // Convert to lowercase
+    setState(formattedState);
+    console.log(formattedState);
   };
 
   return (
     <div className="three-state-toggle">
       <div className="options">
-        <span className={`option-item ${state === 'All' ? 'active' : ''}`}
-          onClick={() => handleStateChange('All')}>
+        <span
+          className={`option-item ${state === 'all' ? 'active' : ''}`}
+          onClick={() => handleStateChange('all')}>
           All
         </span>
-        <span className={`option-item ${state === 'SI' ? 'active' : ''}`}
-          onClick={() => handleStateChange('SI')}>
+        <span
+          className={`option-item ${state === 'si' ? 'active' : ''}`}
+          onClick={() => handleStateChange('si')}>
           SI
         </span>
-        <span className={`option-item ${state === 'EN' ? 'active' : ''}`}
-          onClick={() => handleStateChange('EN')}>
+        <span
+          className={`option-item ${state === 'en' ? 'active' : ''}`}
+          onClick={() => handleStateChange('en')}>
           EN
         </span>
       </div>
-      <div className={`toggle-switch ${state === 'All' ? 'left' : state === 'SI' ? 'center' : 'right'}`}
-        onClick={() => handleStateChange(state === 'All' ? 'SI' : state === 'SI' ? 'EN' : 'All')}>
-        <span className="slider-label">{state}</span>
+      <div
+        className={`toggle-switch ${state === 'all' ? 'left' : state === 'si' ? 'center' : 'right'}`}
+        onClick={() => handleStateChange(state === 'all' ? 'si' : state === 'si' ? 'en' : 'all')}>
+        <span className="slider-label">{state.toUpperCase()}</span> {/* Display uppercase */}
       </div>
     </div>
   );
