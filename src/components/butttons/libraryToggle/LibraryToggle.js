@@ -1,19 +1,36 @@
 import React, { useEffect, useState } from 'react';
 import './LibraryToggle.css';
+import { useNavigate } from 'react-router-dom';
 
 const LibraryToggle = ({ checked, onChange }) => {
   const [state, setState] = useState('All');
+  const navigate = useNavigate();
 
-  useEffect((newState) => {
-    if (onChange) onChange(state);
-    console.log(state);
-  }, [state, onChange]);
+  // useEffect((newState) => {
+  //   if (onChange) onChange(state);
+  //   console.log(state);
+  //   navigate(`/${newState}/`);
+  // }, [state, onChange]);
+
+  // const handleStateChange = (newState) => {
+  //   // Update the state and call the onChange callback
+  //   setState(newState);
+  //   if (onChange) onChange(newState);
+  //   navigate(`/${newState}/`);
+  //   console.log(newState);
+  // };
+
+  useEffect(() => {
+    // Update URL when state changes
+    if (state) {
+      console.log(state);
+      navigate(`/${state}/`);
+      if (onChange) onChange(state);
+    }
+  }, [state, navigate, onChange]);
 
   const handleStateChange = (newState) => {
-    // Update the state and call the onChange callback
-    setState(newState);
-    if (onChange) onChange(newState);
-    // navigate(`/${selectedLibrary}/categories`);
+    setState(newState.toLowerCase());
     console.log(newState);
   };
 
