@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {CCard,CCardBody,CContainer,CRow,CCol,CSpinner} from '@coreui/react';
+import { CCard, CCardBody, CContainer, CRow, CCol, CSpinner } from '@coreui/react';
 import axios from 'axios';
 import { AppFooter, AppHeader, AppSidebar } from '../../../components';
 import CardHeaderWithTitleBtn from '../../../components/cards/CardHeaderWithTitleBtn';
@@ -10,7 +10,7 @@ import base_url from "../../../utils/api/base_url";
 import ResponseAlert from '../../../components/notifications/ResponseAlert';
 import AuthorForm from '../../../components/forms/AuthorForm';
 
-const CreateAuthor = () => {
+const CreateMaterial = () => {
   const navigate = useNavigate();
 
   const diedOptions = [
@@ -109,27 +109,27 @@ const CreateAuthor = () => {
         'Content-Type': 'multipart/form-data'
       }
     })
-    .then(response => {
-      setLoading(false);
-      navigate("/authors", {
-        state: {
-          alert: {
-            visible: true,
-            type: 'success',
-            message: 'Author created successfully!'
+      .then(response => {
+        setLoading(false);
+        navigate("/authors", {
+          state: {
+            alert: {
+              visible: true,
+              type: 'success',
+              message: 'Author created successfully!'
+            }
           }
-        }
+        });
+      })
+      .catch(error => {
+        setLoading(false);
+        setAlert({
+          visible: true,
+          type: 'failure',
+          message: 'Author creation failed. Please try again.'
+        });
+        console.error(error);
       });
-    })
-    .catch(error => {
-      setLoading(false);
-      setAlert({
-        visible: true,
-        type: 'failure',
-        message: 'Author creation failed. Please try again.'
-      });
-      console.error(error);
-    });
   };
 
   const handlePrevious = () => {
@@ -183,4 +183,4 @@ const CreateAuthor = () => {
   );
 };
 
-export default CreateAuthor;
+export default CreateMaterial;
