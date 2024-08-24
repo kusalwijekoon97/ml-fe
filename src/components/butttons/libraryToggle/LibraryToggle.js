@@ -1,13 +1,19 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './LibraryToggle.css';
 
 const LibraryToggle = ({ checked, onChange }) => {
-  const [state, setState] = useState(checked || 'All'); // Initialize with the passed checked prop or 'All'
+  const [state, setState] = useState('All');
+
+  useEffect((newState) => {
+    if (onChange) onChange(state);
+    console.log(state);
+  }, [state, onChange]);
 
   const handleStateChange = (newState) => {
     // Update the state and call the onChange callback
     setState(newState);
     if (onChange) onChange(newState);
+    // navigate(`/${selectedLibrary}/categories`);
     console.log(newState);
   };
 
