@@ -8,54 +8,21 @@ import { cilList } from '@coreui/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import base_url from "../../../utils/api/base_url";
 import ResponseAlert from '../../../components/notifications/ResponseAlert';
-import AuthorForm from '../../../components/forms/AuthorForm';
+import MaterialForm from '../../../components/forms/MaterialForm';
 
 const CreateMaterial = () => {
   const navigate = useNavigate();
-
-  const diedOptions = [
-    { value: '', label: 'Select...' },
-    { value: 'yes', label: 'Yes' },
-    { value: 'no', label: 'No' }
-  ];
-
-  // Handle change for the react-select component
-  const handleDiedChange = (selectedOption) => {
-    handleChange({
-      target: {
-        name: 'died',
-        value: selectedOption ? selectedOption.value : ''
-      }
-    });
-  };
+  const [currentStep, setCurrentStep] = useState(1);
 
   const [form, setForm] = useState({
-    firstname: '',
-    lastname: '',
-    died: 'no',
-    penName: '',
-    nationality: '',
-    firstPublishDate: '',
-    description: '',
-    profileImage: null,
-    position: '',
-    income: ''
+
   });
 
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState({ visible: false, type: '', message: '' });
 
   const [errors, setErrors] = useState({
-    firstname: '',
-    lastname: '',
-    died: '',
-    penName: '',
-    nationality: '',
-    firstPublishDate: '',
-    description: '',
-    profileImage: '',
-    position: '',
-    income: ''
+
   });
 
   const handleChange = (e) => {
@@ -64,22 +31,9 @@ const CreateMaterial = () => {
     setErrors({ ...errors, [name]: '' });
   };
 
-  const handleFileChange = (e) => {
-    setForm({ ...form, profileImage: e.target.files[0] });
-  };
 
   const validateForm = () => {
     const newErrors = {};
-
-    if (!form.firstname) newErrors.firstname = 'First name is mandatory.';
-    if (!form.lastname) newErrors.lastname = 'Last name is mandatory.';
-    if (!form.penName) newErrors.penName = 'Pen name is mandatory.';
-    if (!form.nationality) newErrors.nationality = 'Nationality is mandatory.';
-    if (!form.firstPublishDate) newErrors.firstPublishDate = 'First publish date is mandatory.';
-    if (!form.description) newErrors.description = 'Description is mandatory.';
-    if (!form.profileImage) newErrors.profileImage = 'Profile image is mandatory.';
-    if (!form.position) newErrors.position = 'Position is mandatory.';
-    if (!form.income) newErrors.income = 'Income is mandatory.';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -93,30 +47,20 @@ const CreateMaterial = () => {
     setLoading(true);
 
     const formData = new FormData();
-    formData.append('firstname', form.firstname);
-    formData.append('lastname', form.lastname);
-    formData.append('died', form.died);
-    formData.append('penName', form.penName);
-    formData.append('nationality', form.nationality);
-    formData.append('firstPublishDate', form.firstPublishDate);
-    formData.append('description', form.description);
-    formData.append('profileImage', form.profileImage);
-    formData.append('position', form.position);
-    formData.append('income', form.income);
 
-    axios.post(`${base_url}/api/authors/store`, formData, {
+    axios.post(`${base_url}/api/materials/store`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
     })
       .then(response => {
         setLoading(false);
-        navigate("/authors", {
+        navigate("/materials", {
           state: {
             alert: {
               visible: true,
               type: 'success',
-              message: 'Author created successfully!'
+              message: 'Material created successfully!'
             }
           }
         });
@@ -126,7 +70,7 @@ const CreateMaterial = () => {
         setAlert({
           visible: true,
           type: 'failure',
-          message: 'Author creation failed. Please try again.'
+          message: 'Material creation failed. Please try again.'
         });
         console.error(error);
       });
@@ -136,11 +80,19 @@ const CreateMaterial = () => {
     navigate(-1);
   };
 
+  const handleNextStep = () => {
+    setCurrentStep(currentStep + 1);
+  };
+
+  const handlePreviousStep = () => {
+    setCurrentStep(currentStep - 1);
+  };
+
   return (
     <>
       <AppSidebar />
       <div className="wrapper d-flex flex-column min-vh-100">
-        <AppHeader title="Authors" />
+        <AppHeader title="Materials" />
         <div className="body flex-grow-1">
           <ResponseAlert
             visible={alert.visible}
@@ -153,22 +105,22 @@ const CreateMaterial = () => {
               <CCol xs={12}>
                 <CCard className="mb-4 border-top-primary border-top-3">
                   <CardHeaderWithTitleBtn
-                    title="Author"
+                    title="Material"
                     subtitle="create"
                     buttonIcon={<CIcon icon={cilList} />}
-                    buttonText="Authors"
-                    linkTo="/authors"
+                    buttonText="Materials"
+                    linkTo="/materials"
                   />
                   <CCardBody>
-                    <AuthorForm
+                    <MaterialForm
                       form={form}
                       errors={errors}
-                      diedOptions={diedOptions}
-                      handleDiedChange={handleDiedChange}
                       handleChange={handleChange}
-                      handleFileChange={handleFileChange}
                       handleSubmit={handleSubmit}
                       handlePrevious={handlePrevious}
+                      handleNextStep={handleNextStep}
+                      handlePreviousStep={handlePreviousStep}
+                      currentStep={currentStep}
                       loading={loading}
                     />
                   </CCardBody>

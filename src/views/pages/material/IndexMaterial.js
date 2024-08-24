@@ -126,7 +126,7 @@ const IndexMaterial = () => {
     <>
       <AppSidebar />
       <div className="wrapper d-flex flex-column min-vh-100">
-        <AppHeader title="Authors" />
+        <AppHeader title="Materials" />
         <div className="body flex-grow-1">
           <ResponseAlert
             visible={alert.visible}
@@ -139,11 +139,11 @@ const IndexMaterial = () => {
               <CCol xs={12}>
                 <CCard className="mb-4 border-top-primary border-top-3">
                   <CardHeaderWithTitleBtn
-                    title="Authors"
+                    title="Materials"
                     subtitle="List"
                     buttonIcon={<CIcon icon={cibAddthis} />}
-                    buttonText="Add Author"
-                    linkTo="/authors/create"
+                    buttonText="Add Material"
+                    linkTo="/materials/create"
                   />
                   <CCardBody>
                     <CRow className='mb-2'>

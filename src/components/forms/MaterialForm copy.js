@@ -20,14 +20,14 @@ const MaterialForm = ({
         {currentStep === 1 && (
           <div id='stepOne'>
             <CRow>
-              <CCol xs={12}>
+              <CCol xs={6}>
                 <div className="mb-3">
-                  <CFormLabel htmlFor="name">Name <span className='text-danger'>*</span></CFormLabel>
+                  <CFormLabel htmlFor="name">Material Name <span className='text-danger'>*</span></CFormLabel>
                   <CFormInput
                     type="text"
                     id="name"
                     name="name"
-                    placeholder="Enter name"
+                    placeholder="Enter material name"
                     value={form.name}
                     onChange={handleChange}
                     invalid={!!errors.name}
@@ -38,7 +38,7 @@ const MaterialForm = ({
 
               <CCol xs={6}>
                 <div className="mb-3">
-                  <CFormLabel htmlFor="authorId">Author <span className='text-danger'>*</span></CFormLabel>
+                  <CFormLabel htmlFor="authorId">Author ID <span className='text-danger'>*</span></CFormLabel>
                   <CFormInput
                     type="text"
                     id="authorId"
@@ -51,9 +51,12 @@ const MaterialForm = ({
                   <CFormFeedback>{errors.authorId}</CFormFeedback>
                 </div>
               </CCol>
+            </CRow>
+
+            <CRow>
               <CCol xs={6}>
                 <div className="mb-3">
-                  <CFormLabel htmlFor="translatorId">Translator</CFormLabel>
+                  <CFormLabel htmlFor="translatorId">Translator ID</CFormLabel>
                   <CFormInput
                     type="text"
                     id="translatorId"
@@ -82,6 +85,9 @@ const MaterialForm = ({
                   <CFormFeedback>{errors.isbn}</CFormFeedback>
                 </div>
               </CCol>
+            </CRow>
+
+            <CRow>
               <CCol xs={6}>
                 <div className="mb-3">
                   <CFormLabel htmlFor="coverImage">Cover Image URL</CFormLabel>
@@ -113,6 +119,9 @@ const MaterialForm = ({
                   <CFormFeedback>{errors.publisher}</CFormFeedback>
                 </div>
               </CCol>
+            </CRow>
+
+            <CRow>
               <CCol xs={6}>
                 <div className="mb-3">
                   <CFormLabel htmlFor="publishDate">Publish Date</CFormLabel>
@@ -144,6 +153,9 @@ const MaterialForm = ({
                   <CFormFeedback>{errors.language}</CFormFeedback>
                 </div>
               </CCol>
+            </CRow>
+
+            <CRow>
               <CCol xs={12}>
                 <div className="mb-3">
                   <CFormLabel htmlFor="description">Description</CFormLabel>
