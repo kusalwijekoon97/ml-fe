@@ -13,7 +13,13 @@ const LibrarianForm = ({
   handleSubmit,
   handlePrevious,
   loading
+
 }) => {
+  const permissionKeys = Object.keys(form.permissions);
+  const midIndex = Math.ceil(permissionKeys.length / 2);
+  const firstColumnPermissions = permissionKeys.slice(0, midIndex);
+  const secondColumnPermissions = permissionKeys.slice(midIndex);
+
   return (
     <>
       <CForm onSubmit={handleSubmit}>
@@ -136,33 +142,30 @@ const LibrarianForm = ({
             <CFormLabel htmlFor="library">Choose Access Levels for Menus</CFormLabel>
           </CCol>
           <CCol xs={6}>
-          {Object.keys(form.permissions).map(permission => (
-            <CFormCheck
-              key={permission}
-              type="checkbox"
-              id={permission}
-              name={permission}
-              label={permission.charAt(0).toUpperCase() + permission.slice(1)}
-              checked={form.permissions[permission]}
-              onChange={handlePermissionChange}
-            />
-          ))}
-            {/* <div className="mb-3">
-              <CFormCheck id="permission_users" name="permission_users" label="Users" />
-              <CFormCheck id="permission_readers" name="permission_readers" label="Readers" />
-              <CFormCheck id="permission_categories" name="permission_categories" label="Categories" />
-              <CFormCheck id="permission_books" name="permission_books" label="Books" />
-              <CFormCheck id="permission_authors" name="permission_authors" label="Authors" />
-            </div>
+            {firstColumnPermissions.map(permission => (
+              <CFormCheck
+                key={permission}
+                type="checkbox"
+                id={permission}
+                name={permission}
+                label={permission.charAt(0).toUpperCase() + permission.slice(1)}
+                checked={form.permissions[permission]}
+                onChange={handlePermissionChange}
+              />
+            ))}
           </CCol>
           <CCol xs={6}>
-            <div className="mb-3">
-              <CFormCheck id="permission_statics" name="permission_statics" label="Statics" />
-              <CFormCheck id="permission_sales" name="permission_sales" label="Sales" />
-              <CFormCheck id="permission_packages" name="permission_packages" label="Packages" />
-              <CFormCheck id="permission_notifications" name="permission_notifications" label="Notifications" />
-              <CFormCheck id="permission_settings" name="permission_settings" label="Settings" />
-            </div> */}
+            {secondColumnPermissions.map(permission => (
+              <CFormCheck
+                key={permission}
+                type="checkbox"
+                id={permission}
+                name={permission}
+                label={permission.charAt(0).toUpperCase() + permission.slice(1)}
+                checked={form.permissions[permission]}
+                onChange={handlePermissionChange}
+              />
+            ))}
           </CCol>
         </CRow>
 
