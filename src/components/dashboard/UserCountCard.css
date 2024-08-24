@@ -1,0 +1,4 @@
+/* src\components\dashboard\UserCountCard.css */
+.custom-widget-stats .c-widget-stats-value {
+  font-size: 2rem !important;
+}
