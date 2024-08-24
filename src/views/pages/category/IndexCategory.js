@@ -1,18 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import {
-  CCard,
-  CCardBody,
-  CCol,
-  CContainer,
-  CRow,
-  CPagination,
-  CPaginationItem,
-  CInputGroup,
-  CFormInput,
-  CButton,
-  CInputGroupText,
-} from '@coreui/react';
+import { CCard, CCardBody, CCol, CContainer, CRow, CPagination, CPaginationItem, CInputGroup, CFormInput, CButton, CInputGroupText } from '@coreui/react';
 import { CIcon } from '@coreui/icons-react';
 import { cibAddthis, cilSearch } from '@coreui/icons';
 import { AppFooter, AppHeader, AppSidebar } from '../../../components';
@@ -27,19 +15,21 @@ import 'alertifyjs/build/css/alertify.css';
 const IndexCategory = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [selectedLibrary, setSelectedLibrary] = useState('All');
   const [categories, setCategories] = useState([]);
   const [alert, setAlert] = useState({ visible: false, type: '', message: '' });
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [search, setSearch] = useState('');
 
-  const columns = ["#", "Category Name","Slug", "Sub Categories", "Library", "Status", "Actions"];
+  const columns = ["#", "Category Name", "Slug", "Sub Categories", "Library", "Status", "Actions"];
 
   const fetchCategories = (page = 1, search = '') => {
     axios.get(`${base_url}/api/categories/main/all`, {
       params: {
         page,
         search,
+        library: selectedLibrary
       },
     })
       .then(response => {
@@ -55,6 +45,15 @@ const IndexCategory = () => {
         console.error('There was an error fetching the categories!', error);
       });
   };
+
+  // Retrieve selectedLibrary from sessionStorage when component mounts
+  useEffect(() => {
+    const storedLibrary = sessionStorage.getItem('selectedLibrary');
+    if (storedLibrary) {
+      setSelectedLibrary(storedLibrary); // Set the state
+      console.log('selectedLibrary : ' + storedLibrary); // Log the correct value after setting it
+    }
+  }, []);
 
   useEffect(() => {
     fetchCategories(currentPage, search);
@@ -163,7 +162,7 @@ const IndexCategory = () => {
                     linkTo="/categories/create"
                   />
                   <CCardBody>
-                  <CRow className='mb-2'>
+                    <CRow className='mb-2'>
                       <CCol xs={4}>
                         <CInputGroup>
                           <CInputGroupText>

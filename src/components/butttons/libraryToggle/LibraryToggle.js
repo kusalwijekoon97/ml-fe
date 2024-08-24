@@ -4,17 +4,20 @@ import './LibraryToggle.css';
 const LibraryToggle = ({ checked, onChange }) => {
   const [state, setState] = useState('All');
 
-  useEffect((newState) => {
+  // useEffect to trigger when 'state' changes
+  useEffect(() => {
+    // Trigger the callback if provided
     if (onChange) onChange(state);
+
+    // Update session storage
+    sessionStorage.setItem('selectedLibrary', state);
+
     console.log(state);
   }, [state, onChange]);
 
+  // Function to change the state
   const handleStateChange = (newState) => {
-    // Update the state and call the onChange callback
-    setState(newState);
-    if (onChange) onChange(newState);
-    // navigate(`/${selectedLibrary}/categories`);
-    console.log(newState);
+    setState(newState); // This will automatically trigger the useEffect
   };
 
   return (
