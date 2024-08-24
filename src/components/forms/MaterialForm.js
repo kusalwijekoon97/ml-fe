@@ -12,6 +12,15 @@ const MaterialForm = ({
   handleNextStep,
   handlePreviousStep,
   currentStep,
+  authorOptions,
+  handleAuthorChange,
+  handleTranslatorChange,
+  libraryOptions,
+  handleLibraryChange,
+  categoryOptions,
+  handleCategoryChange,
+  subCategoryOptions,
+  handleSubCategoryChange,
   loading
 }) => {
   return (
@@ -39,31 +48,27 @@ const MaterialForm = ({
               <CCol xs={6}>
                 <div className="mb-3">
                   <CFormLabel htmlFor="authorId">Author <span className='text-danger'>*</span></CFormLabel>
-                  <CFormInput
-                    type="text"
+                  <Select
                     id="authorId"
                     name="authorId"
-                    placeholder="Enter author ID"
-                    value={form.authorId}
-                    onChange={handleChange}
-                    invalid={!!errors.authorId}
-                  />
-                  <CFormFeedback>{errors.authorId}</CFormFeedback>
+                    options={authorOptions}
+                    value={form.author}
+                    onChange={handleAuthorChange}
+                    className={errors.author ? 'is-invalid' : ''} />
+                  {errors.author && <CFormFeedback>{errors.author}</CFormFeedback>}
                 </div>
               </CCol>
               <CCol xs={6}>
                 <div className="mb-3">
                   <CFormLabel htmlFor="translatorId">Translator</CFormLabel>
-                  <CFormInput
-                    type="text"
+                  <Select
                     id="translatorId"
                     name="translatorId"
-                    placeholder="Enter translator ID"
-                    value={form.translatorId}
-                    onChange={handleChange}
-                    invalid={!!errors.translatorId}
-                  />
-                  <CFormFeedback>{errors.translatorId}</CFormFeedback>
+                    options={authorOptions}
+                    value={form.translator}
+                    onChange={handleTranslatorChange}
+                    className={errors.translator ? 'is-invalid' : ''} />
+                  {errors.translator && <CFormFeedback>{errors.translator}</CFormFeedback>}
                 </div>
               </CCol>
 
@@ -84,15 +89,14 @@ const MaterialForm = ({
               </CCol>
               <CCol xs={6}>
                 <div className="mb-3">
-                  <CFormLabel htmlFor="coverImage">Cover Image URL</CFormLabel>
+                  <CFormLabel htmlFor="coverImage">Cover Image</CFormLabel>
                   <CFormInput
-                    type="text"
+                    type="file"
                     id="coverImage"
                     name="coverImage"
-                    placeholder="Enter cover image URL"
-                    value={form.coverImage}
                     onChange={handleChange}
                     invalid={!!errors.coverImage}
+                    accept=".png, .jpg, .jpeg"
                   />
                   <CFormFeedback>{errors.coverImage}</CFormFeedback>
                 </div>
@@ -113,11 +117,12 @@ const MaterialForm = ({
                   <CFormFeedback>{errors.publisher}</CFormFeedback>
                 </div>
               </CCol>
+
               <CCol xs={6}>
                 <div className="mb-3">
                   <CFormLabel htmlFor="publishDate">Publish Date</CFormLabel>
                   <CFormInput
-                    type="text"
+                    type="date"
                     id="publishDate"
                     name="publishDate"
                     placeholder="Enter publish date"
@@ -131,19 +136,51 @@ const MaterialForm = ({
 
               <CCol xs={6}>
                 <div className="mb-3">
-                  <CFormLabel htmlFor="language">Language</CFormLabel>
-                  <CFormInput
-                    type="text"
-                    id="language"
-                    name="language"
-                    placeholder="Enter language"
-                    value={form.language}
-                    onChange={handleChange}
-                    invalid={!!errors.language}
+                  <CFormLabel htmlFor="category">Category</CFormLabel>
+                  <Select
+                    id="category"
+                    name="category"
+                    options={categoryOptions}
+                    isMulti
+                    value={form.category}
+                    onChange={handleCategoryChange}
+                    className={errors.category ? 'is-invalid' : ''}
                   />
-                  <CFormFeedback>{errors.language}</CFormFeedback>
+                  {errors.category && <CFormFeedback>{errors.category}</CFormFeedback>}
                 </div>
               </CCol>
+
+              <CCol xs={6}>
+                <div className="mb-3">
+                  <CFormLabel htmlFor="subCategory">sub Category</CFormLabel>
+                  <Select
+                    id="subCategory"
+                    name="subCategory"
+                    options={subCategoryOptions}
+                    isMulti
+                    value={form.subCategory}
+                    onChange={handleSubCategoryChange}
+                    className={errors.subCategory ? 'is-invalid' : ''}
+                  />
+                  {errors.subCategory && <CFormFeedback>{errors.subCategory}</CFormFeedback>}
+                </div>
+              </CCol>
+
+              <CCol xs={6}>
+                <div className="mb-3">
+                  <CFormLabel htmlFor="language">Library</CFormLabel>
+                  <Select
+                    id="library"
+                    name="library"
+                    options={libraryOptions}
+                    isMulti
+                    value={form.library}
+                    onChange={handleLibraryChange}
+                    className={errors.library ? 'is-invalid' : ''} />
+                  {errors.library && <CFormFeedback>{errors.library}</CFormFeedback>}
+                </div>
+              </CCol>
+
               <CCol xs={12}>
                 <div className="mb-3">
                   <CFormLabel htmlFor="description">Description</CFormLabel>
