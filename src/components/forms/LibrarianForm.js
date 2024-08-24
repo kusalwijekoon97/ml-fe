@@ -1,5 +1,5 @@
 import React from 'react';
-import { CForm, CFormLabel, CButton, CFormFeedback, CFormInput, CRow, CCol, CSpinner } from '@coreui/react';
+import { CForm, CFormLabel, CButton, CFormFeedback, CFormInput, CRow, CCol, CSpinner, CFormCheck } from '@coreui/react';
 import { Link } from 'react-router-dom';
 import Select from 'react-select';
 
@@ -9,6 +9,7 @@ const LibrarianForm = ({
   libraryOptions,
   handleChange,
   handleLibraryChange,
+  handlePermissionChange,
   handleSubmit,
   handlePrevious,
   loading
@@ -129,7 +130,40 @@ const LibrarianForm = ({
               {errors.library && <CFormFeedback>{errors.library}</CFormFeedback>}
             </div>
           </CCol>
-
+        </CRow>
+        <CRow>
+          <CCol xs={12}>
+            <CFormLabel htmlFor="library">Choose Access Levels for Menus</CFormLabel>
+          </CCol>
+          <CCol xs={6}>
+          {Object.keys(form.permissions).map(permission => (
+            <CFormCheck
+              key={permission}
+              type="checkbox"
+              id={permission}
+              name={permission}
+              label={permission.charAt(0).toUpperCase() + permission.slice(1)}
+              checked={form.permissions[permission]}
+              onChange={handlePermissionChange}
+            />
+          ))}
+            {/* <div className="mb-3">
+              <CFormCheck id="permission_users" name="permission_users" label="Users" />
+              <CFormCheck id="permission_readers" name="permission_readers" label="Readers" />
+              <CFormCheck id="permission_categories" name="permission_categories" label="Categories" />
+              <CFormCheck id="permission_books" name="permission_books" label="Books" />
+              <CFormCheck id="permission_authors" name="permission_authors" label="Authors" />
+            </div>
+          </CCol>
+          <CCol xs={6}>
+            <div className="mb-3">
+              <CFormCheck id="permission_statics" name="permission_statics" label="Statics" />
+              <CFormCheck id="permission_sales" name="permission_sales" label="Sales" />
+              <CFormCheck id="permission_packages" name="permission_packages" label="Packages" />
+              <CFormCheck id="permission_notifications" name="permission_notifications" label="Notifications" />
+              <CFormCheck id="permission_settings" name="permission_settings" label="Settings" />
+            </div> */}
+          </CCol>
         </CRow>
 
         <div className="text-end">
