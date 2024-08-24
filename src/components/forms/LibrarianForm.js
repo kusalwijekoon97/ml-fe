@@ -1,5 +1,5 @@
 import React from 'react';
-import { CForm, CFormLabel, CButton, CFormFeedback, CFormInput, CRow, CCol, CSpinner } from '@coreui/react';
+import { CForm, CFormLabel, CButton, CFormFeedback, CFormInput, CRow, CCol, CSpinner, CFormCheck } from '@coreui/react';
 import { Link } from 'react-router-dom';
 import Select from 'react-select';
 
@@ -9,10 +9,17 @@ const LibrarianForm = ({
   libraryOptions,
   handleChange,
   handleLibraryChange,
+  handlePermissionChange,
   handleSubmit,
   handlePrevious,
   loading
+
 }) => {
+  const permissionKeys = Object.keys(form.permissions);
+  const midIndex = Math.ceil(permissionKeys.length / 2);
+  const firstColumnPermissions = permissionKeys.slice(0, midIndex);
+  const secondColumnPermissions = permissionKeys.slice(midIndex);
+
   return (
     <>
       <CForm onSubmit={handleSubmit}>
@@ -129,7 +136,37 @@ const LibrarianForm = ({
               {errors.library && <CFormFeedback>{errors.library}</CFormFeedback>}
             </div>
           </CCol>
-
+        </CRow>
+        <CRow>
+          <CCol xs={12}>
+            <CFormLabel htmlFor="library">Choose Access Levels for Menus</CFormLabel>
+          </CCol>
+          <CCol xs={6}>
+            {firstColumnPermissions.map(permission => (
+              <CFormCheck
+                key={permission}
+                type="checkbox"
+                id={permission}
+                name={permission}
+                label={permission.charAt(0).toUpperCase() + permission.slice(1)}
+                checked={form.permissions[permission]}
+                onChange={handlePermissionChange}
+              />
+            ))}
+          </CCol>
+          <CCol xs={6}>
+            {secondColumnPermissions.map(permission => (
+              <CFormCheck
+                key={permission}
+                type="checkbox"
+                id={permission}
+                name={permission}
+                label={permission.charAt(0).toUpperCase() + permission.slice(1)}
+                checked={form.permissions[permission]}
+                onChange={handlePermissionChange}
+              />
+            ))}
+          </CCol>
         </CRow>
 
         <div className="text-end">

@@ -1,17 +1,5 @@
 import React from 'react';
-import {
-  CForm,
-  CFormLabel,
-  CButton,
-  CFormFeedback,
-  CFormInput,
-  CFormSelect,
-  CFormTextarea,
-  CInputGroup,
-  CRow,
-  CCol,
-  CSpinner
-} from '@coreui/react';
+import {CForm,CFormLabel,CButton,CFormFeedback,CFormInput,CFormSelect,CFormTextarea,CInputGroup,CRow,CCol,CSpinner} from '@coreui/react';
 import { Link } from 'react-router-dom';
 import Select from 'react-select';
 

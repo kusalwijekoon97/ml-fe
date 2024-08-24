@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
 import { CCloseButton, CSidebar, CSidebarBrand, CSidebarFooter, CSidebarHeader, CSidebarToggler } from '@coreui/react';
@@ -13,11 +13,13 @@ import logoFullBGWhite from '../assets/images/logo/logoFullBGWhite.png';
 
 // sidebar nav config
 import navigation from '../_nav';
+import LibraryToggle from './butttons/libraryToggle/LibraryToggle';
 
 const AppSidebar = () => {
   const dispatch = useDispatch()
   const unfoldable = useSelector((state) => state.sidebarUnfoldable)
   const sidebarShow = useSelector((state) => state.sidebarShow)
+
 
   return (
     <CSidebar
@@ -39,6 +41,7 @@ const AppSidebar = () => {
           dark
           onClick={() => dispatch({ type: 'set', sidebarShow: false })} />
       </CSidebarHeader>
+      <LibraryToggle />
       <AppSidebarNav items={navigation} />
       <CSidebarFooter className="border-top d-none d-lg-flex">
         <CSidebarToggler
