@@ -22,7 +22,7 @@ const IndexLibrarian = () => {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [search, setSearch] = useState('');
 
-  const columns = ["#", "Name", "NIC", "Address", "Phone", "Email", "Menu Access", "Status", "Actions"];
+  const columns = ["#", "Name", "Email", "Libraries", "Menu Access", "Status", "Actions"];
 
   useEffect(() => {
     // Fetch librarians with pagination and search

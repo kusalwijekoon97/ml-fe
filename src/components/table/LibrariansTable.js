@@ -30,10 +30,18 @@ const LibrariansTable = ({ columns, data, handleEdit, handleDelete, handleChange
           <CTableRow key={librarian._id}>
             <CTableDataCell>{index + 1}</CTableDataCell>
             <CTableDataCell>{librarian.firstName} {librarian.lastName}</CTableDataCell>
-            <CTableDataCell>{librarian.nic}</CTableDataCell>
-            <CTableDataCell>{librarian.address}</CTableDataCell>
-            <CTableDataCell>{librarian.phone}</CTableDataCell>
             <CTableDataCell>{librarian.email}</CTableDataCell>
+            <CTableDataCell>
+              {librarian.libraries && librarian.libraries.length > 0 ? (
+                librarian.libraries.map((lib, index) => (
+                  <CBadge key={lib._id} color="secondary" className="me-1">{lib.name}</CBadge>
+                ))
+              ) : (
+                <span className="d-flex align-items-center">
+                  <CIcon icon={cilWarning} className="me-2 text-warning" /> No Libraries
+                </span>
+              )}
+            </CTableDataCell>
             <CTableDataCell>
               {formatPermissions(librarian.permissions)}
             </CTableDataCell>
