@@ -24,6 +24,18 @@ const EditLibrarian = () => {
     phone: '',
     address: '',
     libraries: [],
+    permissions: {
+      users: false,
+      readers: false,
+      categories: false,
+      books: false,
+      authors: false,
+      statics: false,
+      sales: false,
+      packages: false,
+      notifications: false,
+      settings: false,
+    }
   });
 
   const [loading, setLoading] = useState(false);
@@ -66,6 +78,18 @@ const EditLibrarian = () => {
             value: lib._id,
             label: lib.name
           })),
+          permissions: data.permissions || {
+            users: false,
+            readers: false,
+            categories: false,
+            books: false,
+            authors: false,
+            statics: false,
+            sales: false,
+            packages: false,
+            notifications: false,
+            settings: false,
+          }
         });
 
         setLoading(false);
@@ -86,13 +110,30 @@ const EditLibrarian = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
-    setErrors({ ...errors, [name]: '' });
+    setForm(prevForm => ({
+      ...prevForm,
+      [name]: value
+    }));
+    setErrors(prevErrors => ({
+      ...prevErrors,
+      [name]: ''
+    }));
   };
 
   const handleLibraryChange = (selectedOptions) => {
     setForm({ ...form, libraries: selectedOptions });
     setErrors({ ...errors, libraries: '' });
+  };
+
+  const handlePermissionChange = (e) => {
+    const { name, checked } = e.target;
+    setForm(prevForm => ({
+      ...prevForm,
+      permissions: {
+        ...prevForm.permissions,
+        [name]: checked
+      }
+    }));
   };
 
   const validateForm = () => {
@@ -174,6 +215,7 @@ const EditLibrarian = () => {
                       libraryOptions={libraryOptions}
                       handleChange={handleChange}
                       handleLibraryChange={handleLibraryChange}
+                      handlePermissionChange={handlePermissionChange}
                       handleSubmit={handleSubmit}
                       handlePrevious={handlePrevious}
                       loading={loading}

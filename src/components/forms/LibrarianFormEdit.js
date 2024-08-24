@@ -1,5 +1,5 @@
 import React from 'react';
-import { CForm, CFormLabel, CButton, CFormFeedback, CFormInput, CRow, CCol, CSpinner } from '@coreui/react';
+import { CForm, CFormLabel, CButton, CFormFeedback, CFormInput, CRow, CCol, CSpinner, CFormCheck } from '@coreui/react';
 import { Link } from 'react-router-dom';
 import Select from 'react-select';
 
@@ -9,10 +9,16 @@ const Edit = ({
   libraryOptions,
   handleChange,
   handleLibraryChange,
+  handlePermissionChange,
   handleSubmit,
   handlePrevious,
   loading
 }) => {
+  const permissionKeys = Object.keys(form.permissions);
+  const midIndex = Math.ceil(permissionKeys.length / 2);
+  const firstColumnPermissions = permissionKeys.slice(0, midIndex);
+  const secondColumnPermissions = permissionKeys.slice(midIndex);
+
   return (
     <>
       <CForm onSubmit={handleSubmit}>
@@ -130,8 +136,45 @@ const Edit = ({
               {errors.libraries && <CFormFeedback>{errors.libraries}</CFormFeedback>}
             </div>
           </CCol>
-
-
+        </CRow>
+        <CRow>
+          <CCol xs={12}>
+            <CFormLabel htmlFor="library">Choose Access Levels for Menus</CFormLabel>
+          </CCol>
+          <CCol xs={6}>
+            {firstColumnPermissions.map(permission => (
+              <div key={permission} className="form-check">
+                <CFormCheck
+                  key={permission}
+                  type="checkbox"
+                  id={permission}
+                  name={permission}
+                  checked={form.permissions[permission]}
+                  onChange={handlePermissionChange}
+                />
+                <CFormLabel htmlFor={permission} className="form-check-label ms-2">
+                  {permission}
+                </CFormLabel>
+              </div>
+            ))}
+          </CCol>
+          <CCol xs={6}>
+            {secondColumnPermissions.map(permission => (
+              <div key={permission} className="form-check">
+                <CFormCheck
+                  key={permission}
+                  type="checkbox"
+                  id={permission}
+                  name={permission}
+                  checked={form.permissions[permission]}
+                  onChange={handlePermissionChange}
+                />
+                <CFormLabel htmlFor={permission} className="form-check-label ms-2">
+                  {permission}
+                </CFormLabel>
+              </div>
+            ))}
+          </CCol>
         </CRow>
 
         <div className="text-end">
