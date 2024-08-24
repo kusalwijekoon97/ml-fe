@@ -3,6 +3,17 @@ import { CTable, CTableHead, CTableBody, CTableRow, CTableHeaderCell, CTableData
 import { PencilSquare, Trash, Eye } from 'react-bootstrap-icons';
 
 const LibrariansTable = ({ columns, data, handleEdit, handleDelete, handleChangeStatus }) => {
+  // Function to format permissions object into a readable string
+  const formatPermissions = (permissions) => {
+    return (
+      <ul style={{ padding: 0, margin: 0 }}>
+        {Object.entries(permissions).map(([key, value]) => (
+          value ? <li key={key}>{key}</li> : null
+        ))}
+      </ul>
+    );
+  };
+
   return (
     <CTable align="middle" className="mb-0 border" hover responsive>
       <CTableHead className="text-nowrap">
@@ -24,7 +35,10 @@ const LibrariansTable = ({ columns, data, handleEdit, handleDelete, handleChange
             <CTableDataCell>{librarian.phone}</CTableDataCell>
             <CTableDataCell>{librarian.email}</CTableDataCell>
             <CTableDataCell>
-            <CBadge color={librarian.is_active ? 'success' : 'danger'}>
+              {formatPermissions(librarian.permissions)}
+            </CTableDataCell>
+            <CTableDataCell>
+              <CBadge color={librarian.is_active ? 'success' : 'danger'}>
                 {librarian.is_active ? 'active' : 'inactive'}
               </CBadge>
             </CTableDataCell>
