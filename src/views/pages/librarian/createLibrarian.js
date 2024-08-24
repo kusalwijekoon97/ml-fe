@@ -21,6 +21,18 @@ const CreateLibrarian = () => {
     phone: '',
     address: '',
     library: [],
+    permissions: {
+      users: false,
+      readers: false,
+      categories: false,
+      books: false,
+      authors: false,
+      statics: false,
+      sales: false,
+      packages: false,
+      notifications: false,
+      settings: false,
+    }
   });
 
   const [loading, setLoading] = useState(false);
@@ -57,6 +69,17 @@ const CreateLibrarian = () => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
     setErrors({ ...errors, [name]: '' });
+  };
+
+  const handlePermissionChange = (e) => {
+    const { name, checked } = e.target;
+    setForm(prevForm => ({
+      ...prevForm,
+      permissions: {
+        ...prevForm.permissions,
+        [name]: checked
+      }
+    }));
   };
 
   const handleLibraryChange = (selectedOptions) => {
@@ -151,6 +174,7 @@ const CreateLibrarian = () => {
                       libraryOptions={libraryOptions}
                       handleChange={handleChange}
                       handleLibraryChange={handleLibraryChange}
+                      handlePermissionChange={handlePermissionChange}
                       handleSubmit={handleSubmit}
                       handlePrevious={handlePrevious}
                       loading={loading}
