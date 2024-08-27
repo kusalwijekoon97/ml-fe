@@ -134,6 +134,36 @@ const MaterialForm = ({
                 </div>
               </CCol>
 
+              <CCol xs={12}>
+                <div className="mb-3">
+                  <CFormLabel htmlFor="description">Description</CFormLabel>
+                  <CFormTextarea
+                    id="description"
+                    name="description"
+                    placeholder="Enter description"
+                    rows="3"
+                    value={form.description}
+                    onChange={handleChange}
+                    invalid={!!errors.description}
+                  />
+                  <CFormFeedback>{errors.description}</CFormFeedback>
+                </div>
+              </CCol>
+
+              <CCol xs={6}>
+                <div className="mb-3">
+                  <CFormLabel htmlFor="language">Library</CFormLabel>
+                  <Select
+                    id="library"
+                    name="library"
+                    options={libraryOptions}
+                    value={form.library}
+                    onChange={handleLibraryChange}
+                    className={errors.library ? 'is-invalid' : ''} />
+                  {errors.library && <CFormFeedback>{errors.library}</CFormFeedback>}
+                </div>
+              </CCol>
+
               <CCol xs={6}>
                 <div className="mb-3">
                   <CFormLabel htmlFor="category">Category</CFormLabel>
@@ -152,7 +182,7 @@ const MaterialForm = ({
 
               <CCol xs={6}>
                 <div className="mb-3">
-                  <CFormLabel htmlFor="subCategory">sub Category</CFormLabel>
+                  <CFormLabel htmlFor="subCategory">Sub Category</CFormLabel>
                   <Select
                     id="subCategory"
                     name="subCategory"
@@ -166,36 +196,6 @@ const MaterialForm = ({
                 </div>
               </CCol>
 
-              <CCol xs={6}>
-                <div className="mb-3">
-                  <CFormLabel htmlFor="language">Library</CFormLabel>
-                  <Select
-                    id="library"
-                    name="library"
-                    options={libraryOptions}
-                    isMulti
-                    value={form.library}
-                    onChange={handleLibraryChange}
-                    className={errors.library ? 'is-invalid' : ''} />
-                  {errors.library && <CFormFeedback>{errors.library}</CFormFeedback>}
-                </div>
-              </CCol>
-
-              <CCol xs={12}>
-                <div className="mb-3">
-                  <CFormLabel htmlFor="description">Description</CFormLabel>
-                  <CFormTextarea
-                    id="description"
-                    name="description"
-                    placeholder="Enter description"
-                    rows="4"
-                    value={form.description}
-                    onChange={handleChange}
-                    invalid={!!errors.description}
-                  />
-                  <CFormFeedback>{errors.description}</CFormFeedback>
-                </div>
-              </CCol>
             </CRow>
 
           </div>

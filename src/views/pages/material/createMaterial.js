@@ -50,10 +50,9 @@ const CreateMaterial = () => {
     setErrors({ ...errors, [name]: '' });
   };
 
-  const [authorOptions, setAuthorOptions] = useState([])
+  const [authorOptions, setAuthorOptions] = useState([]);
 
   useEffect(() => {
-    // Fetch libraries from API
     axios.get(`${base_url}/api/authors/all-open`)
       .then(response => {
         const authors = response.data.data.map(author => ({
@@ -71,15 +70,17 @@ const CreateMaterial = () => {
     setForm({ ...form, author: selectedAuthorOptions });
     setErrors({ ...errors, author: '' });
   };
+
   const handleTranslatorChange = (selectedTranslatorOptions) => {
     setForm({ ...form, translator: selectedTranslatorOptions });
     setErrors({ ...errors, translator: '' });
   };
 
   const [libraryOptions, setLibraryOptions] = useState([]);
+  const [categoryOptions, setCategoryOptions] = useState([]);
+  const [subCategoryOptions, setsubCategoryOptions] = useState([]);
 
   useEffect(() => {
-    // Fetch libraries from API
     axios.get(`${base_url}/api/libraries/all-open`)
       .then(response => {
         const libraries = response.data.data.map(library => ({
@@ -96,34 +97,43 @@ const CreateMaterial = () => {
   const handleLibraryChange = (selectedLibraryOptions) => {
     setForm({ ...form, library: selectedLibraryOptions });
     setErrors({ ...errors, library: '' });
+
+    const selectedLibraryId = selectedLibraryOptions ? selectedLibraryOptions.value : null;
+
+    if (selectedLibraryId) {
+      axios.get(`${base_url}/api/categories/main/all-filtered/${selectedLibraryId}`)
+        .then(response => {
+          const categories = response.data.data.map(category => ({
+            value: category._id,
+            label: category.name
+          }));
+          setCategoryOptions(categories);
+          setsubCategoryOptions([]); // Clear subcategories when library changes
+        })
+        .catch(error => {
+          console.error("There was an error fetching the categories!", error);
+          setCategoryOptions([]); // Clear categories in case of error
+        });
+    } else {
+      setCategoryOptions([]);
+      setsubCategoryOptions([]);
+    }
   };
 
-  const [categoryOptions, setCategoryOptions] = useState([]);
-  const [subCategoryOptions, setsubCategoryOptions] = useState([]);
-
-  useEffect(() => {
-    // Fetch categories from API
-    axios.get(`${base_url}/api/categories/main/all-open`)
-      .then(response => {
-        const categories = response.data.data.map(category => ({
-          value: category._id,
-          label: category.name
-        }));
-        setCategoryOptions(categories);
-      })
-      .catch(error => {
-        console.error("There was an error fetching the categories!", error);
-      });
-  }, []);
-
   const handleCategoryChange = (selectedCategoryOptions) => {
-    const selectedCategoryId = selectedCategoryOptions ? selectedCategoryOptions.value : null;
-    console.log('selectedCategoryId :' + selectedCategoryId);
     setForm({ ...form, category: selectedCategoryOptions });
     setErrors({ ...errors, category: '' });
 
-    if (selectedCategoryId) {
-      axios.get(`${base_url}/api/sub/all-open/${selectedCategoryId}`)
+    if (selectedCategoryOptions && selectedCategoryOptions.length > 0) {
+      // Collect all selected category IDs
+      const selectedCategoryIds = selectedCategoryOptions.map(option => option.value);
+
+      // Fetch subcategories for all selected categories
+      axios.get(`${base_url}/api/categories/sub/all-open`, {
+        params: {
+          ids: selectedCategoryIds.join(',') // Join multiple IDs into a comma-separated string
+        }
+      })
         .then(response => {
           const subCategories = response.data.data.map(subCategory => ({
             value: subCategory._id,
@@ -144,7 +154,6 @@ const CreateMaterial = () => {
     setForm({ ...form, subCategory: selectedSubCategoryOptions });
     setErrors({ ...errors, subCategory: '' });
   };
-
 
   const validateForm = () => {
     const newErrors = {};
