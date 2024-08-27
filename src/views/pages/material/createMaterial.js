@@ -27,7 +27,8 @@ const CreateMaterial = () => {
     subCategory: [],
     description: '',
     hasSeries: false,
-    noOfSeries: 1
+    noOfSeries: 1,
+    bookType: 'bookDocumentNAudio'
   });
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState({ visible: false, type: '', message: '' });
@@ -201,6 +202,13 @@ const CreateMaterial = () => {
   const seriesNumberDecrease = () => {
     setForm(prevForm => ({ ...prevForm, noOfSeries: Math.max(prevForm.noOfSeries - 1, 1) }));
   };
+  // handling bookType radio btn changing
+  const handleBookTypeChange = (e) => {
+    const value = e.target.value;
+    setForm({ ...form, bookType: value });
+    // setErrors({ ...errors, bookType: '' });
+  };
+
 
   // handling form submission
   const handleSubmit = (e) => {
@@ -299,6 +307,7 @@ const CreateMaterial = () => {
                       seriesNumberDecrease={seriesNumberDecrease}
                       seriesOptions={seriesOptions}
                       generateSeriesInputs={generateSeriesInputs}
+                      handleBookTypeChange={handleBookTypeChange}
                       loading={loading}
                     />
                   </CCardBody>

@@ -28,6 +28,7 @@ const MaterialForm = ({
   seriesNumberDecrease,
   seriesOptions,
   generateSeriesInputs,
+  handleBookTypeChange,
   loading
 }) => {
   return (
@@ -271,32 +272,30 @@ const MaterialForm = ({
                     type="radio"
                     name="bookType"
                     id="bookTypeEAudioBook"
-                    value="False"
+                    value="bookDocumentNAudio"
                     label="E-Book & Audio Book"
-                  // checked={!form.bookType}
-                  // onChange={handleBookTypeChange}
-                  // invalid={!!errors.bookType}
+                    checked={form.bookType === 'bookDocumentNAudio'}
+                    onChange={handleBookTypeChange}
                   />
                   <CFormCheck inline
                     type="radio"
                     name="bookType"
                     id="bookTypeEMagazine"
-                    value="True"
+                    value="bookMagazine"
                     label="E-Magazine"
-                  // checked={form.bookType}
-                  // onChange={handleBookTypeChange}
-                  // invalid={!!errors.bookType}
+                    checked={form.bookType === 'bookMagazine'}
+                    onChange={handleBookTypeChange}
                   />
                   <CFormCheck inline
                     type="radio"
                     name="bookType"
                     id="bookTypeENewsPaper"
-                    value="True"
+                    value="bookNewsPaper"
                     label="E-News Paper"
-                  // checked={form.bookType}
-                  // onChange={handleBookTypeChange}
-                  // invalid={!!errors.bookType}
+                    checked={form.bookType === 'bookNewsPaper'}
+                    onChange={handleBookTypeChange}
                   />
+
                   {/* {errors.bookType && <CFormFeedback>{errors.bookType}</CFormFeedback>} */}
                 </div>
               </CCol>
