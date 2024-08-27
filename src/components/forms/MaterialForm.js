@@ -266,60 +266,41 @@ const MaterialForm = ({
             <CRow>
               <CCol xs={12}>
                 <div className="mb-3">
-                  <CFormLabel htmlFor="hasSeries">Series  <span className='text-danger'>*</span></CFormLabel>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <CFormLabel htmlFor="bookType">Book Type  <span className='text-danger'>*</span></CFormLabel>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   <CFormCheck inline
                     type="radio"
-                    name="hasSeries"
-                    id="hasSeriesFalse"
+                    name="bookType"
+                    id="bookTypeEAudioBook"
                     value="False"
-                    label="No"
-                    checked={!form.hasSeries}
-                    onChange={handleHasSeriesChange}
-                    invalid={!!errors.hasSeries} />
+                    label="E-Book & Audio Book"
+                  // checked={!form.bookType}
+                  // onChange={handleBookTypeChange}
+                  // invalid={!!errors.bookType}
+                  />
                   <CFormCheck inline
                     type="radio"
-                    name="hasSeries"
-                    id="hasSeriesTrue"
+                    name="bookType"
+                    id="bookTypeEMagazine"
                     value="True"
-                    label="Yes"
-                    checked={form.hasSeries}
-                    onChange={handleHasSeriesChange}
-                    invalid={!!errors.hasSeries} />
-                  {errors.hasSeries && <CFormFeedback>{errors.hasSeries}</CFormFeedback>}
+                    label="E-Magazine"
+                  // checked={form.bookType}
+                  // onChange={handleBookTypeChange}
+                  // invalid={!!errors.bookType}
+                  />
+                  <CFormCheck inline
+                    type="radio"
+                    name="bookType"
+                    id="bookTypeENewsPaper"
+                    value="True"
+                    label="E-News Paper"
+                  // checked={form.bookType}
+                  // onChange={handleBookTypeChange}
+                  // invalid={!!errors.bookType}
+                  />
+                  {/* {errors.bookType && <CFormFeedback>{errors.bookType}</CFormFeedback>} */}
                 </div>
               </CCol>
-              {form.hasSeries && (
-                <div id="seriesInfo">
-                  <CRow>
-                    <CCol xs={6}>
-                      <div className="mb-3">
-                        <CFormLabel htmlFor="name">Book number of the series</CFormLabel>
-                        <CInputGroup className="mb-3">
-                          <CButton color="outline-primary" onClick={seriesNumberDecrease} disabled={!form.hasSeries}>
-                            <CIcon icon={cilMinus} />
-                          </CButton>
-                          <CFormInput
-                            type="number"
-                            id="noOfSeries"
-                            name="noOfSeries"
-                            placeholder="Enter series number"
-                            value={form.noOfSeries}
-                            onChange={handleChange}
-                            readOnly
-                            disabled={!form.hasSeries}
-                          />
-                          <CButton color="outline-primary" onClick={seriesNumberIncrease} disabled={!form.hasSeries}>
-                            <CIcon icon={cilPlus} />
-                          </CButton>
-                        </CInputGroup>
-                      </div>
-                    </CCol>
-                    <CCol xs={6}  >
-                      {generateSeriesInputs()}
-                    </CCol>
-                  </CRow>
-                </div>
-              )}
+
             </CRow>
           </div>
         )}
