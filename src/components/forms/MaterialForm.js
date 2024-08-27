@@ -27,6 +27,7 @@ const MaterialForm = ({
   seriesNumberIncrease,
   seriesNumberDecrease,
   seriesOptions,
+  generateSeriesInputs,
   loading
 }) => {
   return (
@@ -206,7 +207,7 @@ const MaterialForm = ({
             <CRow>
               <CCol xs={12}>
                 <div className="mb-3">
-                  <CFormLabel htmlFor="hasSeries">Series </CFormLabel>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <CFormLabel htmlFor="hasSeries">Series  <span className='text-danger'>*</span></CFormLabel>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   <CFormCheck inline
                     type="radio"
                     name="hasSeries"
@@ -252,17 +253,69 @@ const MaterialForm = ({
                             <CIcon icon={cilPlus} />
                           </CButton>
                         </CInputGroup>
-
                       </div>
                     </CCol>
-                    <CCol xs={6} id="previousSeries">
+                    <CCol xs={6}  >
+                      {generateSeriesInputs()}
+                    </CCol>
+                  </CRow>
+                </div>
+              )}
+            </CRow>
+            <hr />
+            <CRow>
+              <CCol xs={12}>
+                <div className="mb-3">
+                  <CFormLabel htmlFor="hasSeries">Series  <span className='text-danger'>*</span></CFormLabel>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <CFormCheck inline
+                    type="radio"
+                    name="hasSeries"
+                    id="hasSeriesFalse"
+                    value="False"
+                    label="No"
+                    checked={!form.hasSeries}
+                    onChange={handleHasSeriesChange}
+                    invalid={!!errors.hasSeries} />
+                  <CFormCheck inline
+                    type="radio"
+                    name="hasSeries"
+                    id="hasSeriesTrue"
+                    value="True"
+                    label="Yes"
+                    checked={form.hasSeries}
+                    onChange={handleHasSeriesChange}
+                    invalid={!!errors.hasSeries} />
+                  {errors.hasSeries && <CFormFeedback>{errors.hasSeries}</CFormFeedback>}
+                </div>
+              </CCol>
+              {form.hasSeries && (
+                <div id="seriesInfo">
+                  <CRow>
+                    <CCol xs={6}>
                       <div className="mb-3">
-                        <CFormLabel htmlFor="previousSeries">Series </CFormLabel>
-                        <Select
-                          id="previousSeries"
-                          name="previousSeries"
-                          options={seriesOptions} />
+                        <CFormLabel htmlFor="name">Book number of the series</CFormLabel>
+                        <CInputGroup className="mb-3">
+                          <CButton color="outline-primary" onClick={seriesNumberDecrease} disabled={!form.hasSeries}>
+                            <CIcon icon={cilMinus} />
+                          </CButton>
+                          <CFormInput
+                            type="number"
+                            id="noOfSeries"
+                            name="noOfSeries"
+                            placeholder="Enter series number"
+                            value={form.noOfSeries}
+                            onChange={handleChange}
+                            readOnly
+                            disabled={!form.hasSeries}
+                          />
+                          <CButton color="outline-primary" onClick={seriesNumberIncrease} disabled={!form.hasSeries}>
+                            <CIcon icon={cilPlus} />
+                          </CButton>
+                        </CInputGroup>
                       </div>
+                    </CCol>
+                    <CCol xs={6}  >
+                      {generateSeriesInputs()}
                     </CCol>
                   </CRow>
                 </div>

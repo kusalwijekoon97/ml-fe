@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { CCard, CCardBody, CContainer, CRow, CCol, CSpinner } from '@coreui/react';
+import { CCard, CCardBody, CContainer, CRow, CCol, CSpinner, CFormLabel } from '@coreui/react';
 import axios from 'axios';
 import { AppFooter, AppHeader, AppSidebar } from '../../../components';
 import CardHeaderWithTitleBtn from '../../../components/cards/CardHeaderWithTitleBtn';
+import Select from 'react-select';
 import CIcon from '@coreui/icons-react';
 import { cilList } from '@coreui/icons';
 import { Link, useNavigate } from 'react-router-dom';
@@ -175,15 +176,30 @@ const CreateMaterial = () => {
     setForm({ ...form, hasSeries: value });
     setErrors({ ...errors, hasSeries: '' });
   };
+  // generating previous series inputs based on noOfSeries
+  const generateSeriesInputs = () => {
+    const inputs = [];
+    for (let i = 1; i < form.noOfSeries; i++) {
+      inputs.push(
+          <div className="mb-3" key={i} id={`divPreviousSeries${i}`}>
+            <CFormLabel htmlFor={`previousSeries${i}`}>Series {i}</CFormLabel>
+            <Select
+              id={`previousSeries${i}`}
+              name={`previousSeries${i}`}
+              options={seriesOptions}
+            />
+          </div>
+      );
+    }
+    return inputs;
+  };
   // handling seriesNumberIncrease changing
   const seriesNumberIncrease = () => {
     setForm(prevForm => ({ ...prevForm, noOfSeries: prevForm.noOfSeries + 1 }));
-    // handling the dynamic series dropdown population according to the noOfSeries changing
   };
   // handling seriesNumberDecrease changing
   const seriesNumberDecrease = () => {
     setForm(prevForm => ({ ...prevForm, noOfSeries: Math.max(prevForm.noOfSeries - 1, 1) }));
-    // handling the dynamic series dropdown population according to the noOfSeries changing
   };
 
   // handling form submission
@@ -282,6 +298,7 @@ const CreateMaterial = () => {
                       seriesNumberIncrease={seriesNumberIncrease}
                       seriesNumberDecrease={seriesNumberDecrease}
                       seriesOptions={seriesOptions}
+                      generateSeriesInputs={generateSeriesInputs}
                       loading={loading}
                     />
                   </CCardBody>
