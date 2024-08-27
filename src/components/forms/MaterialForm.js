@@ -1,5 +1,7 @@
 import React from 'react';
-import { CForm, CFormLabel, CButton, CFormFeedback, CFormInput, CFormSelect, CFormTextarea, CInputGroup, CRow, CCol, CSpinner } from '@coreui/react';
+import { CForm, CFormLabel, CButton, CFormFeedback, CFormInput, CFormSelect, CFormTextarea, CInputGroup, CRow, CCol, CSpinner, CFormCheck } from '@coreui/react';
+import CIcon from '@coreui/icons-react';
+import { cilMinus, cilPlus } from '@coreui/icons';
 import { Link } from 'react-router-dom';
 import Select from 'react-select';
 
@@ -21,6 +23,9 @@ const MaterialForm = ({
   handleCategoryChange,
   subCategoryOptions,
   handleSubCategoryChange,
+  handleHasSeriesChange,
+  seriesNumberIncrease,
+  seriesNumberDecrease,
   loading
 }) => {
   return (
@@ -195,9 +200,79 @@ const MaterialForm = ({
                   {errors.subCategory && <CFormFeedback>{errors.subCategory}</CFormFeedback>}
                 </div>
               </CCol>
-
             </CRow>
+            <hr />
+            <CRow>
+              <CCol xs={12}>
+                <div className="mb-3">
+                  <CFormLabel htmlFor="hasSeries">Series </CFormLabel>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <CFormCheck inline
+                    type="radio"
+                    name="hasSeries"
+                    id="hasSeriesFalse"
+                    value="False"
+                    label="No"
+                    checked={!form.hasSeries}
+                    onChange={handleHasSeriesChange}
+                    invalid={!!errors.hasSeries} />
+                  <CFormCheck inline
+                    type="radio"
+                    name="hasSeries"
+                    id="hasSeriesTrue"
+                    value="True"
+                    label="Yes"
+                    checked={form.hasSeries}
+                    onChange={handleHasSeriesChange}
+                    invalid={!!errors.hasSeries} />
+                  {errors.hasSeries && <CFormFeedback>{errors.hasSeries}</CFormFeedback>}
+                </div>
+              </CCol>
+              {form.hasSeries && (
+                <div id="seriesInfo">
+                  <CRow>
+                    <CCol xs={6}>
+                      <div className="mb-3">
+                        <CFormLabel htmlFor="name">Book number of the series</CFormLabel>
+                        <CInputGroup className="mb-3">
+                          <CButton color="outline-primary" onClick={seriesNumberDecrease} disabled={!form.hasSeries}>
+                            <CIcon icon={cilMinus} />
+                          </CButton>
+                          <CFormInput
+                            type="number"
+                            id="noOfSeries"
+                            name="noOfSeries"
+                            placeholder="Enter series number"
+                            value={form.noOfSeries}
+                            onChange={handleChange}
+                            readOnly
+                            disabled={!form.hasSeries}
+                          />
+                          <CButton color="outline-primary" onClick={seriesNumberIncrease} disabled={!form.hasSeries}>
+                            <CIcon icon={cilPlus} />
+                          </CButton>
+                        </CInputGroup>
 
+                      </div>
+                    </CCol>
+                    <CCol xs={6}>
+                      <div className="mb-3">
+                        <CFormLabel htmlFor="name">Name <span className='text-danger'>*</span></CFormLabel>
+                        <CFormInput
+                          type="text"
+                          id="name"
+                          name="name"
+                          placeholder="Enter name"
+                          value={form.name}
+                          onChange={handleChange}
+                          invalid={!!errors.name}
+                        />
+                        <CFormFeedback>{errors.name}</CFormFeedback>
+                      </div>
+                    </CCol>
+                  </CRow>
+                </div>
+              )}
+            </CRow>
           </div>
         )}
 

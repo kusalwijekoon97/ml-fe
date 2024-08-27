@@ -21,15 +21,15 @@ const CreateMaterial = () => {
     coverImage: null,
     publisher: '',
     publishDate: '',
+    library: '',
     category: [],
     subCategory: [],
-    library: '',
     description: '',
+    hasSeries: false,
+    noOfSeries: 1
   });
-
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState({ visible: false, type: '', message: '' });
-
   const [errors, setErrors] = useState({
     name: '',
     author: null,
@@ -38,20 +38,24 @@ const CreateMaterial = () => {
     coverImage: null,
     publisher: '',
     publishDate: '',
+    library: '',
     category: [],
     subCategory: [],
-    library: '',
     description: '',
+    hasSeries: ''
   });
+  const [authorOptions, setAuthorOptions] = useState([]);
+  const [libraryOptions, setLibraryOptions] = useState([]);
+  const [categoryOptions, setCategoryOptions] = useState([]);
+  const [subCategoryOptions, setsubCategoryOptions] = useState([]);
 
+  // handling form changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
     setErrors({ ...errors, [name]: '' });
   };
-
-  const [authorOptions, setAuthorOptions] = useState([]);
-
+  // fetching all open authors
   useEffect(() => {
     axios.get(`${base_url}/api/authors/all-open`)
       .then(response => {
@@ -65,21 +69,17 @@ const CreateMaterial = () => {
         console.error("There was an error fetching the authors!", error);
       });
   }, []);
-
+  // handling author change
   const handleAuthorChange = (selectedAuthorOptions) => {
     setForm({ ...form, author: selectedAuthorOptions });
     setErrors({ ...errors, author: '' });
   };
-
+  // handle translator changing
   const handleTranslatorChange = (selectedTranslatorOptions) => {
     setForm({ ...form, translator: selectedTranslatorOptions });
     setErrors({ ...errors, translator: '' });
   };
-
-  const [libraryOptions, setLibraryOptions] = useState([]);
-  const [categoryOptions, setCategoryOptions] = useState([]);
-  const [subCategoryOptions, setsubCategoryOptions] = useState([]);
-
+  // fetching libraries
   useEffect(() => {
     axios.get(`${base_url}/api/libraries/all-open`)
       .then(response => {
@@ -93,7 +93,7 @@ const CreateMaterial = () => {
         console.error("There was an error fetching the libraries!", error);
       });
   }, []);
-
+  // handling library changing
   const handleLibraryChange = (selectedLibraryOptions) => {
     setForm({ ...form, library: selectedLibraryOptions });
     setErrors({ ...errors, library: '' });
@@ -119,7 +119,7 @@ const CreateMaterial = () => {
       setsubCategoryOptions([]);
     }
   };
-
+  // handling main categories changing
   const handleCategoryChange = (selectedCategoryOptions) => {
     setForm({ ...form, category: selectedCategoryOptions });
     setErrors({ ...errors, category: '' });
@@ -149,7 +149,7 @@ const CreateMaterial = () => {
       setsubCategoryOptions([]);
     }
   };
-
+  // handling sub categories changing
   const handleSubCategoryChange = (selectedSubCategoryOptions) => {
     setForm({ ...form, subCategory: selectedSubCategoryOptions });
     setErrors({ ...errors, subCategory: '' });
@@ -161,7 +161,22 @@ const CreateMaterial = () => {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+  // handling hasSeries radio btn changing
+  const handleHasSeriesChange = (e) => {
+    const value = e.target.value === 'True';
+    setForm({ ...form, hasSeries: value });
+    setErrors({ ...errors, hasSeries: '' });
+  };
+  // handling seriesNumberIncrease changing
+  const seriesNumberIncrease = () => {
+    setForm(prevForm => ({ ...prevForm, noOfSeries: prevForm.noOfSeries + 1 }));
+  };
+  // handling seriesNumberDecrease changing
+  const seriesNumberDecrease = () => {
+    setForm(prevForm => ({ ...prevForm, noOfSeries: Math.max(prevForm.noOfSeries - 1, 1) }));
+  };
 
+  // handling form submission
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -253,6 +268,9 @@ const CreateMaterial = () => {
                       handleCategoryChange={handleCategoryChange}
                       subCategoryOptions={subCategoryOptions}
                       handleSubCategoryChange={handleSubCategoryChange}
+                      handleHasSeriesChange={handleHasSeriesChange}
+                      seriesNumberIncrease={seriesNumberIncrease}
+                      seriesNumberDecrease={seriesNumberDecrease}
                       loading={loading}
                     />
                   </CCardBody>
