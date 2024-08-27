@@ -48,6 +48,14 @@ const CreateMaterial = () => {
   const [libraryOptions, setLibraryOptions] = useState([]);
   const [categoryOptions, setCategoryOptions] = useState([]);
   const [subCategoryOptions, setsubCategoryOptions] = useState([]);
+  // series from backend => now dummy
+  const [seriesOptions, setSeriesOptions] = useState([
+    { value: 1, label: 'Series 1' },
+    { value: 2, label: 'Series 2' },
+    { value: 3, label: 'Series 3' },
+    { value: 4, label: 'Series 4' },
+    { value: 5, label: 'Series 5' },
+  ]);
 
   // handling form changes
   const handleChange = (e) => {
@@ -170,10 +178,12 @@ const CreateMaterial = () => {
   // handling seriesNumberIncrease changing
   const seriesNumberIncrease = () => {
     setForm(prevForm => ({ ...prevForm, noOfSeries: prevForm.noOfSeries + 1 }));
+    // handling the dynamic series dropdown population according to the noOfSeries changing
   };
   // handling seriesNumberDecrease changing
   const seriesNumberDecrease = () => {
     setForm(prevForm => ({ ...prevForm, noOfSeries: Math.max(prevForm.noOfSeries - 1, 1) }));
+    // handling the dynamic series dropdown population according to the noOfSeries changing
   };
 
   // handling form submission
@@ -271,6 +281,7 @@ const CreateMaterial = () => {
                       handleHasSeriesChange={handleHasSeriesChange}
                       seriesNumberIncrease={seriesNumberIncrease}
                       seriesNumberDecrease={seriesNumberDecrease}
+                      seriesOptions={seriesOptions}
                       loading={loading}
                     />
                   </CCardBody>

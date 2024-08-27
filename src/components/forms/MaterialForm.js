@@ -26,6 +26,7 @@ const MaterialForm = ({
   handleHasSeriesChange,
   seriesNumberIncrease,
   seriesNumberDecrease,
+  seriesOptions,
   loading
 }) => {
   return (
@@ -254,19 +255,13 @@ const MaterialForm = ({
 
                       </div>
                     </CCol>
-                    <CCol xs={6}>
+                    <CCol xs={6} id="previousSeries">
                       <div className="mb-3">
-                        <CFormLabel htmlFor="name">Name <span className='text-danger'>*</span></CFormLabel>
-                        <CFormInput
-                          type="text"
-                          id="name"
-                          name="name"
-                          placeholder="Enter name"
-                          value={form.name}
-                          onChange={handleChange}
-                          invalid={!!errors.name}
-                        />
-                        <CFormFeedback>{errors.name}</CFormFeedback>
+                        <CFormLabel htmlFor="previousSeries">Series </CFormLabel>
+                        <Select
+                          id="previousSeries"
+                          name="previousSeries"
+                          options={seriesOptions} />
                       </div>
                     </CCol>
                   </CRow>
