@@ -206,6 +206,8 @@ const CreateMaterial = () => {
   const handleBookTypeChange = (e) => {
     const value = e.target.value;
     setForm({ ...form, bookType: value });
+    console.log(form.bookType);
+
     // setErrors({ ...errors, bookType: '' });
   };
 

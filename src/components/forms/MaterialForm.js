@@ -285,6 +285,7 @@ const MaterialForm = ({
                     label="E-Magazine"
                     checked={form.bookType === 'bookMagazine'}
                     onChange={handleBookTypeChange}
+                  // disabled
                   />
                   <CFormCheck inline
                     type="radio"
@@ -294,6 +295,7 @@ const MaterialForm = ({
                     label="E-News Paper"
                     checked={form.bookType === 'bookNewsPaper'}
                     onChange={handleBookTypeChange}
+                  // disabled
                   />
 
                   {/* {errors.bookType && <CFormFeedback>{errors.bookType}</CFormFeedback>} */}
@@ -306,7 +308,44 @@ const MaterialForm = ({
 
         {currentStep === 2 && (
           <div id='stepTwo'>
-            <CRow>
+            {form.bookType && form.bookType === 'bookDocumentNAudio' &&(
+              <div id="seriesInfo">
+                <CRow>
+                  <CCol xs={6}>
+                    <div className="mb-3">
+                    bookDocumentNAudio
+                    </div>
+                  </CCol>
+                  <CCol xs={6}  >
+
+                  </CCol>
+                </CRow>
+              </div>
+            )}
+            {form.bookType && form.bookType === 'bookMagazine' &&(
+              <div id="seriesInfo">
+                <CRow>
+                  <CCol xs={12}>
+                    <div className="mb-3">
+                    E-MAGAZINE SECTION
+                    </div>
+                  </CCol>
+                </CRow>
+              </div>
+            )}
+            {form.bookType && form.bookType === 'bookNewsPaper' &&(
+              <div id="seriesInfo">
+                <CRow>
+                  <CCol xs={12}>
+                    <div className="mb-3">
+                    E-NEWS PAPER SECTION
+                    </div>
+                  </CCol>
+                </CRow>
+              </div>
+            )}
+
+            {/* <CRow>
               <CCol xs={6}>
                 <div className="mb-3">
                   <CFormLabel htmlFor="lastname">Last Name <span className='text-danger'>*</span></CFormLabel>
@@ -322,7 +361,7 @@ const MaterialForm = ({
                   <CFormFeedback>{errors.lastname}</CFormFeedback>
                 </div>
               </CCol>
-            </CRow>
+            </CRow> */}
           </div>
         )}
 
