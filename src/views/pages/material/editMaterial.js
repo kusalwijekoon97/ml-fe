@@ -8,62 +8,33 @@ import { cilList } from '@coreui/icons';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import base_url from "../../../utils/api/base_url";
 import ResponseAlert from '../../../components/notifications/ResponseAlert';
-import AuthorFormEdit from '../../../components/forms/AuthorFormEdit';
+import MaterialFormEdit from '../../../components/forms/MaterialFormEdit';
 
 const EditMaterial = () => {
   const navigate = useNavigate();
-  const { authorId } = useParams();
-
-  const diedOptions = [
-    { value: 'yes', label: 'Yes' },
-    { value: 'no', label: 'No' }
-  ];
+  const { materialId } = useParams();
 
   const [form, setForm] = useState({
-    firstname: '',
-    lastname: '',
-    died: '',
-    penName: '',
-    nationality: '',
-    firstPublishDate: '',
-    description: '',
-    profileImage: null,
-    position: '',
-    income: ''
+    name: '',
+    fileMaterial: null
   });
 
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState({ visible: false, type: '', message: '' });
 
   const [errors, setErrors] = useState({
-    firstname: '',
-    lastname: '',
-    died: '',
-    penName: '',
-    nationality: '',
-    firstPublishDate: '',
-    description: '',
-    profileImage: '',
-    position: '',
-    income: ''
+    name: '',
+    fileMaterial: ''
   });
 
   useEffect(() => {
-    const fetchAuthorData = async () => {
+    const fetchMaterialData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${base_url}/api/authors/${authorId}`);
+        const response = await axios.get(`${base_url}/api/materials/${materialId}`);
         const data = response.data.data;
         setForm({
-          firstname: data.firstname,
-          lastname: data.lastname,
-          died: data.died,
-          penName: data.penName,
-          nationality: data.nationality,
-          firstPublishDate: data.firstPublishDate,
-          description: data.description,
-          position: data.position,
-          income: data.income
+          name: data.name,
         });
         setLoading(false);
       } catch (error) {
@@ -71,14 +42,14 @@ const EditMaterial = () => {
         setAlert({
           visible: true,
           type: 'failure',
-          message: 'Failed to load author data. Please try again.'
+          message: 'Failed to load material data. Please try again.'
         });
         console.error(error);
       }
     };
 
-    fetchAuthorData();
-  }, [authorId]);
+    fetchMaterialData();
+  }, [materialId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -86,31 +57,17 @@ const EditMaterial = () => {
     setErrors({ ...errors, [name]: '' });
   };
 
-  const handleFileChange = (e) => {
-    setForm({ ...form, profileImage: e.target.files[0] });
-  };
-
-  const handleDiedChange = (selectedOption) => {
-    handleChange({
-      target: {
-        name: 'died',
-        value: selectedOption ? selectedOption.value : ''
-      }
-    });
+  const handleMaterialChange = (e) => {
+    const { name, files } = e.target;
+    setForm({ ...form, [name]: files[0] });
+    setErrors({ ...errors, [name]: '' });
   };
 
   const validateForm = () => {
     const newErrors = {};
 
-    if (!form.firstname) newErrors.firstname = 'First name is mandatory.';
-    if (!form.lastname) newErrors.lastname = 'Last name is mandatory.';
-    if (!form.penName) newErrors.penName = 'Pen name is mandatory.';
-    if (!form.nationality) newErrors.nationality = 'Nationality is mandatory.';
-    if (!form.firstPublishDate) newErrors.firstPublishDate = 'First publish date is mandatory.';
-    if (!form.description) newErrors.description = 'Description is mandatory.';
-    // if (!form.profileImage && !form.profileImage) newErrors.profileImage = 'Profile image is mandatory.';
-    if (!form.position) newErrors.position = 'Position is mandatory.';
-    if (!form.income) newErrors.income = 'Income is mandatory.';
+    if (!form.name) newErrors.name = 'Name is mandatory.';
+    if (!form.fileMaterial) newErrors.fileMaterial = 'File is mandatory.';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -124,30 +81,22 @@ const EditMaterial = () => {
     setLoading(true);
 
     const formData = new FormData();
-    formData.append('firstname', form.firstname);
-    formData.append('lastname', form.lastname);
-    formData.append('died', form.died);
-    formData.append('penName', form.penName);
-    formData.append('nationality', form.nationality);
-    formData.append('firstPublishDate', form.firstPublishDate);
-    formData.append('description', form.description);
-    if (form.profileImage) formData.append('profileImage', form.profileImage);
-    formData.append('position', form.position);
-    formData.append('income', form.income);
+    formData.append('name', form.name);
+    formData.append('fileMaterial', form.fileMaterial);
 
-    axios.post(`${base_url}/api/authors/update/${authorId}`, formData, {
+    axios.post(`${base_url}/api/materials/update/${materialId}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
     })
       .then(response => {
         setLoading(false);
-        navigate("/authors", {
+        navigate("/materials", {
           state: {
             alert: {
               visible: true,
               type: 'success',
-              message: 'Author updated successfully!'
+              message: 'Material updated successfully!'
             }
           }
         });
@@ -157,7 +106,7 @@ const EditMaterial = () => {
         setAlert({
           visible: true,
           type: 'failure',
-          message: 'Author update failed. Please try again.'
+          message: 'Material update failed. Please try again.'
         });
         console.error(error);
       });
@@ -171,7 +120,7 @@ const EditMaterial = () => {
     <>
       <AppSidebar />
       <div className="wrapper d-flex flex-column min-vh-100">
-        <AppHeader title="Authors" />
+        <AppHeader title="Materials" />
         <div className="body flex-grow-1">
           <ResponseAlert
             visible={alert.visible}
@@ -184,20 +133,18 @@ const EditMaterial = () => {
               <CCol xs={12}>
                 <CCard className="mb-4 border-top-primary border-top-3">
                   <CardHeaderWithTitleBtn
-                    title="Author"
+                    title="Material"
                     subtitle="edit"
                     buttonIcon={<CIcon icon={cilList} />}
-                    buttonText="Authors"
-                    linkTo="/authors"
+                    buttonText="Materials"
+                    linkTo="/materials"
                   />
                   <CCardBody>
-                    <AuthorFormEdit
+                    <MaterialFormEdit
                       form={form}
                       errors={errors}
-                      diedOptions={diedOptions}
-                      handleDiedChange={handleDiedChange}
                       handleChange={handleChange}
-                      handleFileChange={handleFileChange}
+                      handleMaterialChange={handleMaterialChange}
                       handleSubmit={handleSubmit}
                       handlePrevious={handlePrevious}
                       loading={loading}

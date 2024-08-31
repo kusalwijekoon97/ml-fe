@@ -7,10 +7,8 @@ import { Link } from 'react-router-dom';
 const MaterialFormEdit = ({
   form,
   errors,
-  diedOptions,
   handleChange,
-  handleDiedChange,
-  handleFileChange,
+  handleMaterialChange,
   handleSubmit,
   handlePrevious,
   loading
@@ -19,158 +17,32 @@ const MaterialFormEdit = ({
     <>
       <CForm onSubmit={handleSubmit}>
         <CRow>
-          <CCol xs={6}>
+        <CCol xs={12}>
             <div className="mb-3">
-              <CFormLabel htmlFor="firstname">First Name <span className='text-danger'>*</span></CFormLabel>
+              <CFormLabel htmlFor="name">Name <span className='text-danger'>*</span></CFormLabel>
               <CFormInput
                 type="text"
-                id="firstname"
-                name="firstname"
-                placeholder="Enter first name"
-                value={form.firstname}
+                id="name"
+                name="name"
+                placeholder="Enter name"
+                value={form.name}
                 onChange={handleChange}
-                invalid={!!errors.firstname}
+                invalid={!!errors.name}
               />
-              <CFormFeedback>{errors.firstname}</CFormFeedback>
+              <CFormFeedback>{errors.name}</CFormFeedback>
             </div>
           </CCol>
-          <CCol xs={6}>
-            <div className="mb-3">
-              <CFormLabel htmlFor="lastname">Last Name <span className='text-danger'>*</span></CFormLabel>
-              <CFormInput
-                type="text"
-                id="lastname"
-                name="lastname"
-                placeholder="Enter last name"
-                value={form.lastname}
-                onChange={handleChange}
-                invalid={!!errors.lastname}
-              />
-              <CFormFeedback>{errors.lastname}</CFormFeedback>
-            </div>
-          </CCol>
-
-          <CCol xs={6}>
-            <div className="mb-3">
-              <CFormLabel htmlFor="profileImage">Profile Image</CFormLabel>
-              <CFormInput
-                type="file"
-                id="profileImage"
-                name="profileImage"
-                onChange={handleFileChange}
-                invalid={!!errors.profileImage}
-              />
-              <CFormFeedback>{errors.profileImage}</CFormFeedback>
-            </div>
-          </CCol>
-
-          <CCol xs={6}>
-            <div className="mb-3">
-              <CFormLabel htmlFor="penName">Pen Name <span className='text-danger'>*</span></CFormLabel>
-              <CFormInput
-                type="text"
-                id="penName"
-                name="penName"
-                placeholder="Enter pen name"
-                value={form.penName}
-                onChange={handleChange}
-                invalid={!!errors.penName}
-              />
-              <CFormFeedback>{errors.penName}</CFormFeedback>
-            </div>
-          </CCol>
-
-          <CCol xs={6}>
-            <div className="mb-3">
-              <CFormLabel htmlFor="nationality">Nationality <span className='text-danger'>*</span></CFormLabel>
-              <CFormInput
-                type="text"
-                id="nationality"
-                name="nationality"
-                placeholder="Enter nationality"
-                value={form.nationality}
-                onChange={handleChange}
-                invalid={!!errors.nationality}
-              />
-              <CFormFeedback>{errors.nationality}</CFormFeedback>
-            </div>
-          </CCol>
-
-          <CCol xs={6}>
-            <div className="mb-3">
-              <CFormLabel htmlFor="firstPublishDate">First Publish Date <span className='text-danger'>*</span></CFormLabel>
-              <CFormInput
-                type="date"
-                id="firstPublishDate"
-                name="firstPublishDate"
-                value={form.firstPublishDate}
-                onChange={handleChange}
-                invalid={!!errors.firstPublishDate}
-              />
-              <CFormFeedback>{errors.firstPublishDate}</CFormFeedback>
-            </div>
-          </CCol>
-
-          <CCol xs={6}>
-            <div className="mb-3">
-              <CFormLabel htmlFor="position">Position <span className='text-danger'>*</span></CFormLabel>
-              <CFormInput
-                type="text"
-                id="position"
-                name="position"
-                placeholder="Enter position"
-                value={form.position}
-                onChange={handleChange}
-                invalid={!!errors.position}
-              />
-              <CFormFeedback>{errors.position}</CFormFeedback>
-            </div>
-          </CCol>
-
-          <CCol xs={6}>
-            <div className="mb-3">
-              <CFormLabel htmlFor="income">Income <span className='text-danger'>*</span></CFormLabel>
-              <CFormInput
-                type="number"
-                id="income"
-                name="income"
-                placeholder="Enter income"
-                value={form.income}
-                onChange={handleChange}
-                invalid={!!errors.income}
-              />
-              <CFormFeedback>{errors.income}</CFormFeedback>
-            </div>
-          </CCol>
-
-          <CCol xs={6}>
-            <div className="mb-3">
-              <CFormLabel htmlFor="died">Died <span className='text-danger'>*</span></CFormLabel>
-              <Select
-                id="died"
-                name="died"
-                options={diedOptions}
-                value={diedOptions.find(option => option.value === form.died)}
-                onChange={handleDiedChange}
-                className={errors.died ? 'is-invalid' : ''}
-              />
-              {errors.died && <CFormFeedback>{errors.died}</CFormFeedback>}
-            </div>
-          </CCol>
-
           <CCol xs={12}>
             <div className="mb-3">
-              <CFormLabel htmlFor="description">Description <span className='text-danger'>*</span></CFormLabel>
-              <CFormTextarea
-                id="description"
-                name="description"
-                placeholder="Enter description"
-                value={form.description}
-                onChange={handleChange}
-                invalid={!!errors.description}
-                rows={3}
+              <CFormLabel htmlFor="fileMaterial">File <span className='text-danger'>*</span></CFormLabel>
+              <CFormInput
+                type="file"
+                id="fileMaterial"
+                name="fileMaterial"
+                className="me-2"
+                onChange={handleMaterialChange}
               />
-              <CFormFeedback>{errors.description}</CFormFeedback>
+              <CFormFeedback>{errors.fileMaterial}</CFormFeedback>
             </div>
           </CCol>
         </CRow>

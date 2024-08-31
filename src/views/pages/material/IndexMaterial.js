@@ -6,7 +6,7 @@ import { cibAddthis, cilSearch } from '@coreui/icons';
 import { AppFooter, AppHeader, AppSidebar } from '../../../components';
 import base_url from "../../../utils/api/base_url";
 import CardHeaderWithTitleBtn from '../../../components/cards/CardHeaderWithTitleBtn';
-import AuthorsTable from '../../../components/table/AuthorsTable';
+import MaterialsTable from '../../../components/table/MaterialsTable';
 import ResponseAlert from '../../../components/notifications/ResponseAlert';
 import { useLocation, useNavigate } from 'react-router-dom';
 import alertify from 'alertifyjs';
@@ -15,17 +15,17 @@ import 'alertifyjs/build/css/alertify.css';
 const IndexMaterial = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [authors, setAuthors] = useState([]);
+  const [materials, setMaterials] = useState([]);
   const [alert, setAlert] = useState({ visible: false, type: '', message: '' });
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [search, setSearch] = useState('');
 
-  const columns = ["#", "Name", "Pen Name", "Nationality", "Income", "First Published", "Position", "Status", "Actions"];
+  const columns = ["#", "Name", "Material Path", "Status", "Actions"];
 
   useEffect(() => {
-    axios.get(`${base_url}/api/authors/all`, {
+    axios.get(`${base_url}/api/materials/all`, {
       params: {
         page: currentPage,
         limit: itemsPerPage,
@@ -34,14 +34,14 @@ const IndexMaterial = () => {
     })
       .then(response => {
         if (response.data && response.data.data && Array.isArray(response.data.data)) {
-          setAuthors(response.data.data);
+          setMaterials(response.data.data);
           setTotalPages(response.data.totalPages);
         } else {
           console.error('API response is not in the expected format', response.data);
         }
       })
       .catch(error => {
-        console.error('There was an error fetching the authors!', error);
+        console.error('There was an error fetching the materials!', error);
       });
   }, [currentPage, itemsPerPage, search]);
 
@@ -52,29 +52,29 @@ const IndexMaterial = () => {
   }, [location.state]);
 
   const handleEdit = (id) => {
-    navigate(`/authors/${id}/edit`);
+    navigate(`/materials/${id}/edit`);
   };
 
   const handleDelete = (id) => {
     alertify.confirm(
       'Confirm Delete',
-      'Are you sure you want to delete this author?',
+      'Are you sure you want to delete this material?',
       () => {
-        axios.post(`${base_url}/api/authors/delete/${id}`)
+        axios.post(`${base_url}/api/materials/delete/${id}`)
           .then(response => {
-            setAuthors(authors.filter(author => author._id !== id));
+            setMaterials(materials.filter(material => material._id !== id));
             setAlert({
               visible: true,
               type: 'success',
-              message: 'Author deleted successfully!'
+              message: 'Material deleted successfully!'
             });
           })
           .catch(error => {
-            console.error('There was an error deleting the author!', error);
+            console.error('There was an error deleting the material!', error);
             setAlert({
               visible: true,
               type: 'failure',
-              message: 'Failed to delete the author. Please try again.'
+              message: 'Failed to delete the material. Please try again.'
             });
           });
       },
@@ -85,25 +85,25 @@ const IndexMaterial = () => {
   const handleChangeStatus = (id) => {
     alertify.confirm(
       'Confirm Status Change',
-      'Are you sure you want to change the status of this author?',
+      'Are you sure you want to change the status of this material?',
       () => {
-        axios.post(`${base_url}/api/authors/change-status/${id}`)
+        axios.post(`${base_url}/api/materials/change-status/${id}`)
           .then(response => {
-            setAuthors(authors.map(author =>
-              author._id === id ? { ...author, is_active: !author.is_active } : author
+            setMaterials(materials.map(material =>
+              material._id === id ? { ...material, is_active: !material.is_active } : material
             ));
             setAlert({
               visible: true,
               type: 'success',
-              message: 'Author status changed successfully!'
+              message: 'Material status changed successfully!'
             });
           })
           .catch(error => {
-            console.error('There was an error changing the author status!', error);
+            console.error('There was an error changing the material status!', error);
             setAlert({
               visible: true,
               type: 'failure',
-              message: 'Failed to change the author status. Please try again.'
+              message: 'Failed to change the material status. Please try again.'
             });
           });
       },
@@ -163,9 +163,9 @@ const IndexMaterial = () => {
                         </CInputGroup>
                       </CCol>
                     </CRow>
-                    <AuthorsTable
+                    <MaterialsTable
                       columns={columns}
-                      data={authors}
+                      data={materials}
                       handleEdit={handleEdit}
                       handleDelete={handleDelete}
                       handleChangeStatus={handleChangeStatus}

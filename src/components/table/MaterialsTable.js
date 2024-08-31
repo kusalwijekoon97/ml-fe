@@ -3,7 +3,16 @@ import { CTable, CTableHead, CTableBody, CTableRow, CTableHeaderCell, CTableData
 import { PencilSquare, Trash, Eye } from 'react-bootstrap-icons';
 import alertify from 'alertifyjs';
 
-const AuthorsTable = ({ columns, data, handleEdit, handleDelete, handleChangeStatus }) => {
+const MaterialsTable = ({ columns, data, handleEdit, handleDelete, handleChangeStatus }) => {
+  const baseURL = 'https://bckt-mylibrary-testing.s3.ap-south-1.amazonaws.com/';
+
+  // Function to get the shortened material path
+  const getShortenedPath = (fullPath) => {
+    if (fullPath && fullPath.startsWith(baseURL)) {
+      return '.../' + fullPath.slice(baseURL.length);
+    }
+    return fullPath || 'N/A'; // Return the original if not matching base URL
+  };
   return (
     <CTable align="middle" className="mb-0 border" hover responsive>
       <CTableHead className="text-nowrap">
@@ -16,28 +25,24 @@ const AuthorsTable = ({ columns, data, handleEdit, handleDelete, handleChangeSta
         </CTableRow>
       </CTableHead>
       <CTableBody>
-        {data.map((author, index) => (
-          <CTableRow key={author._id}>
+        {data.map((material, index) => (
+          <CTableRow key={material._id}>
             <CTableDataCell className="text-center">{index + 1}</CTableDataCell>
-            <CTableDataCell>{author.firstname} {author.lastname}</CTableDataCell>
-            <CTableDataCell>{author.penName || 'N/A'}</CTableDataCell>
-            <CTableDataCell>{author.nationality || 'N/A'}</CTableDataCell>
-            <CTableDataCell>{author.income || 'N/A'}</CTableDataCell>
-            <CTableDataCell>{author.firstPublishDate || 'N/A'}</CTableDataCell>
-            <CTableDataCell>{author.position || 'N/A'}</CTableDataCell>
+            <CTableDataCell>{material.name || 'N/A'}</CTableDataCell>
+            <CTableDataCell>{getShortenedPath(material.material_path)}</CTableDataCell>
             <CTableDataCell className="text-center">
-              <CBadge color={author.is_active ? 'success' : 'danger'}>
-                {author.is_active ? 'active' : 'inactive'}
+              <CBadge color={material.is_active ? 'success' : 'danger'}>
+                {material.is_active ? 'active' : 'inactive'}
               </CBadge>
             </CTableDataCell>
             <CTableDataCell>
-              <CButton className='me-1' color="warning" size="sm" onClick={() => handleEdit(author._id)}>
+              <CButton className='me-1' color="warning" size="sm" onClick={() => handleEdit(material._id)}>
                 <PencilSquare /> Edit
               </CButton>
-              <CButton className='me-1' color="info" size="sm" onClick={() => handleChangeStatus(author._id)}>
+              <CButton className='me-1' color="info" size="sm" onClick={() => handleChangeStatus(material._id)}>
                 <Eye /> Status
               </CButton>
-              <CButton className='me-1' color="danger" size="sm" onClick={() => handleDelete(author._id)}>
+              <CButton className='me-1' color="danger" size="sm" onClick={() => handleDelete(material._id)}>
                 <Trash /> Delete
               </CButton>
             </CTableDataCell>
@@ -48,4 +53,4 @@ const AuthorsTable = ({ columns, data, handleEdit, handleDelete, handleChangeSta
   );
 };
 
-export default AuthorsTable;
+export default MaterialsTable;
