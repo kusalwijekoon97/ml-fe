@@ -9,9 +9,9 @@ import { cilList } from '@coreui/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import base_url from "../../../utils/api/base_url";
 import ResponseAlert from '../../../components/notifications/ResponseAlert';
-import MaterialForm from '../../../components/forms/MaterialForm';
+import BookForm from '../../../components/forms/BookForm';
 
-const CreateMaterial = () => {
+const CreateBook = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [form, setForm] = useState({
@@ -97,6 +97,8 @@ const CreateMaterial = () => {
     { value: 4, label: 'Series 4' },
     { value: 5, label: 'Series 5' },
   ]);
+  const materialEAFormats = ['PDF', 'EPUB', 'TEXT', 'MP3'];
+  const [materialOptions, setMaterialOptions] = useState([]);
   // chapters
   const [chapters, setChapters] = useState([
     { chapter_number: 1, chapter_name: '', chapter_source_pdf: '', chapter_source_epub: '', chapter_source_text: '', chapter_source_mp3: '', chapter_voice: '' }
@@ -108,6 +110,13 @@ const CreateMaterial = () => {
       ...prevForm,
       [name]: value,
     }));
+    setErrors({ ...errors, [name]: '' });
+  };
+
+  // handling cover image changing
+  const handleCoverImageChange = (e) => {
+    const { name, files } = e.target;
+    setForm({ ...form, [name]: files[0] });
     setErrors({ ...errors, [name]: '' });
   };
   // fetching all open authors
@@ -209,7 +218,25 @@ const CreateMaterial = () => {
     setForm({ ...form, subCategory: selectedSubCategoryOptions });
     setErrors({ ...errors, subCategory: '' });
   };
-
+  // fetching all open materials
+  useEffect(() => {
+    axios.get(`${base_url}/api/materials/all-open`)
+      .then(response => {
+        const materials = response.data.data.map(material => ({
+          value: material.material_path,
+          label: material.name
+        }));
+        setMaterialOptions(materials);
+      })
+      .catch(error => {
+        console.error("There was an error fetching the materials!", error);
+      });
+  }, []);
+  // handling material change
+  const handleMaterialChange = (selectedMaterialOptions) => {
+    setForm({ ...form, material: selectedMaterialOptions });
+    setErrors({ ...errors, material: '' });
+  };
   const validateForm = () => {
     const newErrors = {};
 
@@ -257,15 +284,37 @@ const CreateMaterial = () => {
   // handling complete materials changing
   const handleCompleteMaterialChange = (index, field, value) => {
     setForm((prevForm) => {
+      // Validate field
+      if (!['publisher', 'publishedDate'].includes(field)) {
+        console.error('Invalid field name');
+        return prevForm;
+      }
+      // Update the material array
       const updatedMaterials = prevForm.material.completeMaterials.map((material, i) =>
         i === index ? { ...material, [field]: value } : material
       );
+      // Return updated form
       return {
         ...prevForm,
         material: { completeMaterials: updatedMaterials },
       };
     });
   };
+// handling complete materials dropdown changing
+const handleCompleteMaterialSourceChange = (index, selectedOption) => {
+  setForm((prevForm) => {
+    const updatedMaterials = prevForm.material.completeMaterials.map((material, i) =>
+      i === index ? { ...material, source: selectedOption?.value || null } : material
+    );
+
+    return {
+      ...prevForm,
+      material: { completeMaterials: updatedMaterials },
+    };
+  });
+};
+
+
   // handling chapter adding
   const handleChapterAddition = () => {
     setChapters(prevChapters => [
@@ -392,7 +441,7 @@ const CreateMaterial = () => {
     <>
       <AppSidebar />
       <div className="wrapper d-flex flex-column min-vh-100">
-        <AppHeader title="Materials" />
+        <AppHeader title="Books" />
         <div className="body flex-grow-1">
           <ResponseAlert
             visible={alert.visible}
@@ -405,14 +454,14 @@ const CreateMaterial = () => {
               <CCol xs={12}>
                 <CCard className="mb-4 border-top-primary border-top-3">
                   <CardHeaderWithTitleBtn
-                    title="Material"
+                    title="Book"
                     subtitle="create"
                     buttonIcon={<CIcon icon={cilList} />}
-                    buttonText="Materials"
-                    linkTo="/materials"
+                    buttonText="Books"
+                    linkTo="/books"
                   />
                   <CCardBody>
-                    <MaterialForm
+                    <BookForm
                       form={form}
                       errors={errors}
                       handleChange={handleChange}
@@ -421,6 +470,7 @@ const CreateMaterial = () => {
                       handleNextStep={handleNextStep}
                       handlePreviousStep={handlePreviousStep}
                       currentStep={currentStep}
+                      handleCoverImageChange={handleCoverImageChange}
                       authorOptions={authorOptions}
                       handleAuthorChange={handleAuthorChange}
                       handleTranslatorChange={handleTranslatorChange}
@@ -436,7 +486,11 @@ const CreateMaterial = () => {
                       seriesOptions={seriesOptions}
                       generateSeriesInputs={generateSeriesInputs}
                       handleBookTypeChange={handleBookTypeChange}
+                      materialEAFormats={materialEAFormats}
+                      materialOptions={materialOptions}
+                      handleMaterialChange={handleMaterialChange}
                       handleCompleteMaterialChange={handleCompleteMaterialChange}
+                      handleCompleteMaterialSourceChange={handleCompleteMaterialSourceChange}
                       chapters={chapters}
                       handleChapterAddition={handleChapterAddition}
                       handleChapterRemoval={handleChapterRemoval}
@@ -455,4 +509,4 @@ const CreateMaterial = () => {
   );
 };
 
-export default CreateMaterial;
+export default CreateBook;

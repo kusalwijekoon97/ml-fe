@@ -10,7 +10,7 @@ import base_url from "../../../utils/api/base_url";
 import ResponseAlert from '../../../components/notifications/ResponseAlert';
 import AuthorFormEdit from '../../../components/forms/AuthorFormEdit';
 
-const EditMaterial = () => {
+const EditBook = () => {
   const navigate = useNavigate();
   const { authorId } = useParams();
 
@@ -214,4 +214,4 @@ const EditMaterial = () => {
   );
 };
 
-export default EditMaterial;
+export default EditBook;

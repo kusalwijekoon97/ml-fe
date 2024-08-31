@@ -14,6 +14,7 @@ const MaterialForm = ({
   handleNextStep,
   handlePreviousStep,
   currentStep,
+  handleCoverImageChange,
   authorOptions,
   handleAuthorChange,
   handleTranslatorChange,
@@ -29,7 +30,11 @@ const MaterialForm = ({
   seriesOptions,
   generateSeriesInputs,
   handleBookTypeChange,
+  materialEAFormats,
+  materialOptions,
+  handleMaterialChange,
   handleCompleteMaterialChange,
+  handleCompleteMaterialSourceChange,
   chapters,
   handleChapterAddition,
   handleChapterRemoval,
@@ -107,7 +112,7 @@ const MaterialForm = ({
                     type="file"
                     id="coverImage"
                     name="coverImage"
-                    onChange={handleChange}
+                    onChange={handleCoverImageChange}
                     invalid={!!errors.coverImage}
                     accept=".png, .jpg, .jpeg"
                   />
@@ -333,14 +338,14 @@ const MaterialForm = ({
                       <CTableBody>
                         {form.material.completeMaterials.map((material, index) => (
                           <CTableRow key={index}>
-                            <CTableDataCell>
+                            <CTableDataCell className='col-2'>
                               <CFormInput
                                 name={`complete_${material.formatType.toLowerCase()}_formatType`}
                                 value={material.formatType}
                                 readOnly
                               />
                             </CTableDataCell>
-                            <CTableDataCell>
+                            <CTableDataCell className='col-2'>
                               <CFormInput
                                 placeholder="Publisher"
                                 type="text"
@@ -349,7 +354,7 @@ const MaterialForm = ({
                                 onChange={(e) => handleCompleteMaterialChange(index, 'publisher', e.target.value)}
                               />
                             </CTableDataCell>
-                            <CTableDataCell>
+                            <CTableDataCell className='col-2'>
                               <CFormInput
                                 placeholder="Published Date"
                                 type="date"
@@ -358,24 +363,15 @@ const MaterialForm = ({
                                 onChange={(e) => handleCompleteMaterialChange(index, 'publishedDate', e.target.value)}
                               />
                             </CTableDataCell>
-                            <CTableDataCell>
-                              <CFormInput
-                                placeholder={`${material.formatType} Source`}
-                                type="file"
+                            <CTableDataCell className='col-6'>
+                              <Select
                                 name={`complete_${material.formatType.toLowerCase()}_source`}
-                                accept={
-                                  material.formatType === 'PDF'
-                                    ? '.pdf,application/pdf'
-                                    : material.formatType === 'EPUB'
-                                      ? '.epub,application/epub+zip'
-                                      : material.formatType === 'TEXT'
-                                        ? '.txt,text/plain'
-                                        : material.formatType === 'MP3'
-                                          ? '.mp3,audio/mpeg'
-                                          : ''
-                                }
-                                onChange={(e) => handleCompleteMaterialChange(index, 'source', e.target.files[0])}
+                                options={materialOptions}
+                                value={materialOptions.find(option => option.value === material.source) || null}
+                                onChange={(selectedOption) => handleCompleteMaterialSourceChange(index, selectedOption)}
+                                className="custom-select"
                               />
+                              {errors.material && <CFormFeedback>{errors.material}</CFormFeedback>}
                             </CTableDataCell>
                           </CTableRow>
                         ))}

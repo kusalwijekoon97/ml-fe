@@ -12,7 +12,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import alertify from 'alertifyjs';
 import 'alertifyjs/build/css/alertify.css';
 
-const IndexMaterial = () => {
+const IndexBook = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [authors, setAuthors] = useState([]);
@@ -126,7 +126,7 @@ const IndexMaterial = () => {
     <>
       <AppSidebar />
       <div className="wrapper d-flex flex-column min-vh-100">
-        <AppHeader title="Materials" />
+        <AppHeader title="Books" />
         <div className="body flex-grow-1">
           <ResponseAlert
             visible={alert.visible}
@@ -139,11 +139,11 @@ const IndexMaterial = () => {
               <CCol xs={12}>
                 <CCard className="mb-4 border-top-primary border-top-3">
                   <CardHeaderWithTitleBtn
-                    title="Materials"
+                    title="Books"
                     subtitle="List"
                     buttonIcon={<CIcon icon={cibAddthis} />}
-                    buttonText="Add Material"
-                    linkTo="/materials/create"
+                    buttonText="Add Book"
+                    linkTo="/books/create"
                   />
                   <CCardBody>
                     <CRow className='mb-2'>
@@ -207,4 +207,4 @@ const IndexMaterial = () => {
   );
 };
 
-export default IndexMaterial;
+export default IndexBook;

@@ -18,6 +18,9 @@ import EditLibrary from './views/pages/library/editLibrary';
 import IndexMaterial from './views/pages/material/IndexMaterial';
 import CreateMaterial from './views/pages/material/createMaterial';
 import EditMaterial from './views/pages/material/editMaterial';
+import IndexBook from './views/pages/book/IndexBook';
+import CreateBook from './views/pages/book/createBook';
+import EditBook from './views/pages/book/editBook';
 
 // Containers
 const DefaultLayout = React.lazy(() => import('./layout/DefaultLayout'));
@@ -82,6 +85,10 @@ const App = () => {
           <Route path="/materials" name="materials-all" element={<IndexMaterial />} />
           <Route path="/materials/create" name="materials-create" element={<CreateMaterial />} />
           <Route path="/materials/:materialId/edit" name="materials-edit" element={<EditMaterial />} />
+          {/* book */}
+          <Route path="/books" name="books-all" element={<IndexBook />} />
+          <Route path="/books/create" name="books-create" element={<CreateBook />} />
+          <Route path="/books/:bookId/edit" name="books-edit" element={<EditBook />} />
         </Routes>
       </Suspense>
     </Router>
