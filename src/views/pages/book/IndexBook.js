@@ -6,7 +6,7 @@ import { cibAddthis, cilSearch } from '@coreui/icons';
 import { AppFooter, AppHeader, AppSidebar } from '../../../components';
 import base_url from "../../../utils/api/base_url";
 import CardHeaderWithTitleBtn from '../../../components/cards/CardHeaderWithTitleBtn';
-import AuthorsTable from '../../../components/table/AuthorsTable';
+import BooksTable from '../../../components/table/BooksTable';
 import ResponseAlert from '../../../components/notifications/ResponseAlert';
 import { useLocation, useNavigate } from 'react-router-dom';
 import alertify from 'alertifyjs';
@@ -15,17 +15,17 @@ import 'alertifyjs/build/css/alertify.css';
 const IndexBook = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [authors, setAuthors] = useState([]);
+  const [books, setBooks] = useState([]);
   const [alert, setAlert] = useState({ visible: false, type: '', message: '' });
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [search, setSearch] = useState('');
 
-  const columns = ["#", "Name", "Pen Name", "Nationality", "Income", "First Published", "Position", "Status", "Actions"];
+  const columns = ["#", "Name", "ISBN", "Author", "Publisher", "Library", "categories", "Status", "Actions"];
 
   useEffect(() => {
-    axios.get(`${base_url}/api/authors/all`, {
+    axios.get(`${base_url}/api/books/all`, {
       params: {
         page: currentPage,
         limit: itemsPerPage,
@@ -34,14 +34,14 @@ const IndexBook = () => {
     })
       .then(response => {
         if (response.data && response.data.data && Array.isArray(response.data.data)) {
-          setAuthors(response.data.data);
+          setBooks(response.data.data);
           setTotalPages(response.data.totalPages);
         } else {
           console.error('API response is not in the expected format', response.data);
         }
       })
       .catch(error => {
-        console.error('There was an error fetching the authors!', error);
+        console.error('There was an error fetching the books!', error);
       });
   }, [currentPage, itemsPerPage, search]);
 
@@ -52,29 +52,29 @@ const IndexBook = () => {
   }, [location.state]);
 
   const handleEdit = (id) => {
-    navigate(`/authors/${id}/edit`);
+    navigate(`/books/${id}/edit`);
   };
 
   const handleDelete = (id) => {
     alertify.confirm(
       'Confirm Delete',
-      'Are you sure you want to delete this author?',
+      'Are you sure you want to delete this book?',
       () => {
-        axios.post(`${base_url}/api/authors/delete/${id}`)
+        axios.post(`${base_url}/api/books/delete/${id}`)
           .then(response => {
-            setAuthors(authors.filter(author => author._id !== id));
+            setBooks(books.filter(book => book._id !== id));
             setAlert({
               visible: true,
               type: 'success',
-              message: 'Author deleted successfully!'
+              message: 'Book deleted successfully!'
             });
           })
           .catch(error => {
-            console.error('There was an error deleting the author!', error);
+            console.error('There was an error deleting the book!', error);
             setAlert({
               visible: true,
               type: 'failure',
-              message: 'Failed to delete the author. Please try again.'
+              message: 'Failed to delete the book. Please try again.'
             });
           });
       },
@@ -85,25 +85,25 @@ const IndexBook = () => {
   const handleChangeStatus = (id) => {
     alertify.confirm(
       'Confirm Status Change',
-      'Are you sure you want to change the status of this author?',
+      'Are you sure you want to change the status of this book?',
       () => {
-        axios.post(`${base_url}/api/authors/change-status/${id}`)
+        axios.post(`${base_url}/api/books/change-status/${id}`)
           .then(response => {
-            setAuthors(authors.map(author =>
-              author._id === id ? { ...author, is_active: !author.is_active } : author
+            setBooks(books.map(book =>
+              book._id === id ? { ...book, is_active: !book.is_active } : book
             ));
             setAlert({
               visible: true,
               type: 'success',
-              message: 'Author status changed successfully!'
+              message: 'Book status changed successfully!'
             });
           })
           .catch(error => {
-            console.error('There was an error changing the author status!', error);
+            console.error('There was an error changing the book status!', error);
             setAlert({
               visible: true,
               type: 'failure',
-              message: 'Failed to change the author status. Please try again.'
+              message: 'Failed to change the book status. Please try again.'
             });
           });
       },
@@ -163,9 +163,9 @@ const IndexBook = () => {
                         </CInputGroup>
                       </CCol>
                     </CRow>
-                    <AuthorsTable
+                    <BooksTable
                       columns={columns}
-                      data={authors}
+                      data={books}
                       handleEdit={handleEdit}
                       handleDelete={handleDelete}
                       handleChangeStatus={handleChangeStatus}

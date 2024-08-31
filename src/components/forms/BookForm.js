@@ -39,6 +39,7 @@ const MaterialForm = ({
   handleChapterAddition,
   handleChapterRemoval,
   handleChapterChange,
+  handleChapterMaterialSourceChange,
   loading
 }) => {
   return (
@@ -338,14 +339,14 @@ const MaterialForm = ({
                       <CTableBody>
                         {form.material.completeMaterials.map((material, index) => (
                           <CTableRow key={index}>
-                            <CTableDataCell className='col-2'>
+                            <CTableDataCell className='col-1'>
                               <CFormInput
                                 name={`complete_${material.formatType.toLowerCase()}_formatType`}
                                 value={material.formatType}
                                 readOnly
                               />
                             </CTableDataCell>
-                            <CTableDataCell className='col-2'>
+                            <CTableDataCell className='col-3'>
                               <CFormInput
                                 placeholder="Publisher"
                                 type="text"
@@ -390,10 +391,10 @@ const MaterialForm = ({
                     <div className="my-1">
                       <CTable bordered className='my-3'>
                         <CTableBody>
-                          {chapters.map((chapter, index) => (
+                          {form.chapters.map((chapter, index) => (
                             <React.Fragment key={index}>
                               <CTableRow>
-                                <CTableDataCell>
+                                <CTableDataCell rowSpan={5} className='col-3'>
                                   <CFormInput
                                     placeholder="Chapter Number"
                                     type="number"
@@ -403,7 +404,7 @@ const MaterialForm = ({
                                     readOnly
                                   />
                                 </CTableDataCell>
-                                <CTableDataCell colSpan={4}>
+                                <CTableDataCell>
                                   <div className="d-flex align-items-center">
                                     <CFormInput
                                       placeholder="Chapter Name"
@@ -421,65 +422,66 @@ const MaterialForm = ({
                               </CTableRow>
                               <CTableRow>
                                 <CTableDataCell>
-                                  <CFormInput
-                                    placeholder="PDF"
-                                    type="file"
-                                    name="chapter_source_pdf"
-                                    value={chapter.chapter_source_pdf}
-                                    accept=".pdf,application/pdf"
-                                    className="me-2"
-                                    onChange={(e) => handleChapterChange(index, e)}
+                                  <Select
+                                    name="pdf"
+                                    options={materialOptions}
+                                    value={materialOptions.find(option => option.value === chapter.chapter_source_pdf) || null}
+                                    onChange={(selectedOption) => handleChapterMaterialSourceChange(index, 'pdf', selectedOption)}
+                                    className="custom-select"
                                   />
                                 </CTableDataCell>
+                              </CTableRow>
+                              <CTableRow>
                                 <CTableDataCell>
-                                  <CFormInput
-                                    placeholder="EPUB"
-                                    type="file"
-                                    name="chapter_source_epub"
-                                    value={chapter.chapter_source_epub}
-                                    accept=".epub,application/epub+zip"
-                                    className="me-2"
-                                    onChange={(e) => handleChapterChange(index, e)}
+                                  <Select
+                                    name="epub"
+                                    options={materialOptions}
+                                    value={materialOptions.find(option => option.value === chapter.chapter_source_epub) || null}
+                                    onChange={(selectedOption) => handleChapterMaterialSourceChange(index, 'epub', selectedOption)}
+                                    className="custom-select"
                                   />
                                 </CTableDataCell>
+                              </CTableRow>
+                              <CTableRow>
                                 <CTableDataCell>
-                                  <CFormInput
-                                    placeholder="Text"
-                                    type="file"
-                                    name="chapter_source_text"
-                                    value={chapter.chapter_source_text}
-                                    accept=".txt,text/plain"
-                                    className="me-2"
-                                    onChange={(e) => handleChapterChange(index, e)}
+                                  <Select
+                                    name="text"
+                                    options={materialOptions}
+                                    value={materialOptions.find(option => option.value === chapter.chapter_source_text) || null}
+                                    onChange={(selectedOption) => handleChapterMaterialSourceChange(index, 'text', selectedOption)}
+                                    className="custom-select"
                                   />
                                 </CTableDataCell>
+                              </CTableRow>
+                              <CTableRow>
                                 <CTableDataCell>
-                                  <CFormInput
-                                    placeholder="MP3"
-                                    type="file"
-                                    name="chapter_source_mp3"
-                                    value={chapter.chapter_source_mp3}
-                                    accept=".mp3,audio/mpeg"
-                                    className="me-2 mb-2"
-                                    onChange={(e) => handleChapterChange(index, e)}
-                                  />
-                                  <CFormSelect
-                                    name="chapter_voice"
-                                    value={chapter.chapter_voice}
-                                    className="me-2"
-                                    onChange={(e) => handleChapterChange(index, e)}
-                                  >
-                                    <option value="" disabled>Voice...</option>
-                                    <option value="mix">Mix</option>
-                                    <option value="male">Male</option>
-                                    <option value="female">Female</option>
-                                  </CFormSelect>
+                                  <CInputGroup>
+                                    <Select
+                                      name="mp3"
+                                      options={materialOptions}
+                                      value={materialOptions.find(option => option.value === chapter.chapter_source_mp3) || null}
+                                      onChange={(selectedOption) => handleChapterMaterialSourceChange(index, 'mp3', selectedOption)}
+                                      className="custom-select col-10"
+                                    />
+                                    <CFormSelect
+                                      name="chapter_mp3_voice"
+                                      value={chapter.chapter_mp3_voice}
+                                      className="me-2 col-2"
+                                      onChange={(e) => handleChapterChange(index, e)}
+                                    >
+                                      <option value="" disabled>Voice...</option>
+                                      <option value="mix">Mix</option>
+                                      <option value="male">Male</option>
+                                      <option value="female">Female</option>
+                                    </CFormSelect>
+                                  </CInputGroup>
                                 </CTableDataCell>
                               </CTableRow>
                             </React.Fragment>
                           ))}
                         </CTableBody>
                       </CTable>
+
                       <div className='d-flex justify-content-start'>
                         <CButton color="primary" onClick={handleChapterAddition}>+ Add Chapter</CButton>
                       </div>

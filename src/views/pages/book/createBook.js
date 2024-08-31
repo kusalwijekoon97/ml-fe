@@ -57,17 +57,17 @@ const CreateBook = () => {
         }
       ]
     },
-    // chapters: [
-    //   {
-    //     chapter_number: 1,
-    //     chapter_name: '',
-    //     chapter_source_pdf: '',
-    //     chapter_source_epub: '',
-    //     chapter_source_text: '',
-    //     chapter_source_mp3: '',
-    //     chapter_voice: '',
-    //   }
-    // ]
+    chapters: [
+      {
+        chapter_number: 1,
+        chapter_name: '',
+        chapter_source_pdf: '',
+        chapter_source_epub: '',
+        chapter_source_text: '',
+        chapter_source_mp3: '',
+        chapter_mp3_voice: '',
+      }
+    ]
   });
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState({ visible: false, type: '', message: '' });
@@ -101,7 +101,7 @@ const CreateBook = () => {
   const [materialOptions, setMaterialOptions] = useState([]);
   // chapters
   const [chapters, setChapters] = useState([
-    { chapter_number: 1, chapter_name: '', chapter_source_pdf: '', chapter_source_epub: '', chapter_source_text: '', chapter_source_mp3: '', chapter_voice: '' }
+    { chapter_number: 1, chapter_name: '', chapter_source_pdf: '', chapter_source_epub: '', chapter_source_text: '', chapter_source_mp3: '', chapter_mp3_voice: '' }
   ]);
   // handling form changes
   const handleChange = (e) => {
@@ -300,50 +300,75 @@ const CreateBook = () => {
       };
     });
   };
-// handling complete materials dropdown changing
-const handleCompleteMaterialSourceChange = (index, selectedOption) => {
-  setForm((prevForm) => {
-    const updatedMaterials = prevForm.material.completeMaterials.map((material, i) =>
-      i === index ? { ...material, source: selectedOption?.value || null } : material
-    );
+  // handling complete materials dropdown changing
+  const handleCompleteMaterialSourceChange = (index, selectedOption) => {
+    setForm((prevForm) => {
+      const updatedMaterials = prevForm.material.completeMaterials.map((material, i) =>
+        i === index ? { ...material, source: selectedOption?.value || null } : material
+      );
 
-    return {
-      ...prevForm,
-      material: { completeMaterials: updatedMaterials },
-    };
-  });
-};
+      return {
+        ...prevForm,
+        material: { completeMaterials: updatedMaterials },
+      };
+    });
+  };
 
 
-  // handling chapter adding
+  // Handling chapter addition
   const handleChapterAddition = () => {
-    setChapters(prevChapters => [
-      ...prevChapters,
-      { chapter_number: prevChapters.length + 1, chapter_name: '', chapter_source_pdf: '', chapter_source_epub: '', chapter_source_text: '', chapter_source_mp3: '', chapter_voice: '' }
-    ]);
+    setForm(prevForm => ({
+      ...prevForm,
+      chapters: [
+        ...prevForm.chapters,
+        {
+          chapter_number: prevForm.chapters.length + 1,
+          chapter_name: '',
+          chapter_source_pdf: '',
+          chapter_source_epub: '',
+          chapter_source_text: '',
+          chapter_source_mp3: '',
+          chapter_mp3_voice: ''
+        }
+      ]
+    }));
   };
 
   // Handle chapter removal
   const handleChapterRemoval = (index) => {
-    setChapters(prevChapters => {
-      const updatedChapters = prevChapters.filter((_, i) => i !== index);
+    setForm(prevForm => {
+      const updatedChapters = prevForm.chapters.filter((_, i) => i !== index);
       updatedChapters.forEach((chapter, i) => {
         chapter.chapter_number = i + 1;
       });
-      return updatedChapters;
+      return {
+        ...prevForm,
+        chapters: updatedChapters
+      };
     });
   };
 
-  // Handle chapter change
+  // Handle chapter field change
   const handleChapterChange = (index, e) => {
     const { name, value } = e.target;
-    setChapters((prevChapters) => {
-      const updatedChapters = prevChapters.map((chapter, i) =>
+    setForm(prevForm => ({
+      ...prevForm,
+      chapters: prevForm.chapters.map((chapter, i) =>
         i === index ? { ...chapter, [name]: value } : chapter
-      );
-      return updatedChapters;
-    });
+      )
+    }));
   };
+
+  // Handle chapter material source change
+  const handleChapterMaterialSourceChange = (index, materialType, selectedOption) => {
+    setForm(prevForm => ({
+      ...prevForm,
+      chapters: prevForm.chapters.map((chapter, i) =>
+        i === index ? { ...chapter, [`chapter_source_${materialType}`]: selectedOption ? selectedOption.value : '' } : chapter
+      )
+    }));
+  };
+
 
 
   // handling form submission
@@ -377,15 +402,39 @@ const handleCompleteMaterialSourceChange = (index, selectedOption) => {
       }
     });
 
-    // chapters.forEach((chapter, index) => {
-    //   formData.append(`material[chapters][${index}][chapter_number]`, chapter.chapter_number);
-    //   formData.append(`material[chapters][${index}][chapter_name]`, chapter.chapter_name);
-    //   if (chapter.chapter_source_pdf) formData.append(`material[chapters][${index}][chapter_source_pdf]`, chapter.chapter_source_pdf);
-    //   if (chapter.chapter_source_epub) formData.append(`material[chapters][${index}][chapter_source_epub]`, chapter.chapter_source_epub);
-    //   if (chapter.chapter_source_text) formData.append(`material[chapters][${index}][chapter_source_text]`, chapter.chapter_source_text);
-    //   if (chapter.chapter_source_mp3) formData.append(`material[chapters][${index}][chapter_source_mp3]`, chapter.chapter_source_mp3);
-    //   if (chapter.chapter_voice) formData.append(`material[chapters][${index}][chapter_voice]`, chapter.chapter_voice);
+    // Append chapter data
+    form.chapters.forEach((chapter, index) => {
+      formData.append(`material[chapters][${index}][chapter_number]`, chapter.chapter_number);
+      formData.append(`material[chapters][${index}][chapter_name]`, chapter.chapter_name);
+      formData.append(`material[chapters][${index}][chapter_source_pdf]`, chapter.chapter_source_pdf);
+      formData.append(`material[chapters][${index}][chapter_source_epub]`, chapter.chapter_source_epub);
+      formData.append(`material[chapters][${index}][chapter_source_text]`, chapter.chapter_source_text);
+      formData.append(`material[chapters][${index}][chapter_source_mp3]`, chapter.chapter_source_mp3);
+      formData.append(`material[chapters][${index}][chapter_mp3_voice]`, chapter.chapter_mp3_voice);
+    });
+
+    // form.chapters.forEach((chapter, index) => {
+    //   // Chapter Number and Name
+    //   formData.append(`material[chapters][${index}][chapterNumber]`, chapter.chapter_number);
+    //   formData.append(`material[chapters][${index}][chapterName]`, chapter.chapter_name);
+    //   // Chapter Source Array
+    //   if (chapter.chapter_source_pdf) {
+    //     formData.append(`material[chapters][${index}][source][0][source]`, chapter.chapter_source_pdf);
+    //   }
+    //   if (chapter.chapter_source_epub) {
+    //     formData.append(`material[chapters][${index}][source][1][source]`, chapter.chapter_source_epub);
+    //   }
+    //   if (chapter.chapter_source_text) {
+    //     formData.append(`material[chapters][${index}][source][2][source]`, chapter.chapter_source_text);
+    //   }
+    //   if (chapter.chapter_source_mp3) {
+    //     formData.append(`material[chapters][${index}][source][3][source]`, chapter.chapter_source_mp3);
+    //     formData.append(`material[chapters][${index}][source][3][voice]`, chapter.chapter_mp3_voice);
+    //     formData.append(`material[chapters][${index}][source][3][duration]`, chapter.chapter_mp3_duration);
+    //   }
     // });
+
+
 
     // Logging formData to check the contents
     formData.forEach((value, key) => {
@@ -403,7 +452,7 @@ const handleCompleteMaterialSourceChange = (index, selectedOption) => {
     })
       .then(response => {
         setLoading(false);
-        navigate("/materials", {
+        navigate("/books", {
           state: {
             alert: {
               visible: true,
@@ -495,6 +544,7 @@ const handleCompleteMaterialSourceChange = (index, selectedOption) => {
                       handleChapterAddition={handleChapterAddition}
                       handleChapterRemoval={handleChapterRemoval}
                       handleChapterChange={handleChapterChange}
+                      handleChapterMaterialSourceChange={handleChapterMaterialSourceChange}
                       loading={loading}
                     />
                   </CCardBody>
