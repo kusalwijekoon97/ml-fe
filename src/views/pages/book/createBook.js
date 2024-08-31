@@ -9,9 +9,9 @@ import { cilList } from '@coreui/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import base_url from "../../../utils/api/base_url";
 import ResponseAlert from '../../../components/notifications/ResponseAlert';
-import MaterialForm from '../../../components/forms/MaterialForm';
+import BookForm from '../../../components/forms/BookForm';
 
-const CreateMaterial = () => {
+const CreateBook = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [form, setForm] = useState({
@@ -57,17 +57,17 @@ const CreateMaterial = () => {
         }
       ]
     },
-    // chapters: [
-    //   {
-    //     chapter_number: 1,
-    //     chapter_name: '',
-    //     chapter_source_pdf: '',
-    //     chapter_source_epub: '',
-    //     chapter_source_text: '',
-    //     chapter_source_mp3: '',
-    //     chapter_voice: '',
-    //   }
-    // ]
+    chapters: [
+      {
+        chapter_number: 1,
+        chapter_name: '',
+        chapter_source_pdf: '',
+        chapter_source_epub: '',
+        chapter_source_text: '',
+        chapter_source_mp3: '',
+        chapter_mp3_voice: '',
+      }
+    ]
   });
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState({ visible: false, type: '', message: '' });
@@ -97,9 +97,11 @@ const CreateMaterial = () => {
     { value: 4, label: 'Series 4' },
     { value: 5, label: 'Series 5' },
   ]);
+  const materialEAFormats = ['PDF', 'EPUB', 'TEXT', 'MP3'];
+  const [materialOptions, setMaterialOptions] = useState([]);
   // chapters
   const [chapters, setChapters] = useState([
-    { chapter_number: 1, chapter_name: '', chapter_source_pdf: '', chapter_source_epub: '', chapter_source_text: '', chapter_source_mp3: '', chapter_voice: '' }
+    { chapter_number: 1, chapter_name: '', chapter_source_pdf: '', chapter_source_epub: '', chapter_source_text: '', chapter_source_mp3: '', chapter_mp3_voice: '' }
   ]);
   // handling form changes
   const handleChange = (e) => {
@@ -108,6 +110,13 @@ const CreateMaterial = () => {
       ...prevForm,
       [name]: value,
     }));
+    setErrors({ ...errors, [name]: '' });
+  };
+
+  // handling cover image changing
+  const handleCoverImageChange = (e) => {
+    const { name, files } = e.target;
+    setForm({ ...form, [name]: files[0] });
     setErrors({ ...errors, [name]: '' });
   };
   // fetching all open authors
@@ -209,7 +218,25 @@ const CreateMaterial = () => {
     setForm({ ...form, subCategory: selectedSubCategoryOptions });
     setErrors({ ...errors, subCategory: '' });
   };
-
+  // fetching all open materials
+  useEffect(() => {
+    axios.get(`${base_url}/api/materials/all-open`)
+      .then(response => {
+        const materials = response.data.data.map(material => ({
+          value: material.material_path,
+          label: material.name
+        }));
+        setMaterialOptions(materials);
+      })
+      .catch(error => {
+        console.error("There was an error fetching the materials!", error);
+      });
+  }, []);
+  // handling material change
+  const handleMaterialChange = (selectedMaterialOptions) => {
+    setForm({ ...form, material: selectedMaterialOptions });
+    setErrors({ ...errors, material: '' });
+  };
   const validateForm = () => {
     const newErrors = {};
 
@@ -257,44 +284,91 @@ const CreateMaterial = () => {
   // handling complete materials changing
   const handleCompleteMaterialChange = (index, field, value) => {
     setForm((prevForm) => {
+      // Validate field
+      if (!['publisher', 'publishedDate'].includes(field)) {
+        console.error('Invalid field name');
+        return prevForm;
+      }
+      // Update the material array
       const updatedMaterials = prevForm.material.completeMaterials.map((material, i) =>
         i === index ? { ...material, [field]: value } : material
       );
+      // Return updated form
       return {
         ...prevForm,
         material: { completeMaterials: updatedMaterials },
       };
     });
   };
-  // handling chapter adding
+  // handling complete materials dropdown changing
+  const handleCompleteMaterialSourceChange = (index, selectedOption) => {
+    setForm((prevForm) => {
+      const updatedMaterials = prevForm.material.completeMaterials.map((material, i) =>
+        i === index ? { ...material, source: selectedOption?.value || null } : material
+      );
+
+      return {
+        ...prevForm,
+        material: { completeMaterials: updatedMaterials },
+      };
+    });
+  };
+
+
+  // Handling chapter addition
   const handleChapterAddition = () => {
-    setChapters(prevChapters => [
-      ...prevChapters,
-      { chapter_number: prevChapters.length + 1, chapter_name: '', chapter_source_pdf: '', chapter_source_epub: '', chapter_source_text: '', chapter_source_mp3: '', chapter_voice: '' }
-    ]);
+    setForm(prevForm => ({
+      ...prevForm,
+      chapters: [
+        ...prevForm.chapters,
+        {
+          chapter_number: prevForm.chapters.length + 1,
+          chapter_name: '',
+          chapter_source_pdf: '',
+          chapter_source_epub: '',
+          chapter_source_text: '',
+          chapter_source_mp3: '',
+          chapter_mp3_voice: ''
+        }
+      ]
+    }));
   };
 
   // Handle chapter removal
   const handleChapterRemoval = (index) => {
-    setChapters(prevChapters => {
-      const updatedChapters = prevChapters.filter((_, i) => i !== index);
+    setForm(prevForm => {
+      const updatedChapters = prevForm.chapters.filter((_, i) => i !== index);
       updatedChapters.forEach((chapter, i) => {
         chapter.chapter_number = i + 1;
       });
-      return updatedChapters;
+      return {
+        ...prevForm,
+        chapters: updatedChapters
+      };
     });
   };
 
-  // Handle chapter change
+  // Handle chapter field change
   const handleChapterChange = (index, e) => {
     const { name, value } = e.target;
-    setChapters((prevChapters) => {
-      const updatedChapters = prevChapters.map((chapter, i) =>
+    setForm(prevForm => ({
+      ...prevForm,
+      chapters: prevForm.chapters.map((chapter, i) =>
         i === index ? { ...chapter, [name]: value } : chapter
-      );
-      return updatedChapters;
-    });
+      )
+    }));
   };
+
+  // Handle chapter material source change
+  const handleChapterMaterialSourceChange = (index, materialType, selectedOption) => {
+    setForm(prevForm => ({
+      ...prevForm,
+      chapters: prevForm.chapters.map((chapter, i) =>
+        i === index ? { ...chapter, [`chapter_source_${materialType}`]: selectedOption ? selectedOption.value : '' } : chapter
+      )
+    }));
+  };
+
 
 
   // handling form submission
@@ -328,15 +402,39 @@ const CreateMaterial = () => {
       }
     });
 
-    // chapters.forEach((chapter, index) => {
-    //   formData.append(`material[chapters][${index}][chapter_number]`, chapter.chapter_number);
-    //   formData.append(`material[chapters][${index}][chapter_name]`, chapter.chapter_name);
-    //   if (chapter.chapter_source_pdf) formData.append(`material[chapters][${index}][chapter_source_pdf]`, chapter.chapter_source_pdf);
-    //   if (chapter.chapter_source_epub) formData.append(`material[chapters][${index}][chapter_source_epub]`, chapter.chapter_source_epub);
-    //   if (chapter.chapter_source_text) formData.append(`material[chapters][${index}][chapter_source_text]`, chapter.chapter_source_text);
-    //   if (chapter.chapter_source_mp3) formData.append(`material[chapters][${index}][chapter_source_mp3]`, chapter.chapter_source_mp3);
-    //   if (chapter.chapter_voice) formData.append(`material[chapters][${index}][chapter_voice]`, chapter.chapter_voice);
+    // Append chapter data
+    form.chapters.forEach((chapter, index) => {
+      formData.append(`material[chapters][${index}][chapter_number]`, chapter.chapter_number);
+      formData.append(`material[chapters][${index}][chapter_name]`, chapter.chapter_name);
+      formData.append(`material[chapters][${index}][chapter_source_pdf]`, chapter.chapter_source_pdf);
+      formData.append(`material[chapters][${index}][chapter_source_epub]`, chapter.chapter_source_epub);
+      formData.append(`material[chapters][${index}][chapter_source_text]`, chapter.chapter_source_text);
+      formData.append(`material[chapters][${index}][chapter_source_mp3]`, chapter.chapter_source_mp3);
+      formData.append(`material[chapters][${index}][chapter_mp3_voice]`, chapter.chapter_mp3_voice);
+    });
+
+    // form.chapters.forEach((chapter, index) => {
+    //   // Chapter Number and Name
+    //   formData.append(`material[chapters][${index}][chapterNumber]`, chapter.chapter_number);
+    //   formData.append(`material[chapters][${index}][chapterName]`, chapter.chapter_name);
+    //   // Chapter Source Array
+    //   if (chapter.chapter_source_pdf) {
+    //     formData.append(`material[chapters][${index}][source][0][source]`, chapter.chapter_source_pdf);
+    //   }
+    //   if (chapter.chapter_source_epub) {
+    //     formData.append(`material[chapters][${index}][source][1][source]`, chapter.chapter_source_epub);
+    //   }
+    //   if (chapter.chapter_source_text) {
+    //     formData.append(`material[chapters][${index}][source][2][source]`, chapter.chapter_source_text);
+    //   }
+    //   if (chapter.chapter_source_mp3) {
+    //     formData.append(`material[chapters][${index}][source][3][source]`, chapter.chapter_source_mp3);
+    //     formData.append(`material[chapters][${index}][source][3][voice]`, chapter.chapter_mp3_voice);
+    //     formData.append(`material[chapters][${index}][source][3][duration]`, chapter.chapter_mp3_duration);
+    //   }
     // });
+
+
 
     // Logging formData to check the contents
     formData.forEach((value, key) => {
@@ -354,7 +452,7 @@ const CreateMaterial = () => {
     })
       .then(response => {
         setLoading(false);
-        navigate("/materials", {
+        navigate("/books", {
           state: {
             alert: {
               visible: true,
@@ -392,7 +490,7 @@ const CreateMaterial = () => {
     <>
       <AppSidebar />
       <div className="wrapper d-flex flex-column min-vh-100">
-        <AppHeader title="Materials" />
+        <AppHeader title="Books" />
         <div className="body flex-grow-1">
           <ResponseAlert
             visible={alert.visible}
@@ -405,14 +503,14 @@ const CreateMaterial = () => {
               <CCol xs={12}>
                 <CCard className="mb-4 border-top-primary border-top-3">
                   <CardHeaderWithTitleBtn
-                    title="Material"
+                    title="Book"
                     subtitle="create"
                     buttonIcon={<CIcon icon={cilList} />}
-                    buttonText="Materials"
-                    linkTo="/materials"
+                    buttonText="Books"
+                    linkTo="/books"
                   />
                   <CCardBody>
-                    <MaterialForm
+                    <BookForm
                       form={form}
                       errors={errors}
                       handleChange={handleChange}
@@ -421,6 +519,7 @@ const CreateMaterial = () => {
                       handleNextStep={handleNextStep}
                       handlePreviousStep={handlePreviousStep}
                       currentStep={currentStep}
+                      handleCoverImageChange={handleCoverImageChange}
                       authorOptions={authorOptions}
                       handleAuthorChange={handleAuthorChange}
                       handleTranslatorChange={handleTranslatorChange}
@@ -436,11 +535,16 @@ const CreateMaterial = () => {
                       seriesOptions={seriesOptions}
                       generateSeriesInputs={generateSeriesInputs}
                       handleBookTypeChange={handleBookTypeChange}
+                      materialEAFormats={materialEAFormats}
+                      materialOptions={materialOptions}
+                      handleMaterialChange={handleMaterialChange}
                       handleCompleteMaterialChange={handleCompleteMaterialChange}
+                      handleCompleteMaterialSourceChange={handleCompleteMaterialSourceChange}
                       chapters={chapters}
                       handleChapterAddition={handleChapterAddition}
                       handleChapterRemoval={handleChapterRemoval}
                       handleChapterChange={handleChapterChange}
+                      handleChapterMaterialSourceChange={handleChapterMaterialSourceChange}
                       loading={loading}
                     />
                   </CCardBody>
@@ -455,4 +559,4 @@ const CreateMaterial = () => {
   );
 };
 
-export default CreateMaterial;
+export default CreateBook;
