@@ -107,7 +107,7 @@ const CreateMaterial = () => {
     setForm((prevForm) => ({
       ...prevForm,
       [name]: value,
-  }));
+    }));
     setErrors({ ...errors, [name]: '' });
   };
   // fetching all open authors
@@ -257,15 +257,15 @@ const CreateMaterial = () => {
   // handling complete materials changing
   const handleCompleteMaterialChange = (index, field, value) => {
     setForm((prevForm) => {
-        const updatedMaterials = prevForm.material.completeMaterials.map((material, i) =>
-            i === index ? { ...material, [field]: value } : material
-        );
-        return {
-            ...prevForm,
-            material: { completeMaterials: updatedMaterials },
-        };
+      const updatedMaterials = prevForm.material.completeMaterials.map((material, i) =>
+        i === index ? { ...material, [field]: value } : material
+      );
+      return {
+        ...prevForm,
+        material: { completeMaterials: updatedMaterials },
+      };
     });
-};
+  };
   // handling chapter adding
   const handleChapterAddition = () => {
     setChapters(prevChapters => [
@@ -273,7 +273,8 @@ const CreateMaterial = () => {
       { chapter_number: prevChapters.length + 1, chapter_name: '', chapter_source_pdf: '', chapter_source_epub: '', chapter_source_text: '', chapter_source_mp3: '', chapter_voice: '' }
     ]);
   };
-  // handling chapter removal
+
+  // Handle chapter removal
   const handleChapterRemoval = (index) => {
     setChapters(prevChapters => {
       const updatedChapters = prevChapters.filter((_, i) => i !== index);
@@ -283,25 +284,70 @@ const CreateMaterial = () => {
       return updatedChapters;
     });
   };
-  // handling chapter change
-  const handleChapterChange = (index, field, value) => {
+
+  // Handle chapter change
+  const handleChapterChange = (index, e) => {
+    const { name, value } = e.target;
     setChapters((prevChapters) => {
-        const updatedChapters = prevChapters.map((chapter, i) =>
-            i === index ? { ...chapter, [field]: value } : chapter
-        );
-        return updatedChapters;
+      const updatedChapters = prevChapters.map((chapter, i) =>
+        i === index ? { ...chapter, [name]: value } : chapter
+      );
+      return updatedChapters;
     });
-};
+  };
+
 
   // handling form submission
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    const formData = new FormData();
+
+    // Populating FormData with form state data
+    formData.append('name', form.name);
+    if (form.author) formData.append('author', form.author.value);
+    if (form.translator) formData.append('translator', form.translator.value);
+    formData.append('isbn', form.isbn);
+    if (form.coverImage) formData.append('coverImage', form.coverImage);
+    formData.append('publisher', form.publisher);
+    formData.append('publishDate', form.publishDate);
+    if (form.library) formData.append('library', form.library.value);
+    if (form.category) form.category.forEach(category => formData.append('category[]', category.value));
+    if (form.subCategory) form.subCategory.forEach(subCategory => formData.append('subCategory[]', subCategory.value));
+    formData.append('description', form.description);
+    formData.append('hasSeries', form.hasSeries);
+    formData.append('noOfSeries', form.noOfSeries);
+    formData.append('bookType', form.bookType);
+
+    form.material.completeMaterials.forEach((material, index) => {
+      formData.append(`material[completeMaterials][${index}][formatType]`, material.formatType);
+      formData.append(`material[completeMaterials][${index}][publisher]`, material.publisher);
+      formData.append(`material[completeMaterials][${index}][publishedDate]`, material.publishedDate);
+      if (material.source) {
+        formData.append(`material[completeMaterials][${index}][source]`, material.source);
+      }
+    });
+
+    chapters.forEach((chapter, index) => {
+      formData.append(`material[chapters][${index}][chapter_number]`, chapter.chapter_number);
+      formData.append(`material[chapters][${index}][chapter_name]`, chapter.chapter_name);
+      formData.append(`material[chapters][${index}][chapter_source_pdf]`, chapter.chapter_source_pdf);
+      formData.append(`material[chapters][${index}][chapter_source_epub]`, chapter.chapter_source_epub);
+      formData.append(`material[chapters][${index}][chapter_source_text]`, chapter.chapter_source_text);
+      formData.append(`material[chapters][${index}][chapter_source_mp3]`, chapter.chapter_source_mp3);
+      formData.append(`material[chapters][${index}][chapter_voice]`, chapter.chapter_voice);
+    });
+
+    // Logging formData to check the contents
+    formData.forEach((value, key) => {
+      console.log(key + ' : ', value);
+    });
+
     if (!validateForm()) return;
 
     setLoading(true);
 
-    const formData = new FormData();
+    // const formData = new FormData();
 
     axios.post(`${base_url}/api/materials/store`, formData, {
       headers: {
