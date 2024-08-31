@@ -5,7 +5,7 @@ import { cilMinus, cilPlus, cilDelete } from '@coreui/icons';
 import { Link } from 'react-router-dom';
 import Select from 'react-select';
 
-const BookForm = ({
+const BookFormEdit = ({
   form,
   errors,
   handleChange,
@@ -557,4 +557,4 @@ const BookForm = ({
   );
 };
 
-export default BookForm;
+export default BookFormEdit;
