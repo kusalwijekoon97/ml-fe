@@ -23,16 +23,16 @@ const _nav = [
     to: '/categories',
     icon: <BsFillGridFill className="nav-icon" />,
   },
+  // {
+  //   component: CNavItem,
+  //   name: 'Books',
+  //   to: '/books',
+  //   icon: <CIcon icon={cilBook} customClassName="nav-icon" />,
+  // },
   {
     component: CNavItem,
-    name: 'Books',
-    to: '/books',
-    icon: <CIcon icon={cilBook} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavItem,
-    name: 'Material',
-    to: '/material',
+    name: 'Materials',
+    to: '/materials',
     icon: <CIcon icon={cilLayers} customClassName="nav-icon" />,
   },
   {

@@ -15,6 +15,9 @@ import EditLibrarian from './views/pages/librarian/editLibrarian';
 import IndexLibrary from './views/pages/library/IndexLibrary';
 import CreateLibrary from './views/pages/library/createLibrary';
 import EditLibrary from './views/pages/library/editLibrary';
+import IndexMaterial from './views/pages/material/IndexMaterial';
+import CreateMaterial from './views/pages/material/createMaterial';
+import EditMaterial from './views/pages/material/editMaterial';
 
 // Containers
 const DefaultLayout = React.lazy(() => import('./layout/DefaultLayout'));
@@ -75,6 +78,10 @@ const App = () => {
           <Route path="/librarians" name="librarians-all" element={<IndexLibrarian />} />
           <Route path="/librarians/create" name="librarians-create" element={<CreateLibrarian />} />
           <Route path="/librarians/:librarianId/edit" name="librarians-edit" element={<EditLibrarian />} />
+          {/* material */}
+          <Route path="/materials" name="materials-all" element={<IndexMaterial />} />
+          <Route path="/materials/create" name="materials-create" element={<CreateMaterial />} />
+          <Route path="/materials/:materialId/edit" name="materials-edit" element={<EditMaterial />} />
         </Routes>
       </Suspense>
     </Router>
