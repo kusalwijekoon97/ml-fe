@@ -1,7 +1,7 @@
 import React from 'react';
-import { CForm, CFormLabel, CButton, CFormFeedback, CFormInput, CFormSelect, CFormTextarea, CInputGroup, CRow, CCol, CSpinner, CFormCheck } from '@coreui/react';
+import { CForm, CFormLabel, CButton, CFormFeedback, CFormInput, CFormSelect, CFormTextarea, CInputGroup, CRow, CCol, CSpinner, CFormCheck, CTable, CTableHead, CTableRow, CTableHeaderCell, CTableDataCell, CTableBody, CFormText } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
-import { cilMinus, cilPlus } from '@coreui/icons';
+import { cilMinus, cilPlus, cilDelete } from '@coreui/icons';
 import { Link } from 'react-router-dom';
 import Select from 'react-select';
 
@@ -29,6 +29,11 @@ const MaterialForm = ({
   seriesOptions,
   generateSeriesInputs,
   handleBookTypeChange,
+  handleCompleteMaterialChange,
+  chapters,
+  handleChapterAddition,
+  handleChapterRemoval,
+  handleChapterChange,
   loading
 }) => {
   return (
@@ -308,60 +313,207 @@ const MaterialForm = ({
 
         {currentStep === 2 && (
           <div id='stepTwo'>
-            {form.bookType && form.bookType === 'bookDocumentNAudio' &&(
-              <div id="seriesInfo">
+            {form.bookType && form.bookType === 'bookDocumentNAudio' && (
+              <div id="bookDocumentNAudioInfo">
                 <CRow>
-                  <CCol xs={6}>
-                    <div className="mb-3">
-                    bookDocumentNAudio
-                    </div>
+                  <CCol xs={12}>
+                    <CFormLabel>Complete Source <span className='text-danger'>*</span></CFormLabel>
+                    <CFormText className="text-muted" style={{ fontSize: 'small' }}> Please provide the relevant details for each format type: <strong>PDF</strong>, <strong>EPUB</strong>, <strong>TEXT</strong>, and <strong>MP3</strong>. If details is not avaiable, you may leave the fields empty.</CFormText>
                   </CCol>
-                  <CCol xs={6}  >
+                  <CCol xs={12}>
+                    <CTable bordered className='my-3'>
+                      <CTableHead>
+                        <CTableRow>
+                          <CTableHeaderCell>Format Type</CTableHeaderCell>
+                          <CTableHeaderCell>Publisher Name</CTableHeaderCell>
+                          <CTableHeaderCell>Published Date</CTableHeaderCell>
+                          <CTableHeaderCell>Source</CTableHeaderCell>
+                        </CTableRow>
+                      </CTableHead>
+                      <CTableBody>
+                        {form.material.completeMaterials.map((material, index) => (
+                          <CTableRow key={index}>
+                            <CTableDataCell>
+                              <CFormInput
+                                name={`complete_${material.formatType.toLowerCase()}_formatType`}
+                                value={material.formatType}
+                                readOnly
+                              />
+                            </CTableDataCell>
+                            <CTableDataCell>
+                              <CFormInput
+                                placeholder="Publisher"
+                                type="text"
+                                name={`complete_${material.formatType.toLowerCase()}_publisher`}
+                                value={material.publisher}
+                                onChange={(e) => handleCompleteMaterialChange(index, 'publisher', e.target.value)}
+                              />
+                            </CTableDataCell>
+                            <CTableDataCell>
+                              <CFormInput
+                                placeholder="Published Date"
+                                type="date"
+                                name={`complete_${material.formatType.toLowerCase()}_publishedDate`}
+                                value={material.publishedDate}
+                                onChange={(e) => handleCompleteMaterialChange(index, 'publishedDate', e.target.value)}
+                              />
+                            </CTableDataCell>
+                            <CTableDataCell>
+                              <CFormInput
+                                placeholder={`${material.formatType} Source`}
+                                type="file"
+                                name={`complete_${material.formatType.toLowerCase()}_source`}
+                                accept={
+                                  material.formatType === 'PDF'
+                                    ? '.pdf,application/pdf'
+                                    : material.formatType === 'EPUB'
+                                      ? '.epub,application/epub+zip'
+                                      : material.formatType === 'TEXT'
+                                        ? '.txt,text/plain'
+                                        : material.formatType === 'MP3'
+                                          ? '.mp3,audio/mpeg'
+                                          : ''
+                                }
+                                onChange={(e) => handleCompleteMaterialChange(index, 'source', e.target.files[0])}
+                              />
+                            </CTableDataCell>
+                          </CTableRow>
+                        ))}
+                      </CTableBody>
 
+                    </CTable>
+                  </CCol>
+                </CRow>
+                <hr />
+                <CRow>
+                  <CCol xs={12}>
+                    <CFormLabel>Chapters</CFormLabel>
+                    <CFormText className="text-muted" style={{ fontSize: 'small' }}> Enter detailed information for each chapter, including the chapter number, chapter name, and sources for PDF, EPUB, TEXT, and MP3 formats. The MP3 source also requires a duration, voice fields. You can add new chapters by clicking the "Add Chapter" button or remove an existing chapter using the "Remove" button associated with that chapter.</CFormText>
+                  </CCol>
+                  <CCol xs={12}>
+                    <div className="my-1">
+                      <CTable bordered className='my-3'>
+                        <CTableBody>
+                          {chapters.map((chapter, index) => (
+                            <React.Fragment key={index}>
+                              <CTableRow>
+                                <CTableDataCell>
+                                  <CFormInput
+                                    placeholder="Chapter Number"
+                                    type="number"
+                                    name="chapter_number"
+                                    value={chapter.chapter_number}
+                                    className="me-2"
+                                    readOnly
+                                  />
+                                </CTableDataCell>
+                                <CTableDataCell colSpan={4}>
+                                  <div className="d-flex align-items-center">
+                                    <CFormInput
+                                      placeholder="Chapter Name"
+                                      type="text"
+                                      name="chapter_name"
+                                      value={chapter.chapter_name}
+                                      className="me-2"
+                                      onChange={(e) => handleChapterChange(index, e)}
+                                    />
+                                    <CButton color="danger" size="sm" onClick={() => handleChapterRemoval(index)}>
+                                      <CIcon icon={cilDelete} />
+                                    </CButton>
+                                  </div>
+                                </CTableDataCell>
+                              </CTableRow>
+                              <CTableRow>
+                                <CTableDataCell>
+                                  <CFormInput
+                                    placeholder="PDF"
+                                    type="file"
+                                    name="chapter_source_pdf"
+                                    value={chapter.chapter_source_pdf}
+                                    accept=".pdf,application/pdf"
+                                    className="me-2"
+                                    onChange={(e) => handleChapterChange(index, e)}
+                                  />
+                                </CTableDataCell>
+                                <CTableDataCell>
+                                  <CFormInput
+                                    placeholder="EPUB"
+                                    type="file"
+                                    name="chapter_source_epub"
+                                    value={chapter.chapter_source_epub}
+                                    accept=".epub,application/epub+zip"
+                                    className="me-2"
+                                    onChange={(e) => handleChapterChange(index, e)}
+                                  />
+                                </CTableDataCell>
+                                <CTableDataCell>
+                                  <CFormInput
+                                    placeholder="Text"
+                                    type="file"
+                                    name="chapter_source_text"
+                                    value={chapter.chapter_source_text}
+                                    accept=".txt,text/plain"
+                                    className="me-2"
+                                    onChange={(e) => handleChapterChange(index, e)}
+                                  />
+                                </CTableDataCell>
+                                <CTableDataCell>
+                                  <CFormInput
+                                    placeholder="MP3"
+                                    type="file"
+                                    name="chapter_source_mp3"
+                                    value={chapter.chapter_source_mp3}
+                                    accept=".mp3,audio/mpeg"
+                                    className="me-2 mb-2"
+                                    onChange={(e) => handleChapterChange(index, e)}
+                                  />
+                                  <CFormSelect
+                                    name="chapter_voice"
+                                    value={chapter.chapter_voice}
+                                    className="me-2"
+                                    onChange={(e) => handleChapterChange(index, e)}
+                                  >
+                                    <option value="" disabled>Voice...</option>
+                                    <option value="mix">Mix</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                  </CFormSelect>
+                                </CTableDataCell>
+                              </CTableRow>
+                            </React.Fragment>
+                          ))}
+                        </CTableBody>
+                      </CTable>
+                      <div className='d-flex justify-content-start'>
+                        <CButton color="primary" onClick={handleChapterAddition}>+ Add Chapter</CButton>
+                      </div>
+                    </div>
                   </CCol>
                 </CRow>
               </div>
             )}
-            {form.bookType && form.bookType === 'bookMagazine' &&(
-              <div id="seriesInfo">
+            {form.bookType && form.bookType === 'bookMagazine' && (
+              <div id="bookMagazineInfo">
                 <CRow>
                   <CCol xs={12}>
                     <div className="mb-3">
-                    E-MAGAZINE SECTION
+                      E-MAGAZINE SECTION
                     </div>
                   </CCol>
                 </CRow>
               </div>
             )}
-            {form.bookType && form.bookType === 'bookNewsPaper' &&(
-              <div id="seriesInfo">
+            {form.bookType && form.bookType === 'bookNewsPaper' && (
+              <div id="bookNewsPaperInfo">
                 <CRow>
                   <CCol xs={12}>
                     <div className="mb-3">
-                    E-NEWS PAPER SECTION
+                      E-NEWS PAPER SECTION
                     </div>
                   </CCol>
                 </CRow>
               </div>
             )}
-
-            {/* <CRow>
-              <CCol xs={6}>
-                <div className="mb-3">
-                  <CFormLabel htmlFor="lastname">Last Name <span className='text-danger'>*</span></CFormLabel>
-                  <CFormInput
-                    type="text"
-                    id="lastname"
-                    name="lastname"
-                    placeholder="Enter last name"
-                    value={form.lastname}
-                    onChange={handleChange}
-                    invalid={!!errors.lastname}
-                  />
-                  <CFormFeedback>{errors.lastname}</CFormFeedback>
-                </div>
-              </CCol>
-            </CRow> */}
           </div>
         )}
 

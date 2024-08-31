@@ -28,7 +28,46 @@ const CreateMaterial = () => {
     description: '',
     hasSeries: false,
     noOfSeries: 1,
-    bookType: 'bookDocumentNAudio'
+    bookType: 'bookDocumentNAudio',
+    material: {
+      completeMaterials: [
+        {
+          formatType: 'PDF',
+          publisher: '',
+          publishedDate: '',
+          source: null,
+        },
+        {
+          formatType: 'EPUB',
+          publisher: '',
+          publishedDate: '',
+          source: null,
+        },
+        {
+          formatType: 'TEXT',
+          publisher: '',
+          publishedDate: '',
+          source: null,
+        },
+        {
+          formatType: 'MP3',
+          publisher: '',
+          publishedDate: '',
+          source: null,
+        }
+      ]
+    },
+    chapters: [
+      {
+        chapter_number: 1,
+        chapter_name: '',
+        chapter_source_pdf: '',
+        chapter_source_epub: '',
+        chapter_source_text: '',
+        chapter_source_mp3: '',
+        chapter_voice: '',
+      }
+    ]
   });
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState({ visible: false, type: '', message: '' });
@@ -58,11 +97,17 @@ const CreateMaterial = () => {
     { value: 4, label: 'Series 4' },
     { value: 5, label: 'Series 5' },
   ]);
-
+  // chapters
+  const [chapters, setChapters] = useState([
+    { chapter_number: 1, chapter_name: '', chapter_source_pdf: '', chapter_source_epub: '', chapter_source_text: '', chapter_source_mp3: '', chapter_voice: '' }
+  ]);
   // handling form changes
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    setForm((prevForm) => ({
+      ...prevForm,
+      [name]: value,
+  }));
     setErrors({ ...errors, [name]: '' });
   };
   // fetching all open authors
@@ -182,14 +227,14 @@ const CreateMaterial = () => {
     const inputs = [];
     for (let i = 1; i < form.noOfSeries; i++) {
       inputs.push(
-          <div className="mb-3" key={i} id={`divPreviousSeries${i}`}>
-            <CFormLabel htmlFor={`previousSeries${i}`}>Series {i}</CFormLabel>
-            <Select
-              id={`previousSeries${i}`}
-              name={`previousSeries${i}`}
-              options={seriesOptions}
-            />
-          </div>
+        <div className="mb-3" key={i} id={`divPreviousSeries${i}`}>
+          <CFormLabel htmlFor={`previousSeries${i}`}>Series {i}</CFormLabel>
+          <Select
+            id={`previousSeries${i}`}
+            name={`previousSeries${i}`}
+            options={seriesOptions}
+          />
+        </div>
       );
     }
     return inputs;
@@ -207,10 +252,46 @@ const CreateMaterial = () => {
     const value = e.target.value;
     setForm({ ...form, bookType: value });
     console.log(form.bookType);
-
     // setErrors({ ...errors, bookType: '' });
   };
-
+  // handling complete materials changing
+  const handleCompleteMaterialChange = (index, field, value) => {
+    setForm((prevForm) => {
+        const updatedMaterials = prevForm.material.completeMaterials.map((material, i) =>
+            i === index ? { ...material, [field]: value } : material
+        );
+        return {
+            ...prevForm,
+            material: { completeMaterials: updatedMaterials },
+        };
+    });
+};
+  // handling chapter adding
+  const handleChapterAddition = () => {
+    setChapters(prevChapters => [
+      ...prevChapters,
+      { chapter_number: prevChapters.length + 1, chapter_name: '', chapter_source_pdf: '', chapter_source_epub: '', chapter_source_text: '', chapter_source_mp3: '', chapter_voice: '' }
+    ]);
+  };
+  // handling chapter removal
+  const handleChapterRemoval = (index) => {
+    setChapters(prevChapters => {
+      const updatedChapters = prevChapters.filter((_, i) => i !== index);
+      updatedChapters.forEach((chapter, i) => {
+        chapter.chapter_number = i + 1;
+      });
+      return updatedChapters;
+    });
+  };
+  // handling chapter change
+  const handleChapterChange = (index, field, value) => {
+    setChapters((prevChapters) => {
+        const updatedChapters = prevChapters.map((chapter, i) =>
+            i === index ? { ...chapter, [field]: value } : chapter
+        );
+        return updatedChapters;
+    });
+};
 
   // handling form submission
   const handleSubmit = (e) => {
@@ -310,6 +391,11 @@ const CreateMaterial = () => {
                       seriesOptions={seriesOptions}
                       generateSeriesInputs={generateSeriesInputs}
                       handleBookTypeChange={handleBookTypeChange}
+                      handleCompleteMaterialChange={handleCompleteMaterialChange}
+                      chapters={chapters}
+                      handleChapterAddition={handleChapterAddition}
+                      handleChapterRemoval={handleChapterRemoval}
+                      handleChapterChange={handleChapterChange}
                       loading={loading}
                     />
                   </CCardBody>
