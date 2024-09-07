@@ -7,6 +7,7 @@ import {cilBell,cilContrast,cilEnvelopeOpen,cilList,cilMenu,cilMoon,cilSun} from
 
 import { AppBreadcrumb } from './index'
 import { AppHeaderDropdown } from './header/index'
+import BreadCrumb from './breadcrumb/BreadCrumb'
 
 const AppHeader = ({title}) => {
   const headerRef = useRef()
@@ -112,7 +113,7 @@ const AppHeader = ({title}) => {
         </CHeaderNav>
       </CContainer>
       <CContainer className="px-4" fluid>
-        <AppBreadcrumb />
+        <BreadCrumb/>
       </CContainer>
     </CHeader>
   )
