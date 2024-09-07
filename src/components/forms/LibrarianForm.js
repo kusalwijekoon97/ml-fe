@@ -1,24 +1,25 @@
 import React from 'react';
-import {
-  CForm,
-  CFormLabel,
-  CButton,
-  CFormFeedback,
-  CFormInput,
-  CRow,
-  CCol,
-  CSpinner
-} from '@coreui/react';
+import { CForm, CFormLabel, CButton, CFormFeedback, CFormInput, CRow, CCol, CSpinner, CFormCheck } from '@coreui/react';
 import { Link } from 'react-router-dom';
+import Select from 'react-select';
 
 const LibrarianForm = ({
   form,
   errors,
+  libraryOptions,
   handleChange,
+  handleLibraryChange,
+  handlePermissionChange,
   handleSubmit,
   handlePrevious,
   loading
+
 }) => {
+  const permissionKeys = Object.keys(form.permissions);
+  const midIndex = Math.ceil(permissionKeys.length / 2);
+  const firstColumnPermissions = permissionKeys.slice(0, midIndex);
+  const secondColumnPermissions = permissionKeys.slice(midIndex);
+
   return (
     <>
       <CForm onSubmit={handleSubmit}>
@@ -104,6 +105,7 @@ const LibrarianForm = ({
               <CFormFeedback>{errors.phone}</CFormFeedback>
             </div>
           </CCol>
+
           <CCol xs={6}>
             <div className="mb-3">
               <CFormLabel htmlFor="address">Address <span className='text-danger'>*</span></CFormLabel>
@@ -118,6 +120,52 @@ const LibrarianForm = ({
               />
               <CFormFeedback>{errors.address}</CFormFeedback>
             </div>
+          </CCol>
+
+          <CCol xs={6}>
+            <div className="mb-3">
+              <CFormLabel htmlFor="library">Library <span className='text-danger'>*</span></CFormLabel>
+              <Select
+                id="library"
+                name="library"
+                options={libraryOptions}
+                isMulti
+                value={form.library}
+                onChange={handleLibraryChange}
+                className={errors.library ? 'is-invalid' : ''} />
+              {errors.library && <CFormFeedback>{errors.library}</CFormFeedback>}
+            </div>
+          </CCol>
+        </CRow>
+        <CRow>
+          <CCol xs={12}>
+            <CFormLabel htmlFor="library">Choose Access Levels for Menus</CFormLabel>
+          </CCol>
+          <CCol xs={6}>
+            {firstColumnPermissions.map(permission => (
+              <CFormCheck
+                key={permission}
+                type="checkbox"
+                id={permission}
+                name={permission}
+                label={permission.charAt(0).toUpperCase() + permission.slice(1)}
+                checked={form.permissions[permission]}
+                onChange={handlePermissionChange}
+              />
+            ))}
+          </CCol>
+          <CCol xs={6}>
+            {secondColumnPermissions.map(permission => (
+              <CFormCheck
+                key={permission}
+                type="checkbox"
+                id={permission}
+                name={permission}
+                label={permission.charAt(0).toUpperCase() + permission.slice(1)}
+                checked={form.permissions[permission]}
+                onChange={handlePermissionChange}
+              />
+            ))}
           </CCol>
         </CRow>
 

@@ -33,7 +33,7 @@ const IndexCategory = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [search, setSearch] = useState('');
 
-  const columns = ["#", "Category Name", "Sub Categories", "Library", "Status", "Actions"];
+  const columns = ["#", "Category Name","Slug", "Sub Categories", "Library", "Status", "Actions"];
 
   const fetchCategories = (page = 1, search = '') => {
     axios.get(`${base_url}/api/categories/main/all`, {

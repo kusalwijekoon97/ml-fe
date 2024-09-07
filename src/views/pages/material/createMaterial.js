@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {CCard,CCardBody,CContainer,CRow,CCol,CSpinner} from '@coreui/react';
+import { CCard, CCardBody, CContainer, CRow, CCol, CSpinner } from '@coreui/react';
 import axios from 'axios';
 import { AppFooter, AppHeader, AppSidebar } from '../../../components';
 import CardHeaderWithTitleBtn from '../../../components/cards/CardHeaderWithTitleBtn';
@@ -8,62 +8,23 @@ import { cilList } from '@coreui/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import base_url from "../../../utils/api/base_url";
 import ResponseAlert from '../../../components/notifications/ResponseAlert';
-import LibrarianForm from '../../../components/forms/LibrarianForm';
+import MaterialForm from '../../../components/forms/MaterialForm';
 
-const CreateLibrarian = () => {
+const CreateMaterial = () => {
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
-    firstName: '',
-    lastName: '',
-    nic: '',
-    email: '',
-    phone: '',
-    address: '',
-    library: [],
-    permissions: {
-      users: false,
-      readers: false,
-      categories: false,
-      books: false,
-      authors: false,
-      statics: false,
-      sales: false,
-      packages: false,
-      notifications: false,
-      settings: false,
-    }
+    name: '',
+    fileMaterial: null
   });
 
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState({ visible: false, type: '', message: '' });
 
   const [errors, setErrors] = useState({
-    firstName: '',
-    lastName: '',
-    nic: '',
-    email: '',
-    phone: '',
-    address: '',
-    library: '',
+    name: '',
+    fileMaterial: ''
   });
-
-  const [libraryOptions, setLibraryOptions] = useState([]);
-
-  useEffect(() => {
-    // Fetch libraries from API
-    axios.get(`${base_url}/api/libraries/all-open`)
-      .then(response => {
-        const libraries = response.data.data.map(library => ({
-          value: library._id,
-          label: library.name
-        }));
-        setLibraryOptions(libraries);
-      })
-      .catch(error => {
-        console.error("There was an error fetching the libraries!", error);
-      });
-  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -71,35 +32,17 @@ const CreateLibrarian = () => {
     setErrors({ ...errors, [name]: '' });
   };
 
-  const handlePermissionChange = (e) => {
-    const { name, checked } = e.target;
-    setForm(prevForm => ({
-      ...prevForm,
-      permissions: {
-        ...prevForm.permissions,
-        [name]: checked
-      }
-    }));
-  };
-
-  const handleLibraryChange = (selectedOptions) => {
-    setForm({ ...form, library: selectedOptions });
-    setErrors({ ...errors, library: '' });
+  const handleMaterialChange = (e) => {
+    const { name, files } = e.target;
+    setForm({ ...form, [name]: files[0] });
+    setErrors({ ...errors, [name]: '' });
   };
 
   const validateForm = () => {
     const newErrors = {};
 
-    if (form.library.length === 0) {
-      newErrors.library = 'Library is mandatory.';
-    }
-
-    if (!form.firstName) newErrors.firstName = 'First name is mandatory.';
-    if (!form.lastName) newErrors.lastName = 'Last name is mandatory.';
-    if (!form.nic) newErrors.nic = 'NIC is mandatory.';
-    if (!form.email) newErrors.email = 'Email is mandatory.';
-    if (!form.phone) newErrors.phone = 'Phone number is mandatory.';
-    if (!form.address) newErrors.address = 'Address is mandatory.';
+    if (!form.name) newErrors.name = 'Name is mandatory.';
+    if (!form.fileMaterial) newErrors.fileMaterial = 'File is mandatory.';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -111,20 +54,24 @@ const CreateLibrarian = () => {
     if (!validateForm()) return;
 
     setLoading(true);
-    const formattedForm = {
-      ...form,
-      library: form.library.map(option => option.value)
-    };
 
-    axios.post(`${base_url}/api/librarians/store`, formattedForm)
+    const formData = new FormData();
+    formData.append('name', form.name);
+    formData.append('fileMaterial', form.fileMaterial);
+
+    axios.post(`${base_url}/api/materials/store`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
       .then(response => {
         setLoading(false);
-        navigate("/librarians", {
+        navigate("/materials", {
           state: {
             alert: {
               visible: true,
               type: 'success',
-              message: 'Librarian created successfully!'
+              message: 'Material created successfully!'
             }
           }
         });
@@ -134,7 +81,7 @@ const CreateLibrarian = () => {
         setAlert({
           visible: true,
           type: 'failure',
-          message: 'Librarian creation failed. Please try again.'
+          message: 'Material creation failed. Please try again.'
         });
         console.error(error);
       });
@@ -148,7 +95,7 @@ const CreateLibrarian = () => {
     <>
       <AppSidebar />
       <div className="wrapper d-flex flex-column min-vh-100">
-        <AppHeader title="Librarians" />
+        <AppHeader title="Materials" />
         <div className="body flex-grow-1">
           <ResponseAlert
             visible={alert.visible}
@@ -161,20 +108,18 @@ const CreateLibrarian = () => {
               <CCol xs={12}>
                 <CCard className="mb-4 border-top-primary border-top-3">
                   <CardHeaderWithTitleBtn
-                    title="Librarian"
+                    title="Material"
                     subtitle="create"
                     buttonIcon={<CIcon icon={cilList} />}
-                    buttonText="Librarians"
-                    linkTo="/librarians"
+                    buttonText="Materials"
+                    linkTo="/materials"
                   />
                   <CCardBody>
-                    <LibrarianForm
+                    <MaterialForm
                       form={form}
                       errors={errors}
-                      libraryOptions={libraryOptions}
                       handleChange={handleChange}
-                      handleLibraryChange={handleLibraryChange}
-                      handlePermissionChange={handlePermissionChange}
+                      handleMaterialChange={handleMaterialChange}
                       handleSubmit={handleSubmit}
                       handlePrevious={handlePrevious}
                       loading={loading}
@@ -190,5 +135,4 @@ const CreateLibrarian = () => {
     </>
   );
 };
-
-export default CreateLibrarian;
+export default CreateMaterial;

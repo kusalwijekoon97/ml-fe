@@ -1,25 +1,24 @@
 import React from 'react';
-import {
-  CForm,
-  CFormLabel,
-  CButton,
-  CFormFeedback,
-  CFormInput,
-  CFormTextarea,
-  CRow,
-  CCol,
-  CSpinner
-} from '@coreui/react';
+import { CForm, CFormLabel, CButton, CFormFeedback, CFormInput, CRow, CCol, CSpinner, CFormCheck } from '@coreui/react';
 import { Link } from 'react-router-dom';
+import Select from 'react-select';
 
-const LibrarianForm = ({
+const Edit = ({
   form,
   errors,
-  handleSubmit,
+  libraryOptions,
   handleChange,
+  handleLibraryChange,
+  handlePermissionChange,
+  handleSubmit,
   handlePrevious,
   loading
 }) => {
+  const permissionKeys = Object.keys(form.permissions);
+  const midIndex = Math.ceil(permissionKeys.length / 2);
+  const firstColumnPermissions = permissionKeys.slice(0, midIndex);
+  const secondColumnPermissions = permissionKeys.slice(midIndex);
+
   return (
     <>
       <CForm onSubmit={handleSubmit}>
@@ -55,6 +54,7 @@ const LibrarianForm = ({
             </div>
           </CCol>
         </CRow>
+
         <CRow>
           <CCol xs={6}>
             <div className="mb-3">
@@ -87,6 +87,7 @@ const LibrarianForm = ({
             </div>
           </CCol>
         </CRow>
+
         <CRow>
           <CCol xs={6}>
             <div className="mb-3">
@@ -103,14 +104,15 @@ const LibrarianForm = ({
               <CFormFeedback>{errors.phone}</CFormFeedback>
             </div>
           </CCol>
+
           <CCol xs={6}>
             <div className="mb-3">
               <CFormLabel htmlFor="address">Address <span className='text-danger'>*</span></CFormLabel>
-              <CFormTextarea
+              <CFormInput
+                type="text"
                 id="address"
                 name="address"
                 placeholder="Enter address"
-                rows="3"
                 value={form.address}
                 onChange={handleChange}
                 invalid={!!errors.address}
@@ -118,7 +120,63 @@ const LibrarianForm = ({
               <CFormFeedback>{errors.address}</CFormFeedback>
             </div>
           </CCol>
+
+          <CCol xs={6}>
+            <div className="mb-3">
+              <CFormLabel htmlFor="library">Library <span className='text-danger'>*</span></CFormLabel>
+              <Select
+                id="library"
+                name="library"
+                options={libraryOptions}
+                isMulti
+                value={form.libraries}
+                onChange={handleLibraryChange}
+                className={errors.libraries ? 'is-invalid' : ''}
+              />
+              {errors.libraries && <CFormFeedback>{errors.libraries}</CFormFeedback>}
+            </div>
+          </CCol>
         </CRow>
+        <CRow>
+          <CCol xs={12}>
+            <CFormLabel htmlFor="library">Choose Access Levels for Menus</CFormLabel>
+          </CCol>
+          <CCol xs={6}>
+            {firstColumnPermissions.map(permission => (
+              <div key={permission} className="form-check">
+                <CFormCheck
+                  key={permission}
+                  type="checkbox"
+                  id={permission}
+                  name={permission}
+                  checked={form.permissions[permission]}
+                  onChange={handlePermissionChange}
+                />
+                <CFormLabel htmlFor={permission} className="form-check-label ms-2">
+                  {permission}
+                </CFormLabel>
+              </div>
+            ))}
+          </CCol>
+          <CCol xs={6}>
+            {secondColumnPermissions.map(permission => (
+              <div key={permission} className="form-check">
+                <CFormCheck
+                  key={permission}
+                  type="checkbox"
+                  id={permission}
+                  name={permission}
+                  checked={form.permissions[permission]}
+                  onChange={handlePermissionChange}
+                />
+                <CFormLabel htmlFor={permission} className="form-check-label ms-2">
+                  {permission}
+                </CFormLabel>
+              </div>
+            ))}
+          </CCol>
+        </CRow>
+
         <div className="text-end">
           <Link to="/dashboard">
             <CButton
@@ -149,10 +207,10 @@ const LibrarianForm = ({
           >
             {loading ? (
               <>
-                <CSpinner as="span" size="sm" aria-hidden="true" /> Updating...
+                <CSpinner as="span" size="sm" aria-hidden="true" /> Submitting...
               </>
             ) : (
-              'Update'
+              'Submit'
             )}
           </CButton>
         </div>
@@ -161,4 +219,4 @@ const LibrarianForm = ({
   );
 };
 
-export default LibrarianForm;
+export default Edit;

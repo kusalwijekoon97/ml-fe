@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  CCard,
-  CCardBody,
-  CContainer,
-  CRow,
-  CCol,
-  CSpinner
-} from '@coreui/react';
+import { CCard, CCardBody, CContainer, CRow, CCol, CSpinner } from '@coreui/react';
 import axios from 'axios';
 import { AppFooter, AppHeader, AppSidebar } from '../../../components';
 import CardHeaderWithTitleBtn from '../../../components/cards/CardHeaderWithTitleBtn';
@@ -15,11 +8,13 @@ import { cilList } from '@coreui/icons';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import base_url from "../../../utils/api/base_url";
 import ResponseAlert from '../../../components/notifications/ResponseAlert';
-import LibrarianForm from '../../../components/forms/LibrarianForm';
+import LibrarianFormEdit from '../../../components/forms/LibrarianFormEdit';
 
 const EditLibrarian = () => {
   const navigate = useNavigate();
   const { librarianId } = useParams();
+  const [libraryOptions, setLibraryOptions] = useState([]);
+
 
   const [form, setForm] = useState({
     firstName: '',
@@ -27,7 +22,20 @@ const EditLibrarian = () => {
     nic: '',
     email: '',
     phone: '',
-    address: ''
+    address: '',
+    libraries: [],
+    permissions: {
+      users: false,
+      readers: false,
+      categories: false,
+      books: false,
+      authors: false,
+      statics: false,
+      sales: false,
+      packages: false,
+      notifications: false,
+      settings: false,
+    }
   });
 
   const [loading, setLoading] = useState(false);
@@ -38,23 +46,52 @@ const EditLibrarian = () => {
     nic: '',
     email: '',
     phone: '',
-    address: ''
+    address: '',
+    libraries: '',
   });
 
   useEffect(() => {
     const fetchLibrarianData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${base_url}/api/librarians/${librarianId}`);
-        const data = response.data.data; // Ensure you access the correct data property
+        const [librarianResponse, librariesResponse] = await Promise.all([
+          axios.get(`${base_url}/api/librarians/${librarianId}`),
+          axios.get(`${base_url}/api/libraries/all-open`)
+        ]);
+
+        const libraries = librariesResponse.data.data.map(lib => ({
+          value: lib._id,
+          label: lib.name
+        }));
+
+        setLibraryOptions(libraries);
+
+        const data = librarianResponse.data.data;
         setForm({
           firstName: data.firstName || '',
           lastName: data.lastName || '',
           nic: data.nic || '',
           email: data.email || '',
           phone: data.phone || '',
-          address: data.address || ''
+          address: data.address || '',
+          libraries: data.libraries.map(lib => ({
+            value: lib._id,
+            label: lib.name
+          })),
+          permissions: data.permissions || {
+            users: false,
+            readers: false,
+            categories: false,
+            books: false,
+            authors: false,
+            statics: false,
+            sales: false,
+            packages: false,
+            notifications: false,
+            settings: false,
+          }
         });
+
         setLoading(false);
       } catch (error) {
         setLoading(false);
@@ -70,10 +107,33 @@ const EditLibrarian = () => {
     fetchLibrarianData();
   }, [librarianId]);
 
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
-    setErrors({ ...errors, [name]: '' });
+    setForm(prevForm => ({
+      ...prevForm,
+      [name]: value
+    }));
+    setErrors(prevErrors => ({
+      ...prevErrors,
+      [name]: ''
+    }));
+  };
+
+  const handleLibraryChange = (selectedOptions) => {
+    setForm({ ...form, libraries: selectedOptions });
+    setErrors({ ...errors, libraries: '' });
+  };
+
+  const handlePermissionChange = (e) => {
+    const { name, checked } = e.target;
+    setForm(prevForm => ({
+      ...prevForm,
+      permissions: {
+        ...prevForm.permissions,
+        [name]: checked
+      }
+    }));
   };
 
   const validateForm = () => {
@@ -149,10 +209,13 @@ const EditLibrarian = () => {
                     linkTo="/librarians"
                   />
                   <CCardBody>
-                    <LibrarianForm
+                    <LibrarianFormEdit
                       form={form}
                       errors={errors}
+                      libraryOptions={libraryOptions}
                       handleChange={handleChange}
+                      handleLibraryChange={handleLibraryChange}
+                      handlePermissionChange={handlePermissionChange}
                       handleSubmit={handleSubmit}
                       handlePrevious={handlePrevious}
                       loading={loading}

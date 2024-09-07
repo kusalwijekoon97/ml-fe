@@ -1,50 +1,47 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { CCard, CCardBody, CCardFooter, CCol, CContainer, CFormInput, CInputGroup, CInputGroupText, CPagination, CPaginationItem, CRow } from '@coreui/react';
+import { CCard, CCardBody, CCol, CContainer, CInputGroup, CInputGroupText, CFormInput, CPagination, CPaginationItem, CRow } from '@coreui/react';
 import { CIcon } from '@coreui/icons-react';
 import { cibAddthis, cilSearch } from '@coreui/icons';
 import { AppFooter, AppHeader, AppSidebar } from '../../../components';
 import base_url from "../../../utils/api/base_url";
 import CardHeaderWithTitleBtn from '../../../components/cards/CardHeaderWithTitleBtn';
-import LibrariansTable from '../../../components/table/LibrariansTable';
+import MaterialsTable from '../../../components/table/MaterialsTable';
 import ResponseAlert from '../../../components/notifications/ResponseAlert';
 import { useLocation, useNavigate } from 'react-router-dom';
 import alertify from 'alertifyjs';
 import 'alertifyjs/build/css/alertify.css';
 
-const IndexLibrarian = () => {
+const IndexMaterial = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [librarians, setLibrarians] = useState([]);
+  const [materials, setMaterials] = useState([]);
   const [alert, setAlert] = useState({ visible: false, type: '', message: '' });
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [search, setSearch] = useState('');
 
-  const columns = ["#", "Name", "Email", "Libraries", "Menu Access", "Status", "Actions"];
+  const columns = ["#", "Name", "Material Path", "Status", "Actions"];
 
   useEffect(() => {
-    // Fetch librarians with pagination and search
-    axios.get(`${base_url}/api/librarians/all`, {
+    axios.get(`${base_url}/api/materials/all`, {
       params: {
         page: currentPage,
         limit: itemsPerPage,
-        search: search
+        search: search,
       }
     })
       .then(response => {
         if (response.data && response.data.data && Array.isArray(response.data.data)) {
-          // Exclude the restrictions field from the data
-          const filteredLibrarians = response.data.data.map(({ restrictions, ...rest }) => rest);
-          setLibrarians(filteredLibrarians);
+          setMaterials(response.data.data);
           setTotalPages(response.data.totalPages);
         } else {
           console.error('API response is not in the expected format', response.data);
         }
       })
       .catch(error => {
-        console.error('There was an error fetching the librarians!', error);
+        console.error('There was an error fetching the materials!', error);
       });
   }, [currentPage, itemsPerPage, search]);
 
@@ -55,29 +52,29 @@ const IndexLibrarian = () => {
   }, [location.state]);
 
   const handleEdit = (id) => {
-    navigate(`/librarians/${id}/edit`);
+    navigate(`/materials/${id}/edit`);
   };
 
   const handleDelete = (id) => {
     alertify.confirm(
       'Confirm Delete',
-      'Are you sure you want to delete this librarian?',
+      'Are you sure you want to delete this material?',
       () => {
-        axios.post(`${base_url}/api/librarians/delete/${id}`)
+        axios.post(`${base_url}/api/materials/delete/${id}`)
           .then(response => {
-            setLibrarians(librarians.filter(librarian => librarian._id !== id));
+            setMaterials(materials.filter(material => material._id !== id));
             setAlert({
               visible: true,
               type: 'success',
-              message: 'Librarian deleted successfully!'
+              message: 'Material deleted successfully!'
             });
           })
           .catch(error => {
-            console.error('There was an error deleting the librarian!', error);
+            console.error('There was an error deleting the material!', error);
             setAlert({
               visible: true,
               type: 'failure',
-              message: 'Failed to delete the librarian. Please try again.'
+              message: 'Failed to delete the material. Please try again.'
             });
           });
       },
@@ -88,48 +85,48 @@ const IndexLibrarian = () => {
   const handleChangeStatus = (id) => {
     alertify.confirm(
       'Confirm Status Change',
-      'Are you sure you want to change the status of this librarian?',
+      'Are you sure you want to change the status of this material?',
       () => {
-        axios.post(`${base_url}/api/librarians/change-status/${id}`)
+        axios.post(`${base_url}/api/materials/change-status/${id}`)
           .then(response => {
-            setLibrarians(librarians.map(librarian =>
-              librarian._id === id ? { ...librarian, status: !librarian.status } : librarian
+            setMaterials(materials.map(material =>
+              material._id === id ? { ...material, is_active: !material.is_active } : material
             ));
             setAlert({
               visible: true,
               type: 'success',
-              message: 'Librarian status changed successfully!'
+              message: 'Material status changed successfully!'
             });
           })
           .catch(error => {
-            console.error('There was an error changing the librarian status!', error);
+            console.error('There was an error changing the material status!', error);
             setAlert({
               visible: true,
               type: 'failure',
-              message: 'Failed to change the librarian status. Please try again.'
+              message: 'Failed to change the material status. Please try again.'
             });
           });
       },
       () => {
         alertify.message('Status change cancelled');
       }
-    );
+    )
   };
 
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
+  const handleSearchChange = (event) => {
+    setSearch(event.target.value);
+    setCurrentPage(1);  // Reset to the first page when a new search is initiated
   };
 
-  const handleSearchChange = (e) => {
-    setSearch(e.target.value);
-    setCurrentPage(1);
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
   };
 
   return (
     <>
       <AppSidebar />
       <div className="wrapper d-flex flex-column min-vh-100">
-        <AppHeader title="Librarians" />
+        <AppHeader title="Materials" />
         <div className="body flex-grow-1">
           <ResponseAlert
             visible={alert.visible}
@@ -142,11 +139,11 @@ const IndexLibrarian = () => {
               <CCol xs={12}>
                 <CCard className="mb-4 border-top-primary border-top-3">
                   <CardHeaderWithTitleBtn
-                    title="Librarians"
+                    title="Materials"
                     subtitle="List"
                     buttonIcon={<CIcon icon={cibAddthis} />}
-                    buttonText="Add Librarian"
-                    linkTo="/librarians/create"
+                    buttonText="Add Material"
+                    linkTo="/materials/create"
                   />
                   <CCardBody>
                     <CRow className='mb-2'>
@@ -166,9 +163,9 @@ const IndexLibrarian = () => {
                         </CInputGroup>
                       </CCol>
                     </CRow>
-                    <LibrariansTable
+                    <MaterialsTable
                       columns={columns}
-                      data={librarians}
+                      data={materials}
                       handleEdit={handleEdit}
                       handleDelete={handleDelete}
                       handleChangeStatus={handleChangeStatus}
@@ -179,13 +176,13 @@ const IndexLibrarian = () => {
                         onClick={() => handlePageChange(currentPage - 1)}
                         disabled={currentPage === 1}
                       >
-                        <span aria-hidden="true">&laquo;</span>
+                        &laquo;
                       </CPaginationItem>
                       {[...Array(totalPages)].map((_, index) => (
                         <CPaginationItem
                           key={index + 1}
+                          active={index + 1 === currentPage}
                           onClick={() => handlePageChange(index + 1)}
-                          active={currentPage === index + 1}
                         >
                           {index + 1}
                         </CPaginationItem>
@@ -195,7 +192,7 @@ const IndexLibrarian = () => {
                         onClick={() => handlePageChange(currentPage + 1)}
                         disabled={currentPage === totalPages}
                       >
-                        <span aria-hidden="true">&raquo;</span>
+                        &raquo;
                       </CPaginationItem>
                     </CPagination>
                   </CCardBody>
@@ -210,4 +207,4 @@ const IndexLibrarian = () => {
   );
 };
 
-export default IndexLibrarian;
+export default IndexMaterial;

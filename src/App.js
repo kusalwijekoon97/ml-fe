@@ -12,6 +12,15 @@ import EditAuthor from './views/pages/author/editAuthor';
 import IndexLibrarian from './views/pages/librarian/IndexLibrarian';
 import CreateLibrarian from './views/pages/librarian/createLibrarian';
 import EditLibrarian from './views/pages/librarian/editLibrarian';
+import IndexLibrary from './views/pages/library/IndexLibrary';
+import CreateLibrary from './views/pages/library/createLibrary';
+import EditLibrary from './views/pages/library/editLibrary';
+import IndexMaterial from './views/pages/material/IndexMaterial';
+import CreateMaterial from './views/pages/material/createMaterial';
+import EditMaterial from './views/pages/material/editMaterial';
+import IndexBook from './views/pages/book/IndexBook';
+import CreateBook from './views/pages/book/createBook';
+import EditBook from './views/pages/book/editBook';
 
 // Containers
 const DefaultLayout = React.lazy(() => import('./layout/DefaultLayout'));
@@ -56,6 +65,10 @@ const App = () => {
           <Route path="/404" name="Page 404" element={<Page404 />} />
           <Route path="/500" name="Page 500" element={<Page500 />} />
 
+          {/* library */}
+          <Route path="/libraries" name="libraries-all" element={<IndexLibrary/>} />
+          <Route path="/libraries/create" name="libraries-create" element={<CreateLibrary />} />
+          <Route path="/libraries/:libraryId/edit" name="libraries-edit" element={<EditLibrary />} />
           {/* category */}
           <Route path="/categories" name="categories-all" element={<IndexCategory />} />
           <Route path="/categories/create" name="categories-create" element={<CreateCategory />} />
@@ -68,6 +81,14 @@ const App = () => {
           <Route path="/librarians" name="librarians-all" element={<IndexLibrarian />} />
           <Route path="/librarians/create" name="librarians-create" element={<CreateLibrarian />} />
           <Route path="/librarians/:librarianId/edit" name="librarians-edit" element={<EditLibrarian />} />
+          {/* material */}
+          <Route path="/materials" name="materials-all" element={<IndexMaterial />} />
+          <Route path="/materials/create" name="materials-create" element={<CreateMaterial />} />
+          <Route path="/materials/:materialId/edit" name="materials-edit" element={<EditMaterial />} />
+          {/* book */}
+          <Route path="/books" name="books-all" element={<IndexBook />} />
+          <Route path="/books/create" name="books-create" element={<CreateBook />} />
+          <Route path="/books/:bookId/edit" name="books-edit" element={<EditBook />} />
         </Routes>
       </Suspense>
     </Router>

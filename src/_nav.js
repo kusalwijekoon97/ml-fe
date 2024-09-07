@@ -1,6 +1,6 @@
 import React from 'react'
 import CIcon from '@coreui/icons-react'
-import { cilSpeedometer, cilUser, cilPeople, cilBook, cilLayers } from '@coreui/icons'
+import { cilSpeedometer, cilUser, cilPeople, cilBook, cilLayers, cibNintendoSwitch } from '@coreui/icons'
 import { CNavGroup, CNavItem } from '@coreui/react'
 import { BsFillGridFill } from 'react-icons/bs'
 
@@ -10,6 +10,12 @@ const _nav = [
     name: 'Dashboard',
     to: '/dashboard',
     icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Libraries',
+    to: '/libraries',
+    icon: <CIcon icon={cibNintendoSwitch} customClassName="nav-icon" />,
   },
   {
     component: CNavItem,
@@ -25,8 +31,8 @@ const _nav = [
   },
   {
     component: CNavItem,
-    name: 'Material',
-    to: '/material',
+    name: 'Materials',
+    to: '/materials',
     icon: <CIcon icon={cilLayers} customClassName="nav-icon" />,
   },
   {
