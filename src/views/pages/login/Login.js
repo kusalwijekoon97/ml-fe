@@ -16,6 +16,7 @@ import {
 import CIcon from '@coreui/icons-react';
 import { cilLockLocked, cilUser } from '@coreui/icons';
 import base_url from "../../../utils/api/base_url";
+import LogoFull from '../../../components/logo/LogoFull';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -70,8 +71,10 @@ const Login = () => {
       <CContainer>
         <CRow className="justify-content-center">
           <CCol md={4}>
+          <LogoFull width="250px" styles={{ marginBottom: '20px' }} />
             <CCard className="p-4">
               <CCardBody>
+
                 <CForm onSubmit={handleLogin}>
                   <h1>Login</h1>
                   <p className="text-body-secondary">Sign In to your account</p>
