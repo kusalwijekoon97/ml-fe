@@ -1,7 +1,7 @@
 import React from 'react';
 import { CForm, CFormLabel, CButton, CFormFeedback, CFormInput, CFormSelect, CFormTextarea, CInputGroup, CRow, CCol, CSpinner, CFormCheck, CTable, CTableHead, CTableRow, CTableHeaderCell, CTableDataCell, CTableBody, CFormText } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
-import { cilMinus, cilPlus, cilDelete } from '@coreui/icons';
+import { cilMinus, cilPlus, cilDelete, cilFile } from '@coreui/icons';
 import { Link } from 'react-router-dom';
 import Select from 'react-select';
 
@@ -40,7 +40,11 @@ const BookForm = ({
   handleChapterRemoval,
   handleChapterChange,
   handleChapterMaterialSourceChange,
-  loading
+  loading,
+  MaterialFormModal,
+  showModal,
+  handleAddMaterialFileClick,
+  handleMaterialFileUpload
 }) => {
   return (
     <>
@@ -385,7 +389,7 @@ const BookForm = ({
                 <CRow>
                   <CCol xs={12}>
                     <CFormLabel>Chapters</CFormLabel>
-                    <CFormText className="text-muted" style={{ fontSize: 'small' }}> Enter detailed information for each chapter, including the chapter number, chapter name, and sources for PDF, EPUB, TEXT, and MP3 formats. The MP3 source also requires a duration, voice fields. You can add new chapters by clicking the "Add Chapter" button or remove an existing chapter using the "Remove" button associated with that chapter.</CFormText>
+                    <CFormText className="text-muted" style={{ fontSize: 'small' }}> Enter detailed information for each chapter, including the chapter number, chapter name, and sources for <strong>PDF, EPUB, TEXT,</strong> and <strong>MP3</strong> formats. The MP3 source also requires a duration, voice fields. You can add new chapters by clicking the <strong>+ Add Chapter</strong> button or remove an existing chapter using the <strong>Remove icon</strong> button associated with that chapter.</CFormText>
                   </CCol>
                   <CCol xs={12}>
                     <div className="my-1">
@@ -422,35 +426,59 @@ const BookForm = ({
                               </CTableRow>
                               <CTableRow>
                                 <CTableDataCell>
-                                  <Select
-                                    name="pdf"
-                                    options={materialOptions}
-                                    value={materialOptions.find(option => option.value === chapter.chapter_source_pdf) || null}
-                                    onChange={(selectedOption) => handleChapterMaterialSourceChange(index, 'pdf', selectedOption)}
-                                    className="custom-select"
-                                  />
+                                  <CInputGroup>
+                                    <Select
+                                      name="pdf"
+                                      options={materialOptions}
+                                      value={materialOptions.find(option => option.value === chapter.chapter_source_pdf) || null}
+                                      onChange={(selectedOption) => handleChapterMaterialSourceChange(index, 'pdf', selectedOption)}
+                                      className="custom-select col-10"
+                                    />
+                                    <CButton type="button"
+                                      size='sm'
+                                      color="primary"
+                                      className=" col-2"
+                                      onClick={() => handleAddMaterialFileClick(index)}>
+                                        <CIcon icon={cilFile} /> Add File</CButton>
+                                  </CInputGroup>
                                 </CTableDataCell>
                               </CTableRow>
                               <CTableRow>
                                 <CTableDataCell>
-                                  <Select
-                                    name="epub"
-                                    options={materialOptions}
-                                    value={materialOptions.find(option => option.value === chapter.chapter_source_epub) || null}
-                                    onChange={(selectedOption) => handleChapterMaterialSourceChange(index, 'epub', selectedOption)}
-                                    className="custom-select"
-                                  />
+                                  <CInputGroup>
+                                    <Select
+                                      name="epub"
+                                      options={materialOptions}
+                                      value={materialOptions.find(option => option.value === chapter.chapter_source_epub) || null}
+                                      onChange={(selectedOption) => handleChapterMaterialSourceChange(index, 'epub', selectedOption)}
+                                      className="custom-select col-10"
+                                    />
+                                    <CButton type="button"
+                                      size='sm'
+                                      color="primary"
+                                      className=" col-2"
+                                      onClick={() => handleAddMaterialFileClick(index)}>
+                                        <CIcon icon={cilFile} /> Add File</CButton>
+                                  </CInputGroup>
                                 </CTableDataCell>
                               </CTableRow>
                               <CTableRow>
                                 <CTableDataCell>
-                                  <Select
-                                    name="text"
-                                    options={materialOptions}
-                                    value={materialOptions.find(option => option.value === chapter.chapter_source_text) || null}
-                                    onChange={(selectedOption) => handleChapterMaterialSourceChange(index, 'text', selectedOption)}
-                                    className="custom-select"
-                                  />
+                                  <CInputGroup>
+                                    <Select
+                                      name="text"
+                                      options={materialOptions}
+                                      value={materialOptions.find(option => option.value === chapter.chapter_source_text) || null}
+                                      onChange={(selectedOption) => handleChapterMaterialSourceChange(index, 'text', selectedOption)}
+                                      className="custom-select col-10"
+                                    />
+                                    <CButton type="button"
+                                      size='sm'
+                                      color="primary"
+                                      className=" col-2"
+                                      onClick={() => handleAddMaterialFileClick(index)}>
+                                        <CIcon icon={cilFile} /> Add File</CButton>
+                                  </CInputGroup>
                                 </CTableDataCell>
                               </CTableRow>
                               <CTableRow>
@@ -461,8 +489,14 @@ const BookForm = ({
                                       options={materialOptions}
                                       value={materialOptions.find(option => option.value === chapter.chapter_source_mp3) || null}
                                       onChange={(selectedOption) => handleChapterMaterialSourceChange(index, 'mp3', selectedOption)}
-                                      className="custom-select col-10"
+                                      className="custom-select col-8"
                                     />
+                                    <CButton type="button"
+                                      size='sm'
+                                      color="primary"
+                                      className="me-2 col-2"
+                                      onClick={() => handleAddMaterialFileClick(index)}>
+                                        <CIcon icon={cilFile} /> Add File</CButton>
                                     <CFormSelect
                                       name="chapter_mp3_voice"
                                       value={chapter.chapter_mp3_voice}
@@ -485,6 +519,7 @@ const BookForm = ({
                       <div className='d-flex justify-content-start'>
                         <CButton color="primary" onClick={handleChapterAddition}>+ Add Chapter</CButton>
                       </div>
+
                     </div>
                   </CCol>
                 </CRow>
@@ -553,6 +588,12 @@ const BookForm = ({
         </div>
 
       </CForm>
+
+      <MaterialFormModal
+        visible={showModal}
+        onClose={() => setShowModal(false)}
+        onFileUpload={handleMaterialFileUpload}
+      />
     </>
   );
 };

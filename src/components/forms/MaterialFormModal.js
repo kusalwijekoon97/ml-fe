@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { CForm, CFormLabel, CButton, CFormFeedback, CFormInput, CRow, CCol, CSpinner } from '@coreui/react';
+import {CModal, CModalHeader, CModalBody, CModalFooter, CForm, CFormLabel, CButton, CFormFeedback, CFormInput, CRow, CCol, CSpinner } from '@coreui/react';
 import { Link, useNavigate } from 'react-router-dom';
-import base_url from "../../../utils/api/base_url";
+import base_url from "../../utils/api/base_url";
 import axios from 'axios';
 
-const MaterialFormModal = () => {
+const MaterialFormModal = ({ visible, onClose, onFileUpload }) => {
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
@@ -60,15 +60,7 @@ const MaterialFormModal = () => {
     })
       .then(response => {
         setLoading(false);
-        navigate("/materials", {
-          state: {
-            alert: {
-              visible: true,
-              type: 'success',
-              message: 'Material created successfully!'
-            }
-          }
-        });
+        onFileUpload(response.data);
       })
       .catch(error => {
         setLoading(false);
@@ -87,7 +79,10 @@ const MaterialFormModal = () => {
 
   return (
     <>
+    <CModal visible={visible} onClose={onClose}>
+    <CModalHeader>Upload File</CModalHeader>
       <CForm onSubmit={handleSubmit}>
+        <CModalBody>
         <CRow>
           <CCol xs={12}>
             <div className="mb-3">
@@ -118,35 +113,15 @@ const MaterialFormModal = () => {
             </div>
           </CCol>
         </CRow>
-
-        <div className="text-end">
-          <CButton type="button"
-            size='sm'
-            color="danger"
-            className="me-2"
-            onClick={() => navigate('/dashboard')}
-            disabled={loading}>Cancel</CButton>
-          <CButton type="button"
-            size='sm'
-            color="secondary"
-            className="me-2"
-            onClick={handlePrevious}
-            disabled={loading}>Previous</CButton>
-          <CButton
-            type="submit"
-            size='sm'
-            color="success"
-            disabled={loading}>
-            {loading ? (
-              <>
-                <CSpinner as="span" size="sm" aria-hidden="true" /> Submitting...
-              </>
-            ) : (
-              'Submit'
-            )}
+        </CModalBody>
+        <CModalFooter>
+          <CButton color="secondary" onClick={onClose} disabled={loading}>Close</CButton>
+          <CButton color="primary" type="submit" disabled={loading}>
+            {loading ? <CSpinner size="sm" /> : 'Upload'}
           </CButton>
-        </div>
+        </CModalFooter>
       </CForm>
+    </CModal>
     </>
   );
 };

@@ -10,6 +10,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import base_url from "../../../utils/api/base_url";
 import ResponseAlert from '../../../components/notifications/ResponseAlert';
 import BookForm from '../../../components/forms/BookForm';
+import MaterialFormModal from '../../../components/forms/MaterialFormModal';
 
 const CreateBook = () => {
   const navigate = useNavigate();
@@ -103,6 +104,8 @@ const CreateBook = () => {
   const [chapters, setChapters] = useState([
     { chapter_number: 1, chapter_name: '', chapter_source_pdf: '', chapter_source_epub: '', chapter_source_text: '', chapter_source_mp3: '', chapter_mp3_voice: '' }
   ]);
+  const [showModal, setShowModal] = useState(false);
+  const [currentChapterIndex, setCurrentChapterIndex] = useState(null);
   // handling form changes
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -361,6 +364,9 @@ const CreateBook = () => {
 
   // Handle chapter material source change
   const handleChapterMaterialSourceChange = (index, materialType, selectedOption) => {
+    const updatedChapters = [...form.chapters];
+    updatedChapters[index][`chapter_source_${sourceType}`] = selectedOption.value;
+
     setForm(prevForm => ({
       ...prevForm,
       chapters: prevForm.chapters.map((chapter, i) =>
@@ -369,7 +375,21 @@ const CreateBook = () => {
     }));
   };
 
+  const handleAddMaterialFileClick = (index) => {
+    setCurrentChapterIndex(index);
+    setShowModal(true);
+  };
 
+  const handleMaterialFileUpload = (newFile) => {
+    // Add the new file to the materialOptions array and update the form state
+    const newOption = { value: newFile.id, label: newFile.name };  // Example response data
+    setMaterialOptions((prevOptions) => [...prevOptions, newOption]);
+
+    // Automatically set the newly uploaded file in the relevant chapter
+    const updatedChapters = [...form.chapters];
+    updatedChapters[currentChapterIndex].chapter_source_pdf = newFile.id;  // Example for 'pdf', modify as needed
+    setForm({ ...form, chapters: updatedChapters });
+  };
 
   // handling form submission
   const handleSubmit = (e) => {
@@ -546,6 +566,10 @@ const CreateBook = () => {
                       handleChapterChange={handleChapterChange}
                       handleChapterMaterialSourceChange={handleChapterMaterialSourceChange}
                       loading={loading}
+                      MaterialFormModal={MaterialFormModal}
+                      showModal={showModal}
+                      handleAddMaterialFileClick={handleAddMaterialFileClick}
+                      handleMaterialFileUpload={handleMaterialFileUpload}
                     />
                   </CCardBody>
                 </CCard>
