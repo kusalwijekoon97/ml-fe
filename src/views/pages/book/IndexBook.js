@@ -21,15 +21,20 @@ const IndexBook = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [search, setSearch] = useState('');
+  const [currentActiveLibrary, setCurrentActiveLibrary] = useState('');
 
   const columns = ["#", "Name", "ISBN", "Author", "Publisher", "Library", "categories", "Status", "Actions"];
 
   useEffect(() => {
+    const savedLibrary = sessionStorage.getItem('currentActiveLibrary') || '';
+    setCurrentActiveLibrary(savedLibrary);
+
     axios.get(`${base_url}/api/books/all`, {
       params: {
         page: currentPage,
         limit: itemsPerPage,
         search: search,
+        library: savedLibrary
       }
     })
       .then(response => {
@@ -43,7 +48,7 @@ const IndexBook = () => {
       .catch(error => {
         console.error('There was an error fetching the books!', error);
       });
-  }, [currentPage, itemsPerPage, search]);
+  }, [currentPage, itemsPerPage, search, currentActiveLibrary]);
 
   useEffect(() => {
     if (location.state?.alert) {
@@ -122,10 +127,14 @@ const IndexBook = () => {
     setCurrentPage(newPage);
   };
 
+  const handleActiveLibraryChange = (library) => {
+    setCurrentActiveLibrary(library);
+  };
+
   return (
     <>
-      <AppSidebar />
-      <div className="wrapper d-flex flex-column min-vh-100">
+     <AppSidebar onActiveLibraryChange={handleActiveLibraryChange} />
+     <div className="wrapper d-flex flex-column min-vh-100">
         <AppHeader title="Books" />
         <div className="body flex-grow-1">
           <ResponseAlert

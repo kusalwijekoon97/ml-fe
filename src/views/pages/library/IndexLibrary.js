@@ -22,7 +22,7 @@ const IndexLibrary = () => {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [search, setSearch] = useState('');
 
-  const columns = ["#", "Name", "Library", "Status", "Actions"];
+  const columns = ["#", "Library", "Librarian", "Status", "Actions"];
 
   useEffect(() => {
     // Fetch libraries with pagination and search
