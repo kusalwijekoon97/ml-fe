@@ -8,6 +8,7 @@ import navigation from '../_nav';
 import LibraryToggle from './butttons/libraryToggle/LibraryToggle';
 import LogoFull from './logo/LogoFull';
 import LogoPartialTransparent from './logo/LogoPartialTransparent';
+import LibraryDropdownToggle from './butttons/libraryToggle/LibraryDropdownToggle';
 
 const AppSidebar = () => {
   const dispatch = useDispatch()
@@ -51,7 +52,8 @@ const AppSidebar = () => {
           dark
           onClick={() => dispatch({ type: 'set', sidebarShow: false })} />
       </CSidebarHeader>
-      <LibraryToggle />
+      <LibraryDropdownToggle />
+      {/* <LibraryToggle/> */}
       <AppSidebarNav items={navigation} />
       <CSidebarFooter className="border-top d-none d-lg-flex">
         <CSidebarToggler
