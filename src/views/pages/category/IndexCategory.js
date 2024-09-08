@@ -1,18 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import {
-  CCard,
-  CCardBody,
-  CCol,
-  CContainer,
-  CRow,
-  CPagination,
-  CPaginationItem,
-  CInputGroup,
-  CFormInput,
-  CButton,
-  CInputGroupText,
-} from '@coreui/react';
+import { CCard, CCardBody, CCol, CContainer, CRow, CPagination, CPaginationItem, CInputGroup, CFormInput, CButton, CInputGroupText } from '@coreui/react';
 import { CIcon } from '@coreui/icons-react';
 import { cibAddthis, cilSearch } from '@coreui/icons';
 import { AppFooter, AppHeader, AppSidebar } from '../../../components';
@@ -32,14 +20,16 @@ const IndexCategory = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [search, setSearch] = useState('');
+  const [currentActiveLibrary, setCurrentActiveLibrary] = useState('');
 
-  const columns = ["#", "Category Name","Slug", "Sub Categories", "Library", "Status", "Actions"];
+  const columns = ["#", "Category Name", "Slug", "Sub Categories", "Library", "Status", "Actions"];
 
-  const fetchCategories = (page = 1, search = '') => {
+  const fetchCategories = (page = 1, search = '', library = currentActiveLibrary) => {
     axios.get(`${base_url}/api/categories/main/all`, {
       params: {
         page,
         search,
+        library,
       },
     })
       .then(response => {
@@ -57,8 +47,10 @@ const IndexCategory = () => {
   };
 
   useEffect(() => {
-    fetchCategories(currentPage, search);
-  }, [currentPage, search]);
+    const savedLibrary = sessionStorage.getItem('currentActiveLibrary') || '';
+  setCurrentActiveLibrary(savedLibrary);
+    fetchCategories(currentPage, search, currentActiveLibrary);
+  }, [currentPage, search, currentActiveLibrary]);
 
   useEffect(() => {
     if (location.state?.alert) {
@@ -139,9 +131,14 @@ const IndexCategory = () => {
     setSearch(e.target.value);
   };
 
+  const handleActiveLibraryChange = (library) => {
+    setCurrentActiveLibrary(library);
+  };
+
+
   return (
     <>
-      <AppSidebar />
+      <AppSidebar onActiveLibraryChange={handleActiveLibraryChange} />
       <div className="wrapper d-flex flex-column min-vh-100">
         <AppHeader title="Categories" />
         <div className="body flex-grow-1">
@@ -163,7 +160,7 @@ const IndexCategory = () => {
                     linkTo="/categories/create"
                   />
                   <CCardBody>
-                  <CRow className='mb-2'>
+                    <CRow className='mb-2'>
                       <CCol xs={4}>
                         <CInputGroup>
                           <CInputGroupText>
