@@ -5,7 +5,8 @@ import './LibraryDropdownToggle.css';
 import base_url from '../../../utils/api/base_url';
 
 const LibraryDropdownToggle = ({ checked, onChange }) => {
-  const [libraryOptions, setLibraryOptions] = useState([]);
+  const [libraryOptions, setLibraryOptions] = useState([{ value: '', label: '-- All --' }]);
+  const [selectedLibrary, setSelectedLibrary] = useState('');
 
   useEffect(() => {
     // Fetch libraries from API
@@ -15,15 +16,28 @@ const LibraryDropdownToggle = ({ checked, onChange }) => {
           value: library._id,
           label: library.name
         }));
-        setLibraryOptions(libraries);
+        // Add default option to the libraries list
+        setLibraryOptions([{ value: '', label: '-- All --' }, ...libraries]);
       })
       .catch(error => {
         console.error("There was an error fetching the libraries!", error);
       });
+
+      const storedLibrary = sessionStorage.getItem('selectedLibrary');
+      console.log(storedLibrary);
+
+        if (storedLibrary) {
+          setSelectedLibrary(storedLibrary);
+        }
+
   }, []);
 
-  const handleLibraryChange = (selectedOptions) => {
-    onChange(selectedOptions); // Make sure to call the onChange prop
+  const handleLibraryChange = (e) => {
+    const selectedOption = e.target.value;
+    setSelectedLibrary(selectedOption);
+
+    // Store selected library in sessionStorage
+    sessionStorage.setItem('selectedLibrary', selectedOption);
   };
 
   return (
@@ -31,9 +45,15 @@ const LibraryDropdownToggle = ({ checked, onChange }) => {
       <CFormSelect
         id="library"
         name="library"
-        options={libraryOptions}
+        value={selectedLibrary} // Set the value from state
         onChange={handleLibraryChange}
-      />
+      >
+        {libraryOptions.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </CFormSelect>
     </div>
   );
 };
