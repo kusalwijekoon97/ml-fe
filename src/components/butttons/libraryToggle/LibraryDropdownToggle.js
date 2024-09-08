@@ -4,9 +4,9 @@ import React, { useEffect, useState } from 'react';
 import './LibraryDropdownToggle.css';
 import base_url from '../../../utils/api/base_url';
 
-const LibraryDropdownToggle = ({ checked, onChange }) => {
+const LibraryDropdownToggle = ({ checked, onChange, onLibraryChange }) => {
   const [libraryOptions, setLibraryOptions] = useState([{ value: '', label: '-- All --' }]);
-  const [selectedLibrary, setSelectedLibrary] = useState('');
+  const [currentActiveLibrary, setCurrentActiveLibrary] = useState('');
 
   useEffect(() => {
     // Fetch libraries from API
@@ -23,38 +23,40 @@ const LibraryDropdownToggle = ({ checked, onChange }) => {
         console.error("There was an error fetching the libraries!", error);
       });
 
-      const storedLibrary = sessionStorage.getItem('selectedLibrary');
-      console.log(storedLibrary);
-
-        if (storedLibrary) {
-          setSelectedLibrary(storedLibrary);
-        }
-
+    const currentActiveLibrary = sessionStorage.getItem('currentActiveLibrary');
+    if (currentActiveLibrary) {
+      setCurrentActiveLibrary(currentActiveLibrary);
+    }
   }, []);
 
   const handleLibraryChange = (e) => {
     const selectedOption = e.target.value;
-    setSelectedLibrary(selectedOption);
+    setCurrentActiveLibrary(selectedOption);
+    sessionStorage.setItem('currentActiveLibrary', selectedOption);
 
-    // Store selected library in sessionStorage
-    sessionStorage.setItem('selectedLibrary', selectedOption);
+    // Notify parent component of the library change
+    if (onLibraryChange) {
+      onLibraryChange(selectedOption);
+    }
   };
 
   return (
-    <div className="library-dropdown mb-2 p-2">
-      <CFormSelect
-        id="library"
-        name="library"
-        value={selectedLibrary} // Set the value from state
-        onChange={handleLibraryChange}
-      >
-        {libraryOptions.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </CFormSelect>
-    </div>
+    <>
+      <div className="library-dropdown mb-2 p-2">
+        <CFormSelect
+          id="library"
+          name="library"
+          value={currentActiveLibrary}
+          onChange={handleLibraryChange}
+        >
+          {libraryOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </CFormSelect>
+      </div>
+    </>
   );
 };
 
