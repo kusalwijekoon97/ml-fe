@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import './LibraryDropdownToggle.css';
 import base_url from '../../../utils/api/base_url';
 
-const LibraryDropdownToggle = ({ checked, onChange, onLibraryChange }) => {
+const LibraryDropdownToggle = ({ checked, onChange, onActiveLibraryChange }) => {
   const [libraryOptions, setLibraryOptions] = useState([{ value: '', label: '-- All --' }]);
   const [currentActiveLibrary, setCurrentActiveLibrary] = useState('');
 
@@ -35,8 +35,8 @@ const LibraryDropdownToggle = ({ checked, onChange, onLibraryChange }) => {
     sessionStorage.setItem('currentActiveLibrary', selectedOption);
 
     // Notify parent component of the library change
-    if (onLibraryChange) {
-      onLibraryChange(selectedOption);
+    if (onActiveLibraryChange) {
+      onActiveLibraryChange(selectedOption);
     }
   };
 

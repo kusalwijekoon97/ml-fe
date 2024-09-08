@@ -10,7 +10,7 @@ import LogoFull from './logo/LogoFull';
 import LogoPartialTransparent from './logo/LogoPartialTransparent';
 import LibraryDropdownToggle from './butttons/libraryToggle/LibraryDropdownToggle';
 
-const AppSidebar = ({ onLibraryChange }) => {
+const AppSidebar = ({ onActiveLibraryChange }) => {
   const dispatch = useDispatch()
   const unfoldable = useSelector((state) => state.sidebarUnfoldable)
   const sidebarShow = useSelector((state) => state.sidebarShow)
@@ -52,7 +52,7 @@ const AppSidebar = ({ onLibraryChange }) => {
           dark
           onClick={() => dispatch({ type: 'set', sidebarShow: false })} />
       </CSidebarHeader>
-      <LibraryDropdownToggle onLibraryChange={onLibraryChange} />
+      <LibraryDropdownToggle onActiveLibraryChange={onActiveLibraryChange} />
       {/* <LibraryToggle/> */}
       <AppSidebarNav items={navigation} />
       <CSidebarFooter className="border-top d-none d-lg-flex">
