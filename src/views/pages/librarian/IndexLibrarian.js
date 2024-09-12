@@ -21,16 +21,21 @@ const IndexLibrarian = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [search, setSearch] = useState('');
+  const [currentActiveLibrary, setCurrentActiveLibrary] = useState('');
 
   const columns = ["#", "Name", "Email", "Libraries", "Menu Access", "Status", "Actions"];
 
   useEffect(() => {
+    const savedLibrary = sessionStorage.getItem('currentActiveLibrary') || '';
+  setCurrentActiveLibrary(savedLibrary);
+
     // Fetch librarians with pagination and search
     axios.get(`${base_url}/api/librarians/all`, {
       params: {
         page: currentPage,
         limit: itemsPerPage,
-        search: search
+        search: search,
+        library: savedLibrary
       }
     })
       .then(response => {
@@ -46,7 +51,7 @@ const IndexLibrarian = () => {
       .catch(error => {
         console.error('There was an error fetching the librarians!', error);
       });
-  }, [currentPage, itemsPerPage, search]);
+  }, [currentPage, itemsPerPage, search, currentActiveLibrary]);
 
   useEffect(() => {
     if (location.state?.alert) {
@@ -125,10 +130,14 @@ const IndexLibrarian = () => {
     setCurrentPage(1);
   };
 
+  const handleActiveLibraryChange = (library) => {
+    setCurrentActiveLibrary(library);
+  };
+
   return (
     <>
-      <AppSidebar />
-      <div className="wrapper d-flex flex-column min-vh-100">
+   <AppSidebar onActiveLibraryChange={handleActiveLibraryChange} />
+   <div className="wrapper d-flex flex-column min-vh-100">
         <AppHeader title="Librarians" />
         <div className="body flex-grow-1">
           <ResponseAlert

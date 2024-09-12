@@ -1,8 +1,8 @@
 import React from 'react'
 import classNames from 'classnames'
 
-import {CAvatar,CButton,CButtonGroup,CCard,CCardBody,CCardFooter,CCardHeader,CCol,CProgress,CRow,CTable,CTableBody,CTableDataCell,CTableHead,CTableHeaderCell,CTableRow} from '@coreui/react'
-import {cibCcAmex,cibCcApplePay,cibCcMastercard,cibCcPaypal,cibCcStripe,cibCcVisa,cibGoogle,cibFacebook,cibLinkedin,cifBr,cifEs,cifFr,cifIn,cifPl,cifUs,cibTwitter,cilCloudDownload,cilPeople,cilUser,cilUserFemale} from '@coreui/icons'
+import { CAvatar, CButton, CButtonGroup, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CProgress, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react'
+import { cibCcAmex, cibCcApplePay, cibCcMastercard, cibCcPaypal, cibCcStripe, cibCcVisa, cibGoogle, cibFacebook, cibLinkedin, cifBr, cifEs, cifFr, cifIn, cifPl, cifUs, cibTwitter, cilCloudDownload, cilPeople, cilUser, cilUserFemale } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 
 import avatar1 from 'src/assets/images/avatars/1.jpg'
@@ -141,7 +141,7 @@ const Dashboard = () => {
 
   return (
     <>
-    <CountWidgetSection classNamemb-4/>
+      <CountWidgetSection classNamemb-4 />
       {/* <WidgetsDropdown className="mb-4" /> */}
       <CCard className="mb-4">
         <CCardBody>
