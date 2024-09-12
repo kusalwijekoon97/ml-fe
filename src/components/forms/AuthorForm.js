@@ -1,7 +1,9 @@
 import React from 'react';
-import {CForm,CFormLabel,CButton,CFormFeedback,CFormInput,CFormSelect,CFormTextarea,CInputGroup,CRow,CCol,CSpinner} from '@coreui/react';
+import { CForm, CFormLabel, CButton, CFormFeedback, CFormInput, CFormSelect, CFormTextarea, CInputGroup, CRow, CCol, CSpinner } from '@coreui/react';
 import { Link } from 'react-router-dom';
 import Select from 'react-select';
+import { Upload, Button, message } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
 
 const AuthorForm = ({
   form,
@@ -14,6 +16,17 @@ const AuthorForm = ({
   handlePrevious,
   loading
 }) => {
+
+  const uploadProps = {
+    beforeUpload: (file) => {
+      handleFileChange(file);
+      return false;
+    },
+    fileList: form.profileImage ? [form.profileImage] : [],
+    accept: 'image/*',
+  };
+
+
   return (
     <>
       <CForm onSubmit={handleSubmit}>
@@ -52,14 +65,12 @@ const AuthorForm = ({
           <CCol xs={6}>
             <div className="mb-3">
               <CFormLabel htmlFor="profileImage">Profile Image <span className='text-danger'>*</span></CFormLabel>
-              <CFormInput
-                type="file"
-                id="profileImage"
-                name="profileImage"
-                onChange={handleFileChange}
-                invalid={!!errors.profileImage}
-              />
-              <CFormFeedback>{errors.profileImage}</CFormFeedback>
+              <div>
+                <Upload {...uploadProps}>
+                  <Button icon={<UploadOutlined />}>Upload Profile Image</Button>
+                </Upload>
+              </div>
+              {errors.profileImage && <CFormFeedback className="d-block">{errors.profileImage}</CFormFeedback>}
             </div>
           </CCol>
 
@@ -143,7 +154,7 @@ const AuthorForm = ({
           </CCol>
 
           <CCol xs={6}>
-          <div className="mb-3">
+            <div className="mb-3">
               <CFormLabel htmlFor="died">Died <span className='text-danger'>*</span></CFormLabel>
               <Select
                 id="died"

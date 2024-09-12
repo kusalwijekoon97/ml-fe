@@ -64,9 +64,14 @@ const CreateAuthor = () => {
     setErrors({ ...errors, [name]: '' });
   };
 
-  const handleFileChange = (e) => {
-    setForm({ ...form, profileImage: e.target.files[0] });
+  // const handleFileChange = (e) => {
+  //   setForm({ ...form, profileImage: e.target.files[0] });
+  // };
+
+  const handleFileChange = (file) => {
+    setForm({ ...form, profileImage: file });
   };
+
 
   const validateForm = () => {
     const newErrors = {};
