@@ -4,9 +4,6 @@ import CIcon from '@coreui/icons-react';
 import { cilMinus, cilPlus, cilDelete, cilFile } from '@coreui/icons';
 import { Link } from 'react-router-dom';
 import Select from 'react-select';
-import base_url from "../../utils/api/base_url";
-import { Upload, Button, message, Spin } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
 
 const BookForm = ({
   form,
@@ -346,14 +343,14 @@ const BookForm = ({
                       <CTableBody>
                         {form.material.completeMaterials.map((material, index) => (
                           <CTableRow key={index}>
-                            <CTableDataCell className='col-2'>
+                            <CTableDataCell className='col-1'>
                               <CFormInput
                                 name={`complete_${material.formatType.toLowerCase()}_formatType`}
                                 value={material.formatType}
                                 readOnly
                               />
                             </CTableDataCell>
-                            <CTableDataCell className='col-4'>
+                            <CTableDataCell className='col-3'>
                               <CFormInput
                                 placeholder="Publisher"
                                 type="text"
@@ -362,7 +359,7 @@ const BookForm = ({
                                 onChange={(e) => handleCompleteMaterialChange(index, 'publisher', e.target.value)}
                               />
                             </CTableDataCell>
-                            <CTableDataCell className='col-3'>
+                            <CTableDataCell className='col-2'>
                               <CFormInput
                                 placeholder="Published Date"
                                 type="date"
@@ -371,38 +368,20 @@ const BookForm = ({
                                 onChange={(e) => handleCompleteMaterialChange(index, 'publishedDate', e.target.value)}
                               />
                             </CTableDataCell>
-                            <CTableDataCell className='col-2'>
-                              <Upload
-                                beforeUpload={(file) => {
-                                  const formData = new FormData();
-                                  formData.append('fileMaterial', file);
-                                  fetch(`${base_url}/api/materials/store`, {
-                                    method: 'POST',
-                                    body: formData,
-                                  })
-                                    .then((response) => response.json())
-                                    .then((data) => {
-                                      if (data && data.data && data.data.material_path) {
-                                        handleCompleteMaterialSourceChange(index, data.data.material_path);
-                                        message.success('File uploaded successfully');
-                                      } else {
-                                        message.error('Failed to upload file');
-                                      }
-                                    })
-                                    .catch(() => {
-                                      message.error('Upload failed');
-                                    });
-                                  return false;
-                                }}
-                                fileList={[]}
-                                accept=".pdf,.epub,.txt,.mp3"
-                              >
-                                <Button icon={<UploadOutlined />} className='w-100'>Upload File</Button>
-                              </Upload>
+                            <CTableDataCell className='col-6'>
+                              <Select
+                                name={`complete_${material.formatType.toLowerCase()}_source`}
+                                options={materialOptions}
+                                value={materialOptions.find(option => option.value === material.source) || null}
+                                onChange={(selectedOption) => handleCompleteMaterialSourceChange(index, selectedOption)}
+                                className="custom-select"
+                              />
+                              {errors.material && <CFormFeedback>{errors.material}</CFormFeedback>}
                             </CTableDataCell>
                           </CTableRow>
                         ))}
                       </CTableBody>
+
                     </CTable>
                   </CCol>
                 </CRow>
@@ -419,7 +398,7 @@ const BookForm = ({
                           {form.chapters.map((chapter, index) => (
                             <React.Fragment key={index}>
                               <CTableRow>
-                                <CTableDataCell rowSpan={2} className='col-3'>
+                                <CTableDataCell rowSpan={5} className='col-3'>
                                   <CFormInput
                                     placeholder="Chapter Number"
                                     type="number"
@@ -429,7 +408,7 @@ const BookForm = ({
                                     readOnly
                                   />
                                 </CTableDataCell>
-                                <CTableDataCell colSpan={4}>
+                                <CTableDataCell>
                                   <div className="d-flex align-items-center">
                                     <CFormInput
                                       placeholder="Chapter Name"
@@ -447,129 +426,77 @@ const BookForm = ({
                               </CTableRow>
                               <CTableRow>
                                 <CTableDataCell>
-                                  <Upload
-                                    beforeUpload={(file) => {
-                                      const formData = new FormData();
-                                      formData.append('fileMaterial', file);
-                                      fetch(`${base_url}/api/materials/store`, {
-                                        method: 'POST',
-                                        body: formData,
-                                      })
-                                        .then((response) => response.json())
-                                        .then((data) => {
-                                          if (data && data.data && data.data.material_path) {
-                                            handleChapterMaterialSourceChange(index, 'pdf', data.data.material_path);
-                                            message.success('File uploaded successfully');
-                                          } else {
-                                            message.error('Failed to upload file');
-                                          }
-                                        })
-                                        .catch((e) => {
-                                          message.error('Upload failed');
-                                          console.error(e);
-                                        });
-                                      return false;
-                                    }}
-                                    fileList={[]}
-                                    accept=".pdf"
-                                  >
-                                    <Button icon={<UploadOutlined />} className='w-100'>Upload PDF</Button>
-                                  </Upload>
+                                  <CInputGroup>
+                                    <Select
+                                      name="pdf"
+                                      options={materialOptions}
+                                      value={materialOptions.find(option => option.value === chapter.chapter_source_pdf) || null}
+                                      onChange={(selectedOption) => handleChapterMaterialSourceChange(index, 'pdf', selectedOption)}
+                                      className="custom-select col-10"
+                                    />
+                                    <CButton type="button"
+                                      size='sm'
+                                      color="primary"
+                                      className=" col-2"
+                                      onClick={() => handleAddMaterialFileClick(index)}>
+                                        <CIcon icon={cilFile} /> Add File</CButton>
+                                  </CInputGroup>
                                 </CTableDataCell>
-
-                                <CTableDataCell>
-                                  <Upload
-                                    beforeUpload={(file) => {
-                                      const formData = new FormData();
-                                      formData.append('fileMaterial', file);
-                                      fetch(`${base_url}/api/materials/store`, {
-                                        method: 'POST',
-                                        body: formData,
-                                      })
-                                        .then((response) => response.json())
-                                        .then((data) => {
-                                          if (data && data.data && data.data.material_path) {
-                                            handleChapterMaterialSourceChange(index, 'epub', data.data.material_path);
-                                            message.success('File uploaded successfully');
-                                          } else {
-                                            message.error('Failed to upload file');
-                                          }
-                                        })
-                                        .catch((e) => {
-                                          message.error('Upload failed');
-                                          console.error(e);
-                                        });
-                                      return false;
-                                    }}
-                                    fileList={[]}
-                                    accept=".epub"
-                                  >
-                                    <Button icon={<UploadOutlined />} className='w-100'>Upload EPUB</Button>
-                                  </Upload>
-                                </CTableDataCell>
-
-
-                                <CTableDataCell>
-                                  <Upload
-                                    beforeUpload={(file) => {
-                                      const formData = new FormData();
-                                      formData.append('fileMaterial', file);
-                                      fetch(`${base_url}/api/materials/store`, {
-                                        method: 'POST',
-                                        body: formData,
-                                      })
-                                        .then((response) => response.json())
-                                        .then((data) => {
-                                          if (data && data.data && data.data.material_path) {
-                                            handleChapterMaterialSourceChange(index, 'text', data.data.material_path);
-                                            message.success('File uploaded successfully');
-                                          } else {
-                                            message.error('Failed to upload file');
-                                          }
-                                        })
-                                        .catch((e) => {
-                                          message.error('Upload failed');
-                                          console.error(e);
-                                        });
-                                      return false;
-                                    }}
-                                    fileList={[]}
-                                    accept=".txt"
-                                  >
-                                    <Button icon={<UploadOutlined />} className='w-100'>Upload TXT</Button>
-                                  </Upload>
-                                </CTableDataCell>
-
+                              </CTableRow>
+                              <CTableRow>
                                 <CTableDataCell>
                                   <CInputGroup>
-                                    <Upload
-                                      beforeUpload={(file) => {
-                                        const formData = new FormData();
-                                        formData.append('fileMaterial', file);
-                                        fetch(`${base_url}/api/materials/store`, {
-                                          method: 'POST',
-                                          body: formData,
-                                        })
-                                          .then((response) => response.json())
-                                          .then((data) => {
-                                            if (data && data.data && data.data.material_path) {
-                                              handleChapterMaterialSourceChange(index, 'mp3', data.data.material_path);
-                                              message.success('File uploaded successfully');
-                                            } else {
-                                              message.error('Failed to upload file');
-                                            }
-                                          })
-                                          .catch((e) => {
-                                            message.error('Upload failed');
-                                            console.error(e);
-                                          });
-                                        return false;
-                                      }}
-                                      fileList={[]}
-                                      accept=".mp3"
-                                    >
-                                      <Button icon={<UploadOutlined />} className='w-100'>Upload MP3</Button>
-                                    </Upload>
+                                    <Select
+                                      name="epub"
+                                      options={materialOptions}
+                                      value={materialOptions.find(option => option.value === chapter.chapter_source_epub) || null}
+                                      onChange={(selectedOption) => handleChapterMaterialSourceChange(index, 'epub', selectedOption)}
+                                      className="custom-select col-10"
+                                    />
+                                    <CButton type="button"
+                                      size='sm'
+                                      color="primary"
+                                      className=" col-2"
+                                      onClick={() => handleAddMaterialFileClick(index)}>
+                                        <CIcon icon={cilFile} /> Add File</CButton>
+                                  </CInputGroup>
+                                </CTableDataCell>
+                              </CTableRow>
+                              <CTableRow>
+                                <CTableDataCell>
+                                  <CInputGroup>
+                                    <Select
+                                      name="text"
+                                      options={materialOptions}
+                                      value={materialOptions.find(option => option.value === chapter.chapter_source_text) || null}
+                                      onChange={(selectedOption) => handleChapterMaterialSourceChange(index, 'text', selectedOption)}
+                                      className="custom-select col-10"
+                                    />
+                                    <CButton type="button"
+                                      size='sm'
+                                      color="primary"
+                                      className=" col-2"
+                                      onClick={() => handleAddMaterialFileClick(index)}>
+                                        <CIcon icon={cilFile} /> Add File</CButton>
+                                  </CInputGroup>
+                                </CTableDataCell>
+                              </CTableRow>
+                              <CTableRow>
+                                <CTableDataCell>
+                                  <CInputGroup>
+                                    <Select
+                                      name="mp3"
+                                      options={materialOptions}
+                                      value={materialOptions.find(option => option.value === chapter.chapter_source_mp3) || null}
+                                      onChange={(selectedOption) => handleChapterMaterialSourceChange(index, 'mp3', selectedOption)}
+                                      className="custom-select col-8"
+                                    />
+                                    <CButton type="button"
+                                      size='sm'
+                                      color="primary"
+                                      className="me-2 col-2"
+                                      onClick={() => handleAddMaterialFileClick(index)}>
+                                        <CIcon icon={cilFile} /> Add File</CButton>
                                     <CFormSelect
                                       name="chapter_mp3_voice"
                                       value={chapter.chapter_mp3_voice}
@@ -583,7 +510,6 @@ const BookForm = ({
                                     </CFormSelect>
                                   </CInputGroup>
                                 </CTableDataCell>
-
                               </CTableRow>
                             </React.Fragment>
                           ))}
