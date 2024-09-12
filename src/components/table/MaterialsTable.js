@@ -28,8 +28,8 @@ const MaterialsTable = ({ columns, data, handleEdit, handleDelete, handleChangeS
         {data.map((material, index) => (
           <CTableRow key={material._id}>
             <CTableDataCell className="text-center">{index + 1}</CTableDataCell>
-            <CTableDataCell>{material.name || 'N/A'}</CTableDataCell>
-            <CTableDataCell>{getShortenedPath(material.material_path)}</CTableDataCell>
+            <CTableDataCell>{material.material_path || 'N/A'}</CTableDataCell>
+            {/* <CTableDataCell>{getShortenedPath(material.material_path)}</CTableDataCell> */}
             <CTableDataCell className="text-center">
               <CBadge color={material.is_active ? 'success' : 'danger'}>
                 {material.is_active ? 'active' : 'inactive'}
