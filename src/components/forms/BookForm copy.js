@@ -4,9 +4,6 @@ import CIcon from '@coreui/icons-react';
 import { cilMinus, cilPlus, cilDelete, cilFile } from '@coreui/icons';
 import { Link } from 'react-router-dom';
 import Select from 'react-select';
-import base_url from "../../utils/api/base_url";
-import { Upload, Button, message, Spin } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
 
 const BookForm = ({
   form,
@@ -49,30 +46,6 @@ const BookForm = ({
   handleAddMaterialFileClick,
   handleMaterialFileUpload
 }) => {
-  const uploadMaterialFile = async (file, onSuccess, onError) => {
-    const formData = new FormData();
-    formData.append('fileMaterial', file);
-
-    try {
-      const response = await fetch(`${base_url}/api/materials/store`, {
-        method: 'POST',
-        body: formData,
-      });
-
-      const data = await response.json();
-
-      if (data && data.data && data.data.material_path) {
-        onSuccess(data.data.material_path);
-        message.success('File uploaded successfully');
-      } else {
-        onError('Failed to upload file');
-      }
-    } catch (error) {
-      onError('Upload failed');
-      console.error(error);
-    }
-  };
-
   return (
     <>
       <CForm onSubmit={handleSubmit}>
@@ -370,14 +343,14 @@ const BookForm = ({
                       <CTableBody>
                         {form.material.completeMaterials.map((material, index) => (
                           <CTableRow key={index}>
-                            <CTableDataCell className='col-2'>
+                            <CTableDataCell className='col-1'>
                               <CFormInput
                                 name={`complete_${material.formatType.toLowerCase()}_formatType`}
                                 value={material.formatType}
                                 readOnly
                               />
                             </CTableDataCell>
-                            <CTableDataCell className='col-4'>
+                            <CTableDataCell className='col-3'>
                               <CFormInput
                                 placeholder="Publisher"
                                 type="text"
@@ -386,7 +359,7 @@ const BookForm = ({
                                 onChange={(e) => handleCompleteMaterialChange(index, 'publisher', e.target.value)}
                               />
                             </CTableDataCell>
-                            <CTableDataCell className='col-3'>
+                            <CTableDataCell className='col-2'>
                               <CFormInput
                                 placeholder="Published Date"
                                 type="date"
@@ -395,22 +368,20 @@ const BookForm = ({
                                 onChange={(e) => handleCompleteMaterialChange(index, 'publishedDate', e.target.value)}
                               />
                             </CTableDataCell>
-                            <CTableDataCell className='col-2'>
-                            <Upload
-  beforeUpload={(file) => {
-    uploadMaterialFile(file, (path) => handleCompleteMaterialSourceChange(index, path), (error) => message.error(error));
-    return false; // Prevent default upload behavior
-  }}
-  fileList={[]}
-  accept=".pdf,.epub,.txt,.mp3"
->
-  <Button icon={<UploadOutlined />} className='w-100'>Upload File</Button>
-</Upload>
-
+                            <CTableDataCell className='col-6'>
+                              <Select
+                                name={`complete_${material.formatType.toLowerCase()}_source`}
+                                options={materialOptions}
+                                value={materialOptions.find(option => option.value === material.source) || null}
+                                onChange={(selectedOption) => handleCompleteMaterialSourceChange(index, selectedOption)}
+                                className="custom-select"
+                              />
+                              {errors.material && <CFormFeedback>{errors.material}</CFormFeedback>}
                             </CTableDataCell>
                           </CTableRow>
                         ))}
                       </CTableBody>
+
                     </CTable>
                   </CCol>
                 </CRow>
@@ -427,7 +398,7 @@ const BookForm = ({
                           {form.chapters.map((chapter, index) => (
                             <React.Fragment key={index}>
                               <CTableRow>
-                                <CTableDataCell rowSpan={2} className='col-3'>
+                                <CTableDataCell rowSpan={5} className='col-3'>
                                   <CFormInput
                                     placeholder="Chapter Number"
                                     type="number"
@@ -437,7 +408,7 @@ const BookForm = ({
                                     readOnly
                                   />
                                 </CTableDataCell>
-                                <CTableDataCell colSpan={4}>
+                                <CTableDataCell>
                                   <div className="d-flex align-items-center">
                                     <CFormInput
                                       placeholder="Chapter Name"
@@ -454,72 +425,91 @@ const BookForm = ({
                                 </CTableDataCell>
                               </CTableRow>
                               <CTableRow>
-                              <CTableDataCell>
-  <Upload
-    beforeUpload={(file) => {
-      uploadMaterialFile(file, (path) => handleChapterMaterialSourceChange(index, 'pdf', path), (error) => message.error(error));
-      return false; // Prevent default upload behavior
-    }}
-    fileList={[]}
-    accept=".pdf"
-  >
-    <Button icon={<UploadOutlined />} className='w-100'>Upload PDF</Button>
-  </Upload>
-</CTableDataCell>
-
-<CTableDataCell>
-  <Upload
-    beforeUpload={(file) => {
-      uploadMaterialFile(file, (path) => handleChapterMaterialSourceChange(index, 'epub', path), (error) => message.error(error));
-      return false; // Prevent default upload behavior
-    }}
-    fileList={[]}
-    accept=".epub"
-  >
-    <Button icon={<UploadOutlined />} className='w-100'>Upload EPUB</Button>
-  </Upload>
-</CTableDataCell>
-
-<CTableDataCell>
-  <Upload
-    beforeUpload={(file) => {
-      uploadMaterialFile(file, (path) => handleChapterMaterialSourceChange(index, 'text', path), (error) => message.error(error));
-      return false; // Prevent default upload behavior
-    }}
-    fileList={[]}
-    accept=".txt"
-  >
-    <Button icon={<UploadOutlined />} className='w-100'>Upload TXT</Button>
-  </Upload>
-</CTableDataCell>
-
-<CTableDataCell>
-  <CInputGroup>
-    <Upload
-      beforeUpload={(file) => {
-        uploadMaterialFile(file, (path) => handleChapterMaterialSourceChange(index, 'mp3', path), (error) => message.error(error));
-        return false; // Prevent default upload behavior
-      }}
-      fileList={[]}
-      accept=".mp3"
-    >
-      <Button icon={<UploadOutlined />} className='w-100'>Upload MP3</Button>
-    </Upload>
-    <CFormSelect
-      name="chapter_mp3_voice"
-      value={chapter.chapter_mp3_voice}
-      className="me-2 col-2"
-      onChange={(e) => handleChapterChange(index, e)}
-    >
-      <option value="" disabled>Voice...</option>
-      <option value="mix">Mix</option>
-      <option value="male">Male</option>
-      <option value="female">Female</option>
-    </CFormSelect>
-  </CInputGroup>
-</CTableDataCell>
-
-
+                                <CTableDataCell>
+                                  <CInputGroup>
+                                    <Select
+                                      name="pdf"
+                                      options={materialOptions}
+                                      value={materialOptions.find(option => option.value === chapter.chapter_source_pdf) || null}
+                                      onChange={(selectedOption) => handleChapterMaterialSourceChange(index, 'pdf', selectedOption)}
+                                      className="custom-select col-10"
+                                    />
+                                    <CButton type="button"
+                                      size='sm'
+                                      color="primary"
+                                      className=" col-2"
+                                      onClick={() => handleAddMaterialFileClick(index)}>
+                                        <CIcon icon={cilFile} /> Add File</CButton>
+                                  </CInputGroup>
+                                </CTableDataCell>
+                              </CTableRow>
+                              <CTableRow>
+                                <CTableDataCell>
+                                  <CInputGroup>
+                                    <Select
+                                      name="epub"
+                                      options={materialOptions}
+                                      value={materialOptions.find(option => option.value === chapter.chapter_source_epub) || null}
+                                      onChange={(selectedOption) => handleChapterMaterialSourceChange(index, 'epub', selectedOption)}
+                                      className="custom-select col-10"
+                                    />
+                                    <CButton type="button"
+                                      size='sm'
+                                      color="primary"
+                                      className=" col-2"
+                                      onClick={() => handleAddMaterialFileClick(index)}>
+                                        <CIcon icon={cilFile} /> Add File</CButton>
+                                  </CInputGroup>
+                                </CTableDataCell>
+                              </CTableRow>
+                              <CTableRow>
+                                <CTableDataCell>
+                                  <CInputGroup>
+                                    <Select
+                                      name="text"
+                                      options={materialOptions}
+                                      value={materialOptions.find(option => option.value === chapter.chapter_source_text) || null}
+                                      onChange={(selectedOption) => handleChapterMaterialSourceChange(index, 'text', selectedOption)}
+                                      className="custom-select col-10"
+                                    />
+                                    <CButton type="button"
+                                      size='sm'
+                                      color="primary"
+                                      className=" col-2"
+                                      onClick={() => handleAddMaterialFileClick(index)}>
+                                        <CIcon icon={cilFile} /> Add File</CButton>
+                                  </CInputGroup>
+                                </CTableDataCell>
+                              </CTableRow>
+                              <CTableRow>
+                                <CTableDataCell>
+                                  <CInputGroup>
+                                    <Select
+                                      name="mp3"
+                                      options={materialOptions}
+                                      value={materialOptions.find(option => option.value === chapter.chapter_source_mp3) || null}
+                                      onChange={(selectedOption) => handleChapterMaterialSourceChange(index, 'mp3', selectedOption)}
+                                      className="custom-select col-8"
+                                    />
+                                    <CButton type="button"
+                                      size='sm'
+                                      color="primary"
+                                      className="me-2 col-2"
+                                      onClick={() => handleAddMaterialFileClick(index)}>
+                                        <CIcon icon={cilFile} /> Add File</CButton>
+                                    <CFormSelect
+                                      name="chapter_mp3_voice"
+                                      value={chapter.chapter_mp3_voice}
+                                      className="me-2 col-2"
+                                      onChange={(e) => handleChapterChange(index, e)}
+                                    >
+                                      <option value="" disabled>Voice...</option>
+                                      <option value="mix">Mix</option>
+                                      <option value="male">Male</option>
+                                      <option value="female">Female</option>
+                                    </CFormSelect>
+                                  </CInputGroup>
+                                </CTableDataCell>
                               </CTableRow>
                             </React.Fragment>
                           ))}
