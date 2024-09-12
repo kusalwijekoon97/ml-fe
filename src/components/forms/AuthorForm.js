@@ -1,5 +1,5 @@
-import React from 'react';
-import { CForm, CFormLabel, CButton, CFormFeedback, CFormInput, CFormSelect, CFormTextarea, CInputGroup, CRow, CCol, CSpinner } from '@coreui/react';
+import React, { useState } from 'react';
+import { CForm, CFormLabel, CButton, CFormFeedback, CFormInput, CFormSelect, CFormTextarea, CRow, CCol, CSpinner } from '@coreui/react';
 import { Link } from 'react-router-dom';
 import Select from 'react-select';
 import { Upload, Button, message } from 'antd';
@@ -16,16 +16,17 @@ const AuthorForm = ({
   handlePrevious,
   loading
 }) => {
+  const [imagePreview, setImagePreview] = useState(form.profileImage ? URL.createObjectURL(form.profileImage) : '');
 
   const uploadProps = {
     beforeUpload: (file) => {
+      setImagePreview(URL.createObjectURL(file));
       handleFileChange(file);
       return false;
     },
     fileList: form.profileImage ? [form.profileImage] : [],
     accept: 'image/*',
   };
-
 
   return (
     <>
@@ -69,6 +70,15 @@ const AuthorForm = ({
                 <Upload {...uploadProps}>
                   <Button icon={<UploadOutlined />}>Upload Profile Image</Button>
                 </Upload>
+                {imagePreview && (
+                  <div className="mt-2">
+                    <img
+                      src={imagePreview}
+                      alt="Profile Preview"
+                      style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '8px' }}
+                    />
+                  </div>
+                )}
               </div>
               {errors.profileImage && <CFormFeedback className="d-block">{errors.profileImage}</CFormFeedback>}
             </div>
