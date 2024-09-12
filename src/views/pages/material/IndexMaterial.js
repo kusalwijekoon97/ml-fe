@@ -21,8 +21,8 @@ const IndexMaterial = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [search, setSearch] = useState('');
-
-  const columns = ["#", "Name", "Material Path", "Status", "Actions"];
+// "Name",
+  const columns = ["#",  "Material Path", "Status", "Actions"];
 
   useEffect(() => {
     axios.get(`${base_url}/api/materials/all`, {
