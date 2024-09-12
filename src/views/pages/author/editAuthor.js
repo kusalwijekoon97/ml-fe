@@ -34,7 +34,7 @@ const EditAuthor = () => {
     nationality: '',
     firstPublishDate: '',
     description: '',
-    profileImage: null,
+    profileImage: '',
     position: '',
     income: ''
   });
@@ -70,7 +70,8 @@ const EditAuthor = () => {
           firstPublishDate: data.firstPublishDate,
           description: data.description,
           position: data.position,
-          income: data.income
+          income: data.income,
+          profileImage: data.profileImage
         });
         setLoading(false);
       } catch (error) {
@@ -93,9 +94,14 @@ const EditAuthor = () => {
     setErrors({ ...errors, [name]: '' });
   };
 
-  const handleFileChange = (e) => {
-    setForm({ ...form, profileImage: e.target.files[0] });
+  // const handleFileChange = (e) => {
+  //   setForm({ ...form, profileImage: e.target.files[0] });
+  // };
+
+  const handleFileChange = (file) => {
+    setForm({ ...form, profileImage: file });
   };
+
 
   const handleDiedChange = (selectedOption) => {
     handleChange({
@@ -115,7 +121,7 @@ const EditAuthor = () => {
     if (!form.nationality) newErrors.nationality = 'Nationality is mandatory.';
     if (!form.firstPublishDate) newErrors.firstPublishDate = 'First publish date is mandatory.';
     if (!form.description) newErrors.description = 'Description is mandatory.';
-    // if (!form.profileImage && !form.profileImage) newErrors.profileImage = 'Profile image is mandatory.';
+    if (form.profileImage instanceof File) formData.append('profileImage', form.profileImage); // Only append if it's a File object
     if (!form.position) newErrors.position = 'Position is mandatory.';
     if (!form.income) newErrors.income = 'Income is mandatory.';
 
