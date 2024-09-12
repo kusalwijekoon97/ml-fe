@@ -304,12 +304,16 @@ const CreateBook = () => {
     });
   };
   // handling complete materials dropdown changing
-  const handleCompleteMaterialSourceChange = (index, materialPath) => {
+  const handleCompleteMaterialSourceChange = (index, selectedOption) => {
     setForm((prevForm) => {
       const updatedMaterials = prevForm.material.completeMaterials.map((material, i) =>
-        i === index ? { ...material, source: materialPath } : material
+        i === index ? { ...material, source: selectedOption?.value || null } : material
       );
-      return { ...prevForm, material: { completeMaterials: updatedMaterials } };
+
+      return {
+        ...prevForm,
+        material: { completeMaterials: updatedMaterials },
+      };
     });
   };
 
@@ -358,25 +362,18 @@ const CreateBook = () => {
     }));
   };
 
-  // const handleCompleteMaterialSourceChange = (index, materialPath) => {
-  //   setForm((prevForm) => {
-  //     const updatedMaterials = prevForm.material.completeMaterials.map((material, i) =>
-  //       i === index ? { ...material, source: materialPath } : material
-  //     );
-  //     return { ...prevForm, material: { completeMaterials: updatedMaterials } };
-  //   });
-  // };
-
   // Handle chapter material source change
-  const handleChapterMaterialSourceChange = (index, materialType, materialPath) => {
-  setForm(prevForm => {
-    const updatedChapters = prevForm.chapters.map((chapter, i) =>
-      i === index ? { ...chapter, [`chapter_source_${materialType.toLowerCase()}`]: materialPath } : chapter
-    );
-    return { ...prevForm, chapters: updatedChapters };
-  });
-};
+  const handleChapterMaterialSourceChange = (index, materialType, selectedOption) => {
+    const updatedChapters = [...form.chapters];
+    updatedChapters[index][`chapter_source_${sourceType}`] = selectedOption.value;
 
+    setForm(prevForm => ({
+      ...prevForm,
+      chapters: prevForm.chapters.map((chapter, i) =>
+        i === index ? { ...chapter, [`chapter_source_${materialType}`]: selectedOption ? selectedOption.value : '' } : chapter
+      )
+    }));
+  };
 
   const handleAddMaterialFileClick = (index) => {
     setCurrentChapterIndex(index);
