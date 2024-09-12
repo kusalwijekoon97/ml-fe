@@ -49,6 +49,29 @@ const BookForm = ({
   handleAddMaterialFileClick,
   handleMaterialFileUpload
 }) => {
+  const uploadMaterialFile = async (file, onSuccess, onError) => {
+    const formData = new FormData();
+    formData.append('fileMaterial', file);
+
+    try {
+      const response = await fetch(`${base_url}/api/materials/store`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (data && data.data && data.data.material_path) {
+        onSuccess(data.data.material_path);
+        message.success('File uploaded successfully');
+      } else {
+        onError('Failed to upload file');
+      }
+    } catch (error) {
+      onError('Upload failed');
+      console.error(error);
+    }
+  };
 
   return (
     <>
@@ -373,33 +396,17 @@ const BookForm = ({
                               />
                             </CTableDataCell>
                             <CTableDataCell className='col-2'>
-                              <Upload
-                                beforeUpload={(file) => {
-                                  const formData = new FormData();
-                                  formData.append('fileMaterial', file);
-                                  fetch(`${base_url}/api/materials/store`, {
-                                    method: 'POST',
-                                    body: formData,
-                                  })
-                                    .then((response) => response.json())
-                                    .then((data) => {
-                                      if (data && data.data && data.data.material_path) {
-                                        handleCompleteMaterialSourceChange(index, data.data.material_path);
-                                        message.success('File uploaded successfully');
-                                      } else {
-                                        message.error('Failed to upload file');
-                                      }
-                                    })
-                                    .catch(() => {
-                                      message.error('Upload failed');
-                                    });
-                                  return false;
-                                }}
-                                fileList={[]}
-                                accept=".pdf,.epub,.txt,.mp3"
-                              >
-                                <Button icon={<UploadOutlined />} className='w-100'>Upload File</Button>
-                              </Upload>
+                            <Upload
+  beforeUpload={(file) => {
+    uploadMaterialFile(file, (path) => handleCompleteMaterialSourceChange(index, path), (error) => message.error(error));
+    return false; // Prevent default upload behavior
+  }}
+  fileList={[]}
+  accept=".pdf,.epub,.txt,.mp3"
+>
+  <Button icon={<UploadOutlined />} className='w-100'>Upload File</Button>
+</Upload>
+
                             </CTableDataCell>
                           </CTableRow>
                         ))}
@@ -447,143 +454,71 @@ const BookForm = ({
                                 </CTableDataCell>
                               </CTableRow>
                               <CTableRow>
-                                <CTableDataCell>
-                                  <Upload
-                                    beforeUpload={(file) => {
-                                      const formData = new FormData();
-                                      formData.append('fileMaterial', file);
-                                      fetch(`${base_url}/api/materials/store`, {
-                                        method: 'POST',
-                                        body: formData,
-                                      })
-                                        .then((response) => response.json())
-                                        .then((data) => {
-                                          if (data && data.data && data.data.material_path) {
-                                            handleChapterMaterialSourceChange(index, 'pdf', data.data.material_path);
-                                            message.success('File uploaded successfully');
-                                          } else {
-                                            message.error('Failed to upload file');
-                                          }
-                                        })
-                                        .catch((e) => {
-                                          message.error('Upload failed');
-                                          console.error(e);
-                                        });
-                                      return false;
-                                    }}
-                                    fileList={[]}
-                                    accept=".pdf"
-                                  >
-                                    <Button icon={<UploadOutlined />} className='w-100'>Upload PDF</Button>
-                                  </Upload>
-                                </CTableDataCell>
+                              <CTableDataCell>
+  <Upload
+    beforeUpload={(file) => {
+      uploadMaterialFile(file, (path) => handleChapterMaterialSourceChange(index, 'pdf', path), (error) => message.error(error));
+      return false; // Prevent default upload behavior
+    }}
+    fileList={[]}
+    accept=".pdf"
+  >
+    <Button icon={<UploadOutlined />} className='w-100'>Upload PDF</Button>
+  </Upload>
+</CTableDataCell>
 
-                                <CTableDataCell>
-                                  <Upload
-                                    beforeUpload={(file) => {
-                                      const formData = new FormData();
-                                      formData.append('fileMaterial', file);
-                                      fetch(`${base_url}/api/materials/store`, {
-                                        method: 'POST',
-                                        body: formData,
-                                      })
-                                        .then((response) => response.json())
-                                        .then((data) => {
-                                          if (data && data.data && data.data.material_path) {
-                                            handleChapterMaterialSourceChange(index, 'epub', data.data.material_path);
-                                            message.success('File uploaded successfully');
-                                          } else {
-                                            message.error('Failed to upload file');
-                                          }
-                                        })
-                                        .catch((e) => {
-                                          message.error('Upload failed');
-                                          console.error(e);
-                                        });
-                                      return false;
-                                    }}
-                                    fileList={[]}
-                                    accept=".epub"
-                                  >
-                                    <Button icon={<UploadOutlined />} className='w-100'>Upload EPUB</Button>
-                                  </Upload>
-                                </CTableDataCell>
+<CTableDataCell>
+  <Upload
+    beforeUpload={(file) => {
+      uploadMaterialFile(file, (path) => handleChapterMaterialSourceChange(index, 'epub', path), (error) => message.error(error));
+      return false; // Prevent default upload behavior
+    }}
+    fileList={[]}
+    accept=".epub"
+  >
+    <Button icon={<UploadOutlined />} className='w-100'>Upload EPUB</Button>
+  </Upload>
+</CTableDataCell>
 
+<CTableDataCell>
+  <Upload
+    beforeUpload={(file) => {
+      uploadMaterialFile(file, (path) => handleChapterMaterialSourceChange(index, 'text', path), (error) => message.error(error));
+      return false; // Prevent default upload behavior
+    }}
+    fileList={[]}
+    accept=".txt"
+  >
+    <Button icon={<UploadOutlined />} className='w-100'>Upload TXT</Button>
+  </Upload>
+</CTableDataCell>
 
-                                <CTableDataCell>
-                                  <Upload
-                                    beforeUpload={(file) => {
-                                      const formData = new FormData();
-                                      formData.append('fileMaterial', file);
-                                      fetch(`${base_url}/api/materials/store`, {
-                                        method: 'POST',
-                                        body: formData,
-                                      })
-                                        .then((response) => response.json())
-                                        .then((data) => {
-                                          if (data && data.data && data.data.material_path) {
-                                            handleChapterMaterialSourceChange(index, 'text', data.data.material_path);
-                                            message.success('File uploaded successfully');
-                                          } else {
-                                            message.error('Failed to upload file');
-                                          }
-                                        })
-                                        .catch((e) => {
-                                          message.error('Upload failed');
-                                          console.error(e);
-                                        });
-                                      return false;
-                                    }}
-                                    fileList={[]}
-                                    accept=".txt"
-                                  >
-                                    <Button icon={<UploadOutlined />} className='w-100'>Upload TXT</Button>
-                                  </Upload>
-                                </CTableDataCell>
+<CTableDataCell>
+  <CInputGroup>
+    <Upload
+      beforeUpload={(file) => {
+        uploadMaterialFile(file, (path) => handleChapterMaterialSourceChange(index, 'mp3', path), (error) => message.error(error));
+        return false; // Prevent default upload behavior
+      }}
+      fileList={[]}
+      accept=".mp3"
+    >
+      <Button icon={<UploadOutlined />} className='w-100'>Upload MP3</Button>
+    </Upload>
+    <CFormSelect
+      name="chapter_mp3_voice"
+      value={chapter.chapter_mp3_voice}
+      className="me-2 col-2"
+      onChange={(e) => handleChapterChange(index, e)}
+    >
+      <option value="" disabled>Voice...</option>
+      <option value="mix">Mix</option>
+      <option value="male">Male</option>
+      <option value="female">Female</option>
+    </CFormSelect>
+  </CInputGroup>
+</CTableDataCell>
 
-                                <CTableDataCell>
-                                  <CInputGroup>
-                                    <Upload
-                                      beforeUpload={(file) => {
-                                        const formData = new FormData();
-                                        formData.append('fileMaterial', file);
-                                        fetch(`${base_url}/api/materials/store`, {
-                                          method: 'POST',
-                                          body: formData,
-                                        })
-                                          .then((response) => response.json())
-                                          .then((data) => {
-                                            if (data && data.data && data.data.material_path) {
-                                              handleChapterMaterialSourceChange(index, 'mp3', data.data.material_path);
-                                              message.success('File uploaded successfully');
-                                            } else {
-                                              message.error('Failed to upload file');
-                                            }
-                                          })
-                                          .catch((e) => {
-                                            message.error('Upload failed');
-                                            console.error(e);
-                                          });
-                                        return false;
-                                      }}
-                                      fileList={[]}
-                                      accept=".mp3"
-                                    >
-                                      <Button icon={<UploadOutlined />} className='w-100'>Upload MP3</Button>
-                                    </Upload>
-                                    <CFormSelect
-                                      name="chapter_mp3_voice"
-                                      value={chapter.chapter_mp3_voice}
-                                      className="me-2 col-2"
-                                      onChange={(e) => handleChapterChange(index, e)}
-                                    >
-                                      <option value="" disabled>Voice...</option>
-                                      <option value="mix">Mix</option>
-                                      <option value="male">Male</option>
-                                      <option value="female">Female</option>
-                                    </CFormSelect>
-                                  </CInputGroup>
-                                </CTableDataCell>
 
                               </CTableRow>
                             </React.Fragment>
