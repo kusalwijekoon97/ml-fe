@@ -25,7 +25,6 @@ const BooksTable = ({ columns, data, handleEdit, handleDelete, handleChangeStatu
             <CTableDataCell>{book.publisher || 'N/A'}</CTableDataCell>
             <CTableDataCell> {book.library ? book.library.name : 'N/A'}</CTableDataCell>
             <CTableDataCell>{book.category || 'N/A'}</CTableDataCell>
-            <CTableDataCell>{book.CreatedAt || 'N/A'}</CTableDataCell>
             <CTableDataCell className="text-center">
               <CBadge color={book.is_active ? 'success' : 'danger'}>
                 {book.is_active ? 'active' : 'inactive'}

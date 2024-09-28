@@ -23,7 +23,7 @@ const IndexBook = () => {
   const [search, setSearch] = useState('');
   const [currentActiveLibrary, setCurrentActiveLibrary] = useState('');
 
-  const columns = ["#", "Name", "ISBN", "Author", "Publisher", "Library", "Categories", "Submitted", "Status", "Actions"];
+  const columns = ["#", "Name", "ISBN", "Author", "Publisher", "Library", "Categories", "Status", "Actions"];
 
   useEffect(() => {
     const savedLibrary = sessionStorage.getItem('currentActiveLibrary') || '';
