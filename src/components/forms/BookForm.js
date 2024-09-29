@@ -1,12 +1,47 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { CForm, CFormLabel, CButton, CFormFeedback, CFormInput, CFormSelect, CFormTextarea, CInputGroup, CRow, CCol, CSpinner, CFormCheck, CTable, CTableHead, CTableRow, CTableHeaderCell, CTableDataCell, CTableBody, CFormText } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
 import { cilMinus, cilPlus, cilDelete, cilFile } from '@coreui/icons';
 import { Link } from 'react-router-dom';
 import Select from 'react-select';
 import base_url from "../../utils/api/base_url";
-import { Upload, Button, message, Spin } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
+import { Upload, Button, message, Progress, Spin } from 'antd';
+import { UploadOutlined, CheckCircleOutlined, LoadingOutlined } from '@ant-design/icons';
+import axios from 'axios';
+
+
+const uploadMaterialFile = async (file, onSuccess, onError, onProgress, setUploading) => {
+  const formData = new FormData();
+  formData.append('fileMaterial', file);
+  setUploading(true);
+  try {
+    const response = await axios.post(`${base_url}/api/materials/store`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      onUploadProgress: (progressEvent) => {
+        if (progressEvent.lengthComputable) {
+          const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          onProgress(percent);
+        }
+      },
+    });
+    const data = response.data;
+    if (data && data.data && data.data.material_path) {
+      onSuccess(data.data.material_path);
+      message.success(`${file.name} uploaded successfully`);
+    } else {
+      onError('Failed to upload file');
+    }
+  } catch (error) {
+    onError('Upload failed');
+    console.error(error);
+  } finally {
+    setUploading(false);
+  }
+};
+
+
 
 const BookForm = ({
   form,
@@ -49,29 +84,8 @@ const BookForm = ({
   handleAddMaterialFileClick,
   handleMaterialFileUpload
 }) => {
-  const uploadMaterialFile = async (file, onSuccess, onError) => {
-    const formData = new FormData();
-    formData.append('fileMaterial', file);
-
-    try {
-      const response = await fetch(`${base_url}/api/materials/store`, {
-        method: 'POST',
-        body: formData,
-      });
-
-      const data = await response.json();
-
-      if (data && data.data && data.data.material_path) {
-        onSuccess(data.data.material_path);
-        message.success('File uploaded successfully');
-      } else {
-        onError('Failed to upload file');
-      }
-    } catch (error) {
-      onError('Upload failed');
-      console.error(error);
-    }
-  };
+  const [uploading, setUploading] = useState(false);
+  const [uploadPercent, setUploadPercent] = useState(0);
 
   return (
     <>
@@ -396,17 +410,30 @@ const BookForm = ({
                               />
                             </CTableDataCell>
                             <CTableDataCell className='col-2'>
-                            <Upload
-  beforeUpload={(file) => {
-    uploadMaterialFile(file, (path) => handleCompleteMaterialSourceChange(index, path), (error) => message.error(error));
-    return false; // Prevent default upload behavior
-  }}
-  fileList={[]}
-  accept=".pdf,.epub,.txt,.mp3"
->
-  <Button icon={<UploadOutlined />} className='w-100'>Upload File</Button>
-</Upload>
-
+                              <Upload beforeUpload={(file) => {
+                                uploadMaterialFile(
+                                  file,
+                                  (path) => handleCompleteMaterialSourceChange(index, path),
+                                  (error) => message.error(error),
+                                  setUploadPercent,
+                                  setUploading
+                                );
+                                return false;
+                              }}
+                                showUploadList={true}
+                                accept=".pdf,.epub,.txt,.mp3"
+                              >
+                                  <Button className='w-100'><UploadOutlined /> Upload File</Button>
+                                {/* <Button icon={uploading ? null : <UploadOutlined />} className='w-100'>
+                                  {uploading ? (
+                                    <>
+                                      <LoadingOutlined spin size="small" /> Uploading {uploadPercent}%
+                                    </>
+                                  ) : (
+                                    'Upload File'
+                                  )}
+                                </Button> */}
+                              </Upload>
                             </CTableDataCell>
                           </CTableRow>
                         ))}
@@ -454,70 +481,123 @@ const BookForm = ({
                                 </CTableDataCell>
                               </CTableRow>
                               <CTableRow>
-                              <CTableDataCell>
-  <Upload
-    beforeUpload={(file) => {
-      uploadMaterialFile(file, (path) => handleChapterMaterialSourceChange(index, 'pdf', path), (error) => message.error(error));
-      return false; // Prevent default upload behavior
-    }}
-    fileList={[]}
-    accept=".pdf"
-  >
-    <Button icon={<UploadOutlined />} className='w-100'>Upload PDF</Button>
-  </Upload>
-</CTableDataCell>
+                                <CTableDataCell>
+                                  <Upload beforeUpload={(file) => {
+                                    uploadMaterialFile(
+                                      file,
+                                      (path) => handleChapterMaterialSourceChange(index, 'pdf', path),
+                                      (error) => message.error(error),
+                                      setUploadPercent,
+                                      setUploading
+                                    );
+                                    return false;
+                                  }}
+                                    showUploadList={true}
+                                    accept=".pdf"
+                                  >
+                                      <Button className='w-100'><UploadOutlined /> Upload File</Button>
+                                    {/* <Button icon={uploading ? null : <UploadOutlined />} className='w-100'>
+                                      {uploading ? (
+                                        <>
+                                          <LoadingOutlined spin size="small" /> Uploading {uploadPercent}%
+                                        </>
+                                      ) : (
+                                        'Upload PDF'
+                                      )}
+                                    </Button> */}
+                                  </Upload>
+                                </CTableDataCell>
 
-<CTableDataCell>
-  <Upload
-    beforeUpload={(file) => {
-      uploadMaterialFile(file, (path) => handleChapterMaterialSourceChange(index, 'epub', path), (error) => message.error(error));
-      return false; // Prevent default upload behavior
-    }}
-    fileList={[]}
-    accept=".epub"
-  >
-    <Button icon={<UploadOutlined />} className='w-100'>Upload EPUB</Button>
-  </Upload>
-</CTableDataCell>
+                                <CTableDataCell>
+                                  <Upload beforeUpload={(file) => {
+                                    uploadMaterialFile(file,
+                                      (path) => handleChapterMaterialSourceChange(index, 'epub', path),
+                                      (error) => message.error(error),
+                                      setUploadPercent,
+                                      setUploading
+                                    );
+                                    return false;
+                                  }}
+                                    showUploadList={true}
+                                    accept=".epub"
+                                  >
+                                      <Button className='w-100'><UploadOutlined /> Upload File</Button>
+                                    {/* <Button icon={uploading ? null : <UploadOutlined />} className='w-100'>
+                                      {uploading ? (
+                                        <>
+                                          <LoadingOutlined spin size="small" /> Uploading {uploadPercent}%
+                                        </>
+                                      ) : (
+                                        'Upload EPUB'
+                                      )}
+                                    </Button> */}
+                                  </Upload>
+                                </CTableDataCell>
 
-<CTableDataCell>
-  <Upload
-    beforeUpload={(file) => {
-      uploadMaterialFile(file, (path) => handleChapterMaterialSourceChange(index, 'text', path), (error) => message.error(error));
-      return false; // Prevent default upload behavior
-    }}
-    fileList={[]}
-    accept=".txt"
-  >
-    <Button icon={<UploadOutlined />} className='w-100'>Upload TXT</Button>
-  </Upload>
-</CTableDataCell>
+                                <CTableDataCell>
+                                  <Upload beforeUpload={(file) => {
+                                    uploadMaterialFile(file,
+                                      (path) => handleChapterMaterialSourceChange(index, 'text', path),
+                                      (error) => message.error(error),
+                                      setUploadPercent,
+                                      setUploading
+                                    );
+                                    return false;
+                                  }}
+                                    showUploadList={true}
+                                    accept=".txt"
+                                  >
+                                      <Button className='w-100'><UploadOutlined /> Upload File</Button>
+                                    {/* <Button icon={uploading ? null : <UploadOutlined />} className='w-100'>
+                                      {uploading ? (
+                                        <>
+                                          <LoadingOutlined spin size="small" /> Uploading {uploadPercent}%
+                                        </>
+                                      ) : (
+                                        'Upload TXT'
+                                      )}
+                                    </Button> */}
+                                  </Upload>
+                                </CTableDataCell>
 
-<CTableDataCell>
-  <CInputGroup>
-    <Upload
-      beforeUpload={(file) => {
-        uploadMaterialFile(file, (path) => handleChapterMaterialSourceChange(index, 'mp3', path), (error) => message.error(error));
-        return false; // Prevent default upload behavior
-      }}
-      fileList={[]}
-      accept=".mp3"
-    >
-      <Button icon={<UploadOutlined />} className='w-100'>Upload MP3</Button>
-    </Upload>
-    <CFormSelect
-      name="chapter_mp3_voice"
-      value={chapter.chapter_mp3_voice}
-      className="me-2 col-2"
-      onChange={(e) => handleChapterChange(index, e)}
-    >
-      <option value="" disabled>Voice...</option>
-      <option value="mix">Mix</option>
-      <option value="male">Male</option>
-      <option value="female">Female</option>
-    </CFormSelect>
-  </CInputGroup>
-</CTableDataCell>
+                                <CTableDataCell>
+                                  <CInputGroup>
+                                    <Upload beforeUpload={(file) => {
+                                      uploadMaterialFile(file,
+                                        (path) => handleChapterMaterialSourceChange(index, 'mp3', path),
+                                        (error) => message.error(error),
+                                        setUploadPercent,
+                                        setUploading
+                                      );
+                                      return false;
+                                    }}
+                                      showUploadList={true}
+                                      accept=".mp3"
+                                    >
+                                        <Button className='w-100'><UploadOutlined /> Upload File</Button>
+                                      {/* <Button icon={uploading ? null : <UploadOutlined />} className='w-100'>
+                                        {uploading ? (
+                                          <>
+                                            <LoadingOutlined spin size="small" /> Uploading {uploadPercent}%
+                                          </>
+                                        ) : (
+                                          'Upload MP3'
+                                        )}
+                                      </Button> */}
+                                    </Upload>
+                                    <CFormSelect
+                                      name="chapter_mp3_voice"
+                                      value={chapter.chapter_mp3_voice}
+                                      className="me-2 col-2"
+                                      onChange={(e) => handleChapterChange(index, e)}
+                                    >
+                                      <option value="" disabled>Voice...</option>
+                                      <option value="mix">Mix</option>
+                                      <option value="male">Male</option>
+                                      <option value="female">Female</option>
+                                    </CFormSelect>
+                                  </CInputGroup>
+                                </CTableDataCell>
 
 
                               </CTableRow>
