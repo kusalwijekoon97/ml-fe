@@ -1,12 +1,5 @@
 import React, { useState } from 'react';
-import {
-  CCard,
-  CCardBody,
-  CContainer,
-  CRow,
-  CCol,
-  CSpinner
-} from '@coreui/react';
+import {CCard,CCardBody,CContainer,CRow,CCol,CSpinner} from '@coreui/react';
 import axios from 'axios';
 import { AppFooter, AppHeader, AppSidebar } from '../../../components';
 import CardHeaderWithTitleBtn from '../../../components/cards/CardHeaderWithTitleBtn';
@@ -71,9 +64,14 @@ const CreateAuthor = () => {
     setErrors({ ...errors, [name]: '' });
   };
 
-  const handleFileChange = (e) => {
-    setForm({ ...form, profileImage: e.target.files[0] });
+  // const handleFileChange = (e) => {
+  //   setForm({ ...form, profileImage: e.target.files[0] });
+  // };
+
+  const handleFileChange = (file) => {
+    setForm({ ...form, profileImage: file });
   };
+
 
   const validateForm = () => {
     const newErrors = {};

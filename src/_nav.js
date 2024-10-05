@@ -31,8 +31,8 @@ const _nav = [
   },
   {
     component: CNavItem,
-    name: 'Material',
-    to: '/material',
+    name: 'Materials',
+    to: '/materials',
     icon: <CIcon icon={cilLayers} customClassName="nav-icon" />,
   },
   {
