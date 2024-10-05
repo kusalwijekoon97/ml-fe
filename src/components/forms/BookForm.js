@@ -421,7 +421,7 @@ const BookForm = ({
                                 return false;
                               }}
                                 showUploadList={true}
-                                accept=".pdf,.epub,.txt,.mp3"
+                                accept=".pdf,.epub,.txt"
                               >
                                   <Button className='w-100'><UploadOutlined /> Upload File</Button>
                                 {/* <Button icon={uploading ? null : <UploadOutlined />} className='w-100'>
