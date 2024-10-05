@@ -1,0 +1,35 @@
+.library-dropdown {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.library-dropdown select {
+  background-color: #2196F3;
+  color: #fff;
+  font-weight: 800;
+  border: 1px solid #2196F3;
+  border-radius: 50px;
+  padding: 8px;
+  font-size: 16px;
+  text-align: center; /* Center align the text */
+}
+
+.library-dropdown option {
+  background-color: #616161;
+  color: #fff;
+  border: 1px solid #2196F3;
+  border-radius: 50px;
+  padding: 8px;
+  font-size: 16px;
+  text-align: center; /* Center align the text */
+}
+
+.library-dropdown select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+}
+
+/* Style for the selected option */
+.library-dropdown select option:checked {
+  background-color: #2196F3; /* Change the background of the selected option */
+}

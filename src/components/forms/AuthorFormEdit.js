@@ -1,18 +1,10 @@
-import React from 'react';
-import {
-  CForm,
-  CFormLabel,
-  CButton,
-  CFormFeedback,
-  CFormInput,
-  CFormTextarea,
-  CRow,
-  CCol,
-  CSpinner
-} from '@coreui/react';
+import React, { useState, useEffect } from 'react';
+import { CForm, CFormLabel, CButton, CFormFeedback, CFormInput, CFormTextarea, CRow, CCol, CSpinner} from '@coreui/react';
 import Select from 'react-select';
 import CIcon from '@coreui/icons-react';
 import { Link } from 'react-router-dom';
+import { Upload, Button, message } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
 
 const AuthorFormEdit = ({
   form,
@@ -25,6 +17,24 @@ const AuthorFormEdit = ({
   handlePrevious,
   loading
 }) => {
+  const [imagePreview, setImagePreview] = useState(form.profileImage || '');
+
+  useEffect(() => {
+    if (form.profileImage) {
+      setImagePreview(form.profileImage);
+    }
+  }, [form.profileImage]);
+
+  const uploadProps = {
+    beforeUpload: (file) => {
+      setImagePreview(URL.createObjectURL(file));
+      handleFileChange(file);
+      return false;
+    },
+    fileList: form.profileImage ? [{ url: form.profileImage }] : [],
+    accept: 'image/*',
+  };
+
   return (
     <>
       <CForm onSubmit={handleSubmit}>
@@ -62,15 +72,22 @@ const AuthorFormEdit = ({
 
           <CCol xs={6}>
             <div className="mb-3">
-              <CFormLabel htmlFor="profileImage">Profile Image</CFormLabel>
-              <CFormInput
-                type="file"
-                id="profileImage"
-                name="profileImage"
-                onChange={handleFileChange}
-                invalid={!!errors.profileImage}
-              />
-              <CFormFeedback>{errors.profileImage}</CFormFeedback>
+              <CFormLabel htmlFor="profileImage">Profile Image <span className='text-danger'>*</span></CFormLabel>
+              <div>
+                <Upload {...uploadProps}>
+                  <Button icon={<UploadOutlined />}>Upload Profile Image</Button>
+                </Upload>
+                {imagePreview && (
+                  <div className="mt-2">
+                    <img
+                      src={imagePreview}
+                      alt="Profile Preview"
+                      style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '8px' }}
+                    />
+                  </div>
+                )}
+              </div>
+              {errors.profileImage && <CFormFeedback className="d-block">{errors.profileImage}</CFormFeedback>}
             </div>
           </CCol>
 
