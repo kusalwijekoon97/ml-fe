@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { CForm, CFormLabel, CButton, CFormFeedback, CFormInput, CFormSelect, CFormTextarea, CInputGroup, CRow, CCol, CSpinner, CFormCheck, CTable, CTableHead, CTableRow, CTableHeaderCell, CTableDataCell, CTableBody, CFormText } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
-import { cilMinus, cilPlus, cilDelete, cilList, cilFile } from '@coreui/icons';
+import { cilMinus, cilPlus, cilDelete, cilFile } from '@coreui/icons';
 import { Link } from 'react-router-dom';
 import Select from 'react-select';
 import base_url from "../../utils/api/base_url";
 import { Upload, Button, message, Progress, Spin } from 'antd';
-import { UploadOutlined, CheckCircleOutlined, LoadingOutlined, AudioOutlined } from '@ant-design/icons';
+import { UploadOutlined, CheckCircleOutlined, LoadingOutlined } from '@ant-design/icons';
 import axios from 'axios';
 
 
@@ -423,7 +423,7 @@ const BookForm = ({
                                 showUploadList={true}
                                 accept=".pdf,.epub,.txt"
                               >
-                                <Button className='w-100'><UploadOutlined /> Upload File</Button>
+                                  <Button className='w-100'><UploadOutlined /> Upload File</Button>
                                 {/* <Button icon={uploading ? null : <UploadOutlined />} className='w-100'>
                                   {uploading ? (
                                     <>
@@ -454,7 +454,7 @@ const BookForm = ({
                           {form.chapters.map((chapter, index) => (
                             <React.Fragment key={index}>
                               <CTableRow>
-                                <CTableDataCell rowSpan={3} className='col-1'>
+                                <CTableDataCell rowSpan={2} className='col-3'>
                                   <CFormInput
                                     placeholder="Chapter Number"
                                     type="number"
@@ -481,12 +481,6 @@ const BookForm = ({
                                 </CTableDataCell>
                               </CTableRow>
                               <CTableRow>
-                                <CTableDataCell style={{ display: 'flex', alignItems: 'center' }}>
-                                  <CIcon icon={cilFile} style={{ marginRight: '8px', color: '#262626', height: '14px', width: '14px' }} />
-                                  <CFormText style={{ fontSize: '16px', fontWeight: 'bold', color: '#262626' }}>
-                                    E Books
-                                  </CFormText>
-                                </CTableDataCell>
                                 <CTableDataCell>
                                   <Upload beforeUpload={(file) => {
                                     uploadMaterialFile(
@@ -501,7 +495,16 @@ const BookForm = ({
                                     showUploadList={true}
                                     accept=".pdf"
                                   >
-                                    <Button className='w-100'><UploadOutlined /> Upload PDF File</Button>
+                                      <Button className='w-100'><UploadOutlined /> Upload File</Button>
+                                    {/* <Button icon={uploading ? null : <UploadOutlined />} className='w-100'>
+                                      {uploading ? (
+                                        <>
+                                          <LoadingOutlined spin size="small" /> Uploading {uploadPercent}%
+                                        </>
+                                      ) : (
+                                        'Upload PDF'
+                                      )}
+                                    </Button> */}
                                   </Upload>
                                 </CTableDataCell>
 
@@ -518,7 +521,16 @@ const BookForm = ({
                                     showUploadList={true}
                                     accept=".epub"
                                   >
-                                    <Button className='w-100'><UploadOutlined /> Upload EPUB File</Button>
+                                      <Button className='w-100'><UploadOutlined /> Upload File</Button>
+                                    {/* <Button icon={uploading ? null : <UploadOutlined />} className='w-100'>
+                                      {uploading ? (
+                                        <>
+                                          <LoadingOutlined spin size="small" /> Uploading {uploadPercent}%
+                                        </>
+                                      ) : (
+                                        'Upload EPUB'
+                                      )}
+                                    </Button> */}
                                   </Upload>
                                 </CTableDataCell>
 
@@ -535,41 +547,24 @@ const BookForm = ({
                                     showUploadList={true}
                                     accept=".txt"
                                   >
-                                    <Button className='w-100'><UploadOutlined /> Upload TEXT File</Button>
+                                      <Button className='w-100'><UploadOutlined /> Upload File</Button>
+                                    {/* <Button icon={uploading ? null : <UploadOutlined />} className='w-100'>
+                                      {uploading ? (
+                                        <>
+                                          <LoadingOutlined spin size="small" /> Uploading {uploadPercent}%
+                                        </>
+                                      ) : (
+                                        'Upload TXT'
+                                      )}
+                                    </Button> */}
                                   </Upload>
                                 </CTableDataCell>
-                              </CTableRow>
-                              <CTableRow>
-                              <CTableDataCell style={{ display: 'flex', alignItems: 'center' }}>
-                                  <AudioOutlined style={{ marginRight: '8px', color: '#262626', height: '14px', width: '14px' }} />
-                                  <CFormText style={{ fontSize: '16px', fontWeight: 'bold', color: '#262626' }}>
-                                    Audio Books
-                                  </CFormText>
-                                </CTableDataCell>
-                                <CTableDataCell>
-                                  <CInputGroup>
-                                    <Upload beforeUpload={(file) => {
-                                      uploadMaterialFile(file,
-                                        (path) => handleChapterMaterialSourceChange(index, 'mp3_male', path),
-                                        (error) => message.error(error),
-                                        setUploadPercent,
-                                        setUploading
-                                      );
-                                      return false;
-                                    }}
-                                      showUploadList={true}
-                                      accept=".mp3"
-                                    >
-                                      <Button className='w-100'><UploadOutlined /> Upload Male Audio</Button>
-                                    </Upload>
-                                  </CInputGroup>
-                                </CTableDataCell>
 
                                 <CTableDataCell>
                                   <CInputGroup>
                                     <Upload beforeUpload={(file) => {
                                       uploadMaterialFile(file,
-                                        (path) => handleChapterMaterialSourceChange(index, 'mp3_female', path),
+                                        (path) => handleChapterMaterialSourceChange(index, 'mp3', path),
                                         (error) => message.error(error),
                                         setUploadPercent,
                                         setUploading
@@ -579,29 +574,32 @@ const BookForm = ({
                                       showUploadList={true}
                                       accept=".mp3"
                                     >
-                                      <Button className='w-100'><UploadOutlined /> Upload Female Audio</Button>
+                                        <Button className='w-100'><UploadOutlined /> Upload File</Button>
+                                      {/* <Button icon={uploading ? null : <UploadOutlined />} className='w-100'>
+                                        {uploading ? (
+                                          <>
+                                            <LoadingOutlined spin size="small" /> Uploading {uploadPercent}%
+                                          </>
+                                        ) : (
+                                          'Upload MP3'
+                                        )}
+                                      </Button> */}
                                     </Upload>
+                                    <CFormSelect
+                                      name="chapter_mp3_voice"
+                                      value={chapter.chapter_mp3_voice}
+                                      className="me-2 col-2"
+                                      onChange={(e) => handleChapterChange(index, e)}
+                                    >
+                                      <option value="" disabled>Voice...</option>
+                                      <option value="mix">Mix</option>
+                                      <option value="male">Male</option>
+                                      <option value="female">Female</option>
+                                    </CFormSelect>
                                   </CInputGroup>
                                 </CTableDataCell>
 
-                                <CTableDataCell>
-                                  <CInputGroup>
-                                    <Upload beforeUpload={(file) => {
-                                      uploadMaterialFile(file,
-                                        (path) => handleChapterMaterialSourceChange(index, 'mp3_mix', path),
-                                        (error) => message.error(error),
-                                        setUploadPercent,
-                                        setUploading
-                                      );
-                                      return false;
-                                    }}
-                                      showUploadList={true}
-                                      accept=".mp3"
-                                    >
-                                      <Button className='w-100'><UploadOutlined /> Upload Mix Audio</Button>
-                                    </Upload>
-                                  </CInputGroup>
-                                </CTableDataCell>
+
                               </CTableRow>
                             </React.Fragment>
                           ))}
