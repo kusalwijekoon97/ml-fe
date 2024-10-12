@@ -8,8 +8,8 @@ const CountWidgetSection = ({
 }) => {
   return (
     <>
-    <CRow>
-      <UserCountCard />
+      <CRow>
+        <UserCountCard />
       </CRow>
     </>
   );

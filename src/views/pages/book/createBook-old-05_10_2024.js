@@ -65,9 +65,8 @@ const CreateBook = () => {
         chapter_source_pdf: '',
         chapter_source_epub: '',
         chapter_source_text: '',
-        chapter_source_mp3_male: '',
-        chapter_source_mp3_female: '',
-        chapter_source_mp3_mix: '',
+        chapter_source_mp3: '',
+        chapter_mp3_voice: '',
       }
     ]
   });
@@ -103,7 +102,7 @@ const CreateBook = () => {
   const [materialOptions, setMaterialOptions] = useState([]);
   // chapters
   const [chapters, setChapters] = useState([
-    { chapter_number: 1, chapter_name: '', chapter_source_pdf: '', chapter_source_epub: '', chapter_source_text: '', chapter_source_mp3_male: '', chapter_source_mp3_female: '', chapter_source_mp3_mix: '' }
+    { chapter_number: 1, chapter_name: '', chapter_source_pdf: '', chapter_source_epub: '', chapter_source_text: '', chapter_source_mp3: '', chapter_mp3_voice: '' }
   ]);
   const [showModal, setShowModal] = useState(false);
   const [currentChapterIndex, setCurrentChapterIndex] = useState(null);
@@ -327,9 +326,8 @@ const CreateBook = () => {
           chapter_source_pdf: '',
           chapter_source_epub: '',
           chapter_source_text: '',
-          chapter_source_mp3_male: '',
-          chapter_source_mp3_female: '',
-          chapter_source_mp3_mix: ''
+          chapter_source_mp3: '',
+          chapter_mp3_voice: ''
         }
       ]
     }));
@@ -434,9 +432,8 @@ const CreateBook = () => {
       formData.append(`material[chapters][${index}][chapter_source_pdf]`, chapter.chapter_source_pdf);
       formData.append(`material[chapters][${index}][chapter_source_epub]`, chapter.chapter_source_epub);
       formData.append(`material[chapters][${index}][chapter_source_text]`, chapter.chapter_source_text);
-      formData.append(`material[chapters][${index}][chapter_source_mp3_male]`, chapter.chapter_source_mp3_male);
-      formData.append(`material[chapters][${index}][chapter_source_mp3_female]`, chapter.chapter_source_mp3_female);
-      formData.append(`material[chapters][${index}][chapter_source_mp3_mix]`, chapter.chapter_source_mp3_mix);
+      formData.append(`material[chapters][${index}][chapter_source_mp3]`, chapter.chapter_source_mp3);
+      formData.append(`material[chapters][${index}][chapter_mp3_voice]`, chapter.chapter_mp3_voice);
     });
 
     // form.chapters.forEach((chapter, index) => {
@@ -453,8 +450,8 @@ const CreateBook = () => {
     //   if (chapter.chapter_source_text) {
     //     formData.append(`material[chapters][${index}][source][2][source]`, chapter.chapter_source_text);
     //   }
-    //   if (chapter.chapter_source_mp3_male) {
-    //     formData.append(`material[chapters][${index}][source][3][source]`, chapter.chapter_source_mp3_male);
+    //   if (chapter.chapter_source_mp3) {
+    //     formData.append(`material[chapters][${index}][source][3][source]`, chapter.chapter_source_mp3);
     //     formData.append(`material[chapters][${index}][source][3][voice]`, chapter.chapter_mp3_voice);
     //     formData.append(`material[chapters][${index}][source][3][duration]`, chapter.chapter_mp3_duration);
     //   }
