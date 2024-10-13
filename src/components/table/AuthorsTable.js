@@ -22,8 +22,7 @@ const AuthorsTable = ({ columns, data, handleEdit, handleDelete, handleChangeSta
             <CTableDataCell>{author.firstname} {author.lastname}</CTableDataCell>
             <CTableDataCell>{author.penName || 'N/A'}</CTableDataCell>
             <CTableDataCell>{author.nationality || 'N/A'}</CTableDataCell>
-            <CTableDataCell>{author.income || 'N/A'}</CTableDataCell>
-            <CTableDataCell>{author.firstPublishDate || 'N/A'}</CTableDataCell>
+            <CTableDataCell>{new Date(author.firstPublishDate).toLocaleDateString() || 'N/A'}</CTableDataCell>
             <CTableDataCell>{author.position || 'N/A'}</CTableDataCell>
             <CTableDataCell className="text-center">
               <CBadge color={author.is_active ? 'success' : 'danger'}>

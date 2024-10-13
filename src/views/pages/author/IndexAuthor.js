@@ -22,7 +22,7 @@ const IndexAuthor = () => {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [search, setSearch] = useState('');
 
-  const columns = ["#", "Name", "Pen Name", "Nationality", "Income", "First Published", "Position", "Status", "Actions"];
+  const columns = ["#", "Name", "Pen Name", "Nationality", "First Published", "Position", "Status", "Actions"];
 
   useEffect(() => {
     axios.get(`${base_url}/api/authors/all`, {
