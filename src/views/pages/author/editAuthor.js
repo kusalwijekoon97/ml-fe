@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  CCard,
-  CCardBody,
-  CContainer,
-  CRow,
-  CCol,
-  CSpinner
-} from '@coreui/react';
+import {CCard,CCardBody,CContainer,CRow,CCol,CSpinner,CNavLink,CNavItem,CNav} from '@coreui/react';
 import axios from 'axios';
 import { AppFooter, AppHeader, AppSidebar } from '../../../components';
 import CardHeaderWithTitleBtn from '../../../components/cards/CardHeaderWithTitleBtn';
@@ -20,6 +13,7 @@ import AuthorFormEdit from '../../../components/forms/AuthorFormEdit';
 const EditAuthor = () => {
   const navigate = useNavigate();
   const { authorId } = useParams();
+  const [activeTab, setActiveTab] = useState('general');
 
   const diedOptions = [
     { value: 'yes', label: 'Yes' },
@@ -94,14 +88,9 @@ const EditAuthor = () => {
     setErrors({ ...errors, [name]: '' });
   };
 
-  // const handleFileChange = (e) => {
-  //   setForm({ ...form, profileImage: e.target.files[0] });
-  // };
-
   const handleFileChange = (file) => {
     setForm({ ...form, profileImage: file });
   };
-
 
   const handleDiedChange = (selectedOption) => {
     handleChange({
@@ -180,6 +169,10 @@ const EditAuthor = () => {
     navigate(-1);
   };
 
+  const handleTabClick = (tabName) => {
+    setActiveTab(tabName);
+  };
+
   return (
     <>
       <AppSidebar />
@@ -204,17 +197,92 @@ const EditAuthor = () => {
                     linkTo="/authors"
                   />
                   <CCardBody>
-                    <AuthorFormEdit
-                      form={form}
-                      errors={errors}
-                      diedOptions={diedOptions}
-                      handleDiedChange={handleDiedChange}
-                      handleChange={handleChange}
-                      handleFileChange={handleFileChange}
-                      handleSubmit={handleSubmit}
-                      handlePrevious={handlePrevious}
-                      loading={loading}
-                    />
+                    <CNav variant="tabs">
+                      <CNavItem>
+                        <CNavLink
+                          href="#"
+                          active={activeTab === 'general'}
+                          onClick={() => handleTabClick('general')}
+                        >
+                          General Information
+                        </CNavLink>
+                      </CNavItem>
+                      <CNavItem>
+                        <CNavLink
+                          href="#"
+                          active={activeTab === 'book'}
+                          onClick={() => handleTabClick('book')}
+                        >
+                          Book Information
+                        </CNavLink>
+                      </CNavItem>
+                      <CNavItem>
+                        <CNavLink
+                          href="#"
+                          active={activeTab === 'income'}
+                          onClick={() => handleTabClick('income')}
+                        >
+                          Income Information
+                        </CNavLink>
+                      </CNavItem>
+                      <CNavItem>
+                        <CNavLink
+                          href="#"
+                          active={activeTab === 'account'}
+                          onClick={() => handleTabClick('account')}
+                        >
+                          Account Information
+                        </CNavLink>
+                      </CNavItem>
+                      <CNavItem>
+                        <CNavLink
+                          href="#"
+                          active={activeTab === 'social'}
+                          onClick={() => handleTabClick('social')}
+                        >
+                          Social Media
+                        </CNavLink>
+                      </CNavItem>
+                    </CNav>
+
+                    {/* Conditionally render content for each tab */}
+                    <div className="mt-4">
+                      {activeTab === 'general' && (
+                        <div>
+                          {/* Render General Information Content */}
+                          <h5>General Information</h5>
+                          <p>Details about the author, including personal data.</p>
+                        </div>
+                      )}
+                      {activeTab === 'book' && (
+                        <div>
+                          {/* Render Book Information Content */}
+                          <h5>Book Information</h5>
+                          <p>Details about the books authored.</p>
+                        </div>
+                      )}
+                      {activeTab === 'income' && (
+                        <div>
+                          {/* Render Income Information Content */}
+                          <h5>Income Information</h5>
+                          <p>Details about the income generated by the author.</p>
+                        </div>
+                      )}
+                      {activeTab === 'account' && (
+                        <div>
+                          {/* Render Account Information Content */}
+                          <h5>Account Information</h5>
+                          <p>Account and payment details of the author.</p>
+                        </div>
+                      )}
+                      {activeTab === 'social' && (
+                        <div>
+                          {/* Render Social Media Content */}
+                          <h5>Social Media</h5>
+                          <p>Author's social media profiles and links.</p>
+                        </div>
+                      )}
+                    </div>
                   </CCardBody>
                 </CCard>
               </CCol>
