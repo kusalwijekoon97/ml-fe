@@ -8,7 +8,7 @@ import { cilList } from '@coreui/icons';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import base_url from "../../../utils/api/base_url";
 import ResponseAlert from '../../../components/notifications/ResponseAlert';
-import AuthorFormEdit from '../../../components/forms/AuthorFormEdit';
+import AuthorFormEditGeneral from '../../../components/forms/AuthorFormEditGeneral';
 
 const EditAuthor = () => {
   const navigate = useNavigate();
@@ -29,8 +29,7 @@ const EditAuthor = () => {
     firstPublishDate: '',
     description: '',
     profileImage: '',
-    position: '',
-    income: ''
+    position: ''
   });
 
   const [loading, setLoading] = useState(false);
@@ -46,7 +45,6 @@ const EditAuthor = () => {
     description: '',
     profileImage: '',
     position: '',
-    income: ''
   });
 
   useEffect(() => {
@@ -64,7 +62,6 @@ const EditAuthor = () => {
           firstPublishDate: data.firstPublishDate,
           description: data.description,
           position: data.position,
-          income: data.income,
           profileImage: data.profileImage
         });
         setLoading(false);
@@ -112,7 +109,6 @@ const EditAuthor = () => {
     if (!form.description) newErrors.description = 'Description is mandatory.';
     if (form.profileImage instanceof File) formData.append('profileImage', form.profileImage); // Only append if it's a File object
     if (!form.position) newErrors.position = 'Position is mandatory.';
-    if (!form.income) newErrors.income = 'Income is mandatory.';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -135,7 +131,6 @@ const EditAuthor = () => {
     formData.append('description', form.description);
     if (form.profileImage) formData.append('profileImage', form.profileImage);
     formData.append('position', form.position);
-    formData.append('income', form.income);
 
     axios.post(`${base_url}/api/authors/update/${authorId}`, formData, {
       headers: {
@@ -251,7 +246,17 @@ const EditAuthor = () => {
                         <div>
                           {/* Render General Information Content */}
                           <h5>General Information</h5>
-                          <p>Details about the author, including personal data.</p>
+                          <AuthorFormEditGeneral
+                      form={form}
+                      errors={errors}
+                      diedOptions={diedOptions}
+                      handleDiedChange={handleDiedChange}
+                      handleChange={handleChange}
+                      handleFileChange={handleFileChange}
+                      handleSubmit={handleSubmit}
+                      handlePrevious={handlePrevious}
+                      loading={loading}
+                    />
                         </div>
                       )}
                       {activeTab === 'book' && (
