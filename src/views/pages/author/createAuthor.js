@@ -15,7 +15,6 @@ const CreateAuthor = () => {
   const [libraryOptions, setLibraryOptions] = useState([]);
   const [currentStep, setCurrentStep] = useState(1);
   const [addedBooks, setAddedBooks] = useState([{
-    added_book_number: 1,
     added_book_library: '',
     added_book_name: '',
     added_book_source_isbn: ''
@@ -87,7 +86,6 @@ const CreateAuthor = () => {
     position: '',
     addedBooks: [
       {
-        added_book_number: 1,
         added_book_library: '',
         added_book_name: '',
         added_book_isbn: ''
@@ -139,7 +137,6 @@ const CreateAuthor = () => {
       addedBooks: [
         ...prevForm.addedBooks,
         {
-          added_book_number: prevForm.addedBooks.length + 1,
           added_book_library: '',
           added_book_name: '',
           added_book_source_isbn: ''
@@ -172,9 +169,6 @@ const CreateAuthor = () => {
   const handleAddedBookRemoval = (index) => {
     setForm(prevForm => {
       const updatedAddedBooks = prevForm.addedBooks.filter((_, i) => i !== index);
-      updatedAddedBooks.forEach((addedBook, i) => {
-        addedBook.added_book_number = i + 1;
-      });
       return {
         ...prevForm,
         addedBooks: updatedAddedBooks
@@ -252,7 +246,6 @@ const CreateAuthor = () => {
     formData.append('position', form.position);
 
     form.addedBooks.forEach((addedBook, index) => {
-      formData.append(`addedBooks[${index}][added_book_number]`, addedBook.added_book_number);
       formData.append(`addedBooks[${index}][added_book_library]`, addedBook.added_book_library);
       formData.append(`addedBooks[${index}][added_book_name]`, addedBook.added_book_name);
       formData.append(`addedBooks[${index}][added_book_isbn]`, addedBook.added_book_isbn);

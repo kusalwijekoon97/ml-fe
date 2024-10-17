@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { CForm, CFormLabel, CButton, CFormFeedback, CFormInput, CFormTextarea, CRow, CCol, CSpinner} from '@coreui/react';
+import { CForm, CFormLabel, CButton, CFormFeedback, CFormInput, CFormTextarea, CRow, CCol, CSpinner } from '@coreui/react';
 import Select from 'react-select';
+import { cilTrash } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
 import { Link } from 'react-router-dom';
 import { Upload, Button, message } from 'antd';
@@ -9,195 +10,177 @@ import { UploadOutlined } from '@ant-design/icons';
 const AuthorFormEditAccount = ({
   form,
   errors,
-  diedOptions,
-  handleChange,
-  handleDiedChange,
-  handleFileChange,
+  accounts,
+  handleAccountAddition,
+  handleAccountRemoval,
+  handleAccountChange,
   handleSubmit,
   handlePrevious,
   loading
 }) => {
-  const [imagePreview, setImagePreview] = useState(form.profileImage || '');
-
-  useEffect(() => {
-    if (form.profileImage) {
-      setImagePreview(form.profileImage);
-    }
-  }, [form.profileImage]);
-
-  const uploadProps = {
-    beforeUpload: (file) => {
-      setImagePreview(URL.createObjectURL(file));
-      handleFileChange(file);
-      return false;
-    },
-    fileList: form.profileImage ? [{ url: form.profileImage }] : [],
-    accept: 'image/*',
-  };
 
   return (
     <>
       <CForm onSubmit={handleSubmit}>
         <CRow>
-          <CCol xs={6}>
-            <div className="mb-3">
-              <CFormLabel htmlFor="firstname">First Name <span className='text-danger'>*</span></CFormLabel>
-              <CFormInput
-                type="text"
-                id="firstname"
-                name="firstname"
-                placeholder="Enter first name"
-                value={form.firstname}
-                onChange={handleChange}
-                invalid={!!errors.firstname}
-              />
-              <CFormFeedback>{errors.firstname}</CFormFeedback>
-            </div>
-          </CCol>
-          <CCol xs={6}>
-            <div className="mb-3">
-              <CFormLabel htmlFor="lastname">Last Name <span className='text-danger'>*</span></CFormLabel>
-              <CFormInput
-                type="text"
-                id="lastname"
-                name="lastname"
-                placeholder="Enter last name"
-                value={form.lastname}
-                onChange={handleChange}
-                invalid={!!errors.lastname}
-              />
-              <CFormFeedback>{errors.lastname}</CFormFeedback>
-            </div>
-          </CCol>
-
-          <CCol xs={6}>
-            <div className="mb-3">
-              <CFormLabel htmlFor="profileImage">Profile Image <span className='text-danger'>*</span></CFormLabel>
-              <div>
-                <Upload {...uploadProps}>
-                  <Button icon={<UploadOutlined />}>Upload Profile Image</Button>
-                </Upload>
-                {imagePreview && (
-                  <div className="mt-2">
-                    <img
-                      src={imagePreview}
-                      alt="Profile Preview"
-                      style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '8px' }}
-                    />
-                  </div>
-                )}
-              </div>
-              {errors.profileImage && <CFormFeedback className="d-block">{errors.profileImage}</CFormFeedback>}
-            </div>
-          </CCol>
-
-          <CCol xs={6}>
-            <div className="mb-3">
-              <CFormLabel htmlFor="penName">Pen Name <span className='text-danger'>*</span></CFormLabel>
-              <CFormInput
-                type="text"
-                id="penName"
-                name="penName"
-                placeholder="Enter pen name"
-                value={form.penName}
-                onChange={handleChange}
-                invalid={!!errors.penName}
-              />
-              <CFormFeedback>{errors.penName}</CFormFeedback>
-            </div>
-          </CCol>
-
-          <CCol xs={6}>
-            <div className="mb-3">
-              <CFormLabel htmlFor="nationality">Nationality <span className='text-danger'>*</span></CFormLabel>
-              <CFormInput
-                type="text"
-                id="nationality"
-                name="nationality"
-                placeholder="Enter nationality"
-                value={form.nationality}
-                onChange={handleChange}
-                invalid={!!errors.nationality}
-              />
-              <CFormFeedback>{errors.nationality}</CFormFeedback>
-            </div>
-          </CCol>
-
-          <CCol xs={6}>
-            <div className="mb-3">
-              <CFormLabel htmlFor="firstPublishDate">First Publish Date <span className='text-danger'>*</span></CFormLabel>
-              <CFormInput
-                type="date"
-                id="firstPublishDate"
-                name="firstPublishDate"
-                value={form.firstPublishDate}
-                onChange={handleChange}
-                invalid={!!errors.firstPublishDate}
-              />
-              <CFormFeedback>{errors.firstPublishDate}</CFormFeedback>
-            </div>
-          </CCol>
-
-          <CCol xs={6}>
-            <div className="mb-3">
-              <CFormLabel htmlFor="position">Position <span className='text-danger'>*</span></CFormLabel>
-              <CFormInput
-                type="text"
-                id="position"
-                name="position"
-                placeholder="Enter position"
-                value={form.position}
-                onChange={handleChange}
-                invalid={!!errors.position}
-              />
-              <CFormFeedback>{errors.position}</CFormFeedback>
-            </div>
-          </CCol>
-
-          <CCol xs={6}>
-            <div className="mb-3">
-              <CFormLabel htmlFor="income">Income <span className='text-danger'>*</span></CFormLabel>
-              <CFormInput
-                type="number"
-                id="income"
-                name="income"
-                placeholder="Enter income"
-                value={form.income}
-                onChange={handleChange}
-                invalid={!!errors.income}
-              />
-              <CFormFeedback>{errors.income}</CFormFeedback>
-            </div>
-          </CCol>
-
-          <CCol xs={6}>
-            <div className="mb-3">
-              <CFormLabel htmlFor="died">Died <span className='text-danger'>*</span></CFormLabel>
-              <Select
-                id="died"
-                name="died"
-                options={diedOptions}
-                value={diedOptions.find(option => option.value === form.died)}
-                onChange={handleDiedChange}
-                className={errors.died ? 'is-invalid' : ''}
-              />
-              {errors.died && <CFormFeedback>{errors.died}</CFormFeedback>}
-            </div>
-          </CCol>
-
           <CCol xs={12}>
-            <div className="mb-3">
-              <CFormLabel htmlFor="description">Description <span className='text-danger'>*</span></CFormLabel>
-              <CFormTextarea
-                id="description"
-                name="description"
-                placeholder="Enter description"
-                value={form.description}
-                onChange={handleChange}
-                invalid={!!errors.description}
-                rows={3}
-              />
-              <CFormFeedback>{errors.description}</CFormFeedback>
+            <div className="my-1">
+              {accounts.map((account, index) => (
+                <React.Fragment key={index}>
+                  <div style={{ border: '1px solid #5c5c5c', borderRadius: '8px', padding: '10px', position: 'relative', marginBottom: '8px' }}>
+                    <div className="d-flex justify-content-end">
+                      <CButton
+                        color="danger"
+                        size="sm"
+                        onClick={() => handleAccountRemoval(index)}
+                      >
+                        <CIcon icon={cilTrash} />
+                      </CButton>
+                    </div>
+                    <CRow>
+                    {/* <CCol xs={6}>
+                        <div className="mb-3">
+                          <CFormLabel htmlFor="name">Account Name <span className='text-danger'>*</span></CFormLabel> */}
+                          <CFormInput
+                            type="hidden"
+                            id="name"
+                            name="name"
+                            placeholder="Enter account name"
+                            value={account._id || ''}
+                          />
+                          {/* <CFormFeedback>{errors.name}</CFormFeedback>
+                        </div>
+                      </CCol> */}
+
+                      <CCol xs={6}>
+                        <div className="mb-3">
+                          <CFormLabel htmlFor="name">Account Name <span className='text-danger'>*</span></CFormLabel>
+                          <CFormInput
+                            type="text"
+                            id="name"
+                            name="name"
+                            placeholder="Enter account name"
+                            value={account.name || ''}
+                            onChange={(e) => handleAccountChange(index, 'name', e.target.value)}
+                          />
+                          <CFormFeedback>{errors.name}</CFormFeedback>
+                        </div>
+                      </CCol>
+
+                      <CCol xs={6}>
+                        <div className="mb-3">
+                          <CFormLabel htmlFor="bank">Bank <span className='text-danger'>*</span></CFormLabel>
+                          <CFormInput
+                            type="text"
+                            id="bank"
+                            name="bank"
+                            placeholder="Enter bank"
+                            value={account.bank || ''}
+                            onChange={(e) => handleAccountChange(index, 'bank', e.target.value)}
+                          />
+                          <CFormFeedback>{errors.bank}</CFormFeedback>
+                        </div>
+                      </CCol>
+
+                      <CCol xs={6}>
+                        <div className="mb-3">
+                          <CFormLabel htmlFor="branch">Branch <span className='text-danger'>*</span></CFormLabel>
+                          <CFormInput
+                            type="text"
+                            id="branch"
+                            name="branch"
+                            placeholder="Enter branch"
+                            value={account.branch || ''}
+                            onChange={(e) => handleAccountChange(index, 'branch', e.target.value)}
+                          />
+                          <CFormFeedback>{errors.branch}</CFormFeedback>
+                        </div>
+                      </CCol>
+
+                      <CCol xs={6}>
+                        <div className="mb-3">
+                          <CFormLabel htmlFor="accountNumber">Account Number <span className='text-danger'>*</span></CFormLabel>
+                          <CFormInput
+                            type="text"
+                            id="accountNumber"
+                            name="accountNumber"
+                            placeholder="Enter account number"
+                            value={account.accountNumber || ''}
+                            onChange={(e) => handleAccountChange(index, 'accountNumber', e.target.value)}
+                          />
+                          <CFormFeedback>{errors.accountNumber}</CFormFeedback>
+                        </div>
+                      </CCol>
+
+                      <CCol xs={6}>
+                        <div className="mb-3">
+                          <CFormLabel htmlFor="accountType">Account Type <span className='text-danger'>*</span></CFormLabel>
+                          <CFormInput
+                            type="text"
+                            id="accountType"
+                            name="accountType"
+                            placeholder="Enter account type"
+                            value={account.accountType || ''}
+                            onChange={(e) => handleAccountChange(index, 'accountType', e.target.value)}
+                          />
+                          <CFormFeedback>{errors.accountType}</CFormFeedback>
+                        </div>
+                      </CCol>
+
+                      <CCol xs={6}>
+                        <div className="mb-3">
+                          <CFormLabel htmlFor="currency">Currency <span className='text-danger'>*</span></CFormLabel>
+                          <CFormInput
+                            type="text"
+                            id="currency"
+                            name="currency"
+                            placeholder="Enter currency"
+                            value={account.currency || ''}
+                            onChange={(e) => handleAccountChange(index, 'currency', e.target.value)}
+                          />
+                          <CFormFeedback>{errors.currency}</CFormFeedback>
+                        </div>
+                      </CCol>
+
+                      <CCol xs={6}>
+                        <div className="mb-3">
+                          <CFormLabel htmlFor="swiftCode">SWIFT Code (Optional)</CFormLabel>
+                          <CFormInput
+                            type="text"
+                            id="swiftCode"
+                            name="swiftCode"
+                            placeholder="Enter SWIFT code"
+                            value={account.swiftCode || ''}
+                            onChange={(e) => handleAccountChange(index, 'swiftCode', e.target.value)}
+                          />
+                          <CFormFeedback>{errors.swiftCode}</CFormFeedback>
+                        </div>
+                      </CCol>
+
+                      <CCol xs={6}>
+                        <div className="mb-3">
+                          <CFormLabel htmlFor="iban">IBAN (Optional)</CFormLabel>
+                          <CFormInput
+                            type="text"
+                            id="iban"
+                            name="iban"
+                            placeholder="Enter IBAN"
+                            value={account.iban || ''}
+                            onChange={(e) => handleAccountChange(index, 'iban', e.target.value)}
+                          />
+                          <CFormFeedback>{errors.iban}</CFormFeedback>
+                        </div>
+                      </CCol>
+
+                    </CRow>
+                  </div>
+                </React.Fragment>
+              ))}
+
+              <div className='d-flex justify-content-start'>
+                <CButton color="primary" onClick={handleAccountAddition}>+ Add Account</CButton>
+              </div>
+
             </div>
           </CCol>
         </CRow>
