@@ -7,6 +7,7 @@ const LogoFull = ({ width, height = "auto", styles }) => {
       <img
         src={logoFullTransparent}
         alt="Logo"
+        loading="lazy"
         style={{
           width: width,
           height: height, // Responsive height
