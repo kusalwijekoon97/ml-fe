@@ -1,18 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { CCard, CCardBody, CContainer, CRow, CCol, CSpinner, CNavLink, CNavItem, CNav } from '@coreui/react';
+import { CCard, CCardBody, CContainer, CRow, CCol, CSpinner, CNavLink, CNavItem, CNav, CPagination, CPaginationItem, CInputGroup, CInputGroupText, CFormInput } from '@coreui/react';
 import axios from 'axios';
 import { AppFooter, AppHeader, AppSidebar } from '../../../components';
 import CardHeaderWithTitleBtn from '../../../components/cards/CardHeaderWithTitleBtn';
 import CIcon from '@coreui/icons-react';
-import { cilList } from '@coreui/icons';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { cilList, cibAddthis, cilSearch } from '@coreui/icons';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import base_url from "../../../utils/api/base_url";
 import ResponseAlert from '../../../components/notifications/ResponseAlert';
 import AuthorFormEditGeneral from '../../../components/forms/AuthorFormEditGeneral';
 import AuthorFormEditAccount from '../../../components/forms/AuthorFormEditAccount';
 import AuthorFormEditBook from '../../../components/forms/AuthorFormEditBook';
+import alertify from 'alertifyjs';
+import 'alertifyjs/build/css/alertify.css';
+import BooksTable from '../../../components/table/BooksTable';
 
 const EditAuthor = () => {
+  const location = useLocation();
   const navigate = useNavigate();
   const { authorId } = useParams();
   const [activeTab, setActiveTab] = useState('general');
@@ -50,12 +54,6 @@ const EditAuthor = () => {
     description: ''
   }]);
 
-  const [addedBooks, setAddedBooks] = useState([{
-    added_book_library: '',
-    added_book_name: '',
-    added_book_source_isbn: ''
-  }]);
-
   const [errorsGeneralInfo, setErrorsGeneralInfo] = useState({
     firstname: '',
     lastname: '',
@@ -79,14 +77,6 @@ const EditAuthor = () => {
       swiftCode: '',
       iban: '',
       description: ''
-    }
-  ]);
-
-  const [errorsAddedBooksInfo, setErrorsAddedBooksInfo] = useState([
-    {
-      added_book_library: '',
-      added_book_name: '',
-      added_book_source_isbn: ''
     }
   ]);
 
@@ -163,75 +153,6 @@ const EditAuthor = () => {
           visible: true,
           type: 'failure',
           message: 'Author account details update failed. Please try again.'
-        });
-        console.error(error);
-      });
-  };
-
-  const handleAddedBookAddition = () => {
-    setAddedBooks(prevAddedBooks => [
-      ...prevAddedBooks,
-      {
-        added_book_library: '',
-        added_book_name: '',
-        added_book_source_isbn: ''
-      }
-    ]);
-  };
-
-  const handleAddedBookChange = (index, field, value) => {
-    const updatedAddedBooks = addedBooks.map((addedBook, i) =>
-      i === index ? { ...addedBook, [field]: value } : addedBook
-    );
-    setAddedBooks(updatedAddedBooks);
-  };
-
-  const handleAddedBookRemoval = (index) => {
-    const updatedAddedBooks = addedBooks.filter((_, i) => i !== index);
-    setAddedBooks(updatedAddedBooks);
-  };
-
-  const validateAddedBookInfo = () => {
-    const newErrorsAddedBookInfo = {};
-
-    // Add your validation logic for each addedBook field if needed
-    setErrorsAddedBooksInfo(newErrorsAddedBookInfo);
-    return Object.keys(newErrorsAddedBookInfo).length === 0;
-  };
-
-  const handleAddedBookInfoSubmit = (e) => {
-    e.preventDefault();
-
-    if (!validateAddedBookInfo()) return;
-
-    setLoading(true);
-
-    const formData = new FormData();
-    formData.append('addedBooks', JSON.stringify(addedBooks));
-
-    axios.post(`${base_url}/api/authors/update/added-book-info/${authorId}`, formData, {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-      .then(response => {
-        setLoading(false);
-        navigate("/authors", {
-          state: {
-            alert: {
-              visible: true,
-              type: 'success',
-              message: 'Author addedBook details updated successfully!'
-            }
-          }
-        });
-      })
-      .catch(error => {
-        setLoading(false);
-        setAlert({
-          visible: true,
-          type: 'failure',
-          message: 'Author addedBook details update failed. Please try again.'
         });
         console.error(error);
       });
@@ -356,15 +277,6 @@ const EditAuthor = () => {
             : []
         );
 
-        setAddedBooks(
-          Array.isArray(data.addedBooks)
-            ? data.addedBooks.map((book) => ({
-              added_book_name: book.name,
-              added_book_source_isbn: book.isbn,
-            }))
-            : []
-        );
-
         setLoading(false);
       } catch (error) {
         setLoading(false);
@@ -380,6 +292,122 @@ const EditAuthor = () => {
     fetchAuthorData();
   }, [authorId]);
 
+  // fetching books in table
+  const [books, setBooks] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [search, setSearch] = useState('');
+  const [currentActiveLibrary, setCurrentActiveLibrary] = useState('');
+
+  const columns = ["#", "Name", "ISBN", "Publisher", "Library", "Categories", "Status", "Actions"];
+
+  useEffect(() => {
+    const savedLibrary = sessionStorage.getItem('currentActiveLibrary') || '';
+    setCurrentActiveLibrary(savedLibrary);
+
+    axios.get(`${base_url}/api/authors/books/${authorId}`, {
+      params: {
+        page: currentPage,
+        limit: itemsPerPage,
+        search: search,
+        library: savedLibrary
+      }
+    })
+      .then(response => {
+        if (response.data && response.data.data && Array.isArray(response.data.data)) {
+          setBooks(response.data.data);
+          setTotalPages(response.data.totalPages);
+        } else {
+          console.error('API response is not in the expected format', response.data);
+        }
+      })
+      .catch(error => {
+        console.error('There was an error fetching the books!', error);
+      });
+  }, [currentPage, itemsPerPage, search, currentActiveLibrary]);
+
+  useEffect(() => {
+    if (location.state?.alert) {
+      setAlert(location.state.alert);
+    }
+  }, [location.state]);
+
+  const handleEdit = (id) => {
+    navigate(`/books/${id}/edit`);
+  };
+
+  const handleDelete = (id) => {
+    alertify.confirm(
+      'Confirm Delete',
+      'Are you sure you want to delete this book?',
+      () => {
+        axios.post(`${base_url}/api/books/delete/${id}`)
+          .then(response => {
+            setBooks(books.filter(book => book._id !== id));
+            setAlert({
+              visible: true,
+              type: 'success',
+              message: 'Book deleted successfully!'
+            });
+          })
+          .catch(error => {
+            console.error('There was an error deleting the book!', error);
+            setAlert({
+              visible: true,
+              type: 'failure',
+              message: 'Failed to delete the book. Please try again.'
+            });
+          });
+      },
+      () => { }
+    );
+  };
+
+  const handleChangeStatus = (id) => {
+    alertify.confirm(
+      'Confirm Status Change',
+      'Are you sure you want to change the status of this book?',
+      () => {
+        axios.post(`${base_url}/api/books/change-status/${id}`)
+          .then(response => {
+            setBooks(books.map(book =>
+              book._id === id ? { ...book, is_active: !book.is_active } : book
+            ));
+            setAlert({
+              visible: true,
+              type: 'success',
+              message: 'Book status changed successfully!'
+            });
+          })
+          .catch(error => {
+            console.error('There was an error changing the book status!', error);
+            setAlert({
+              visible: true,
+              type: 'failure',
+              message: 'Failed to change the book status. Please try again.'
+            });
+          });
+      },
+      () => {
+        alertify.message('Status change cancelled');
+      }
+    )
+  };
+
+  const handleSearchChange = (event) => {
+    setSearch(event.target.value);
+    setCurrentPage(1);  // Reset to the first page when a new search is initiated
+  };
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+
+
+  const handleActiveLibraryChange = (library) => {
+    setCurrentActiveLibrary(library);
+  };
 
   const handlePrevious = () => {
     navigate(-1);
@@ -484,17 +512,55 @@ const EditAuthor = () => {
                         <div>
                           {/* Render Book Information Content */}
                           <h5>Book Information</h5>
+                          <CRow className='mb-2'>
+                            <CCol xs={4}>
+                              <CInputGroup>
+                                <CInputGroupText>
+                                  <CIcon icon={cilSearch} />
+                                </CInputGroupText>
+                                <CFormInput
+                                  type="text"
+                                  id="_search"
+                                  name="_search"
+                                  placeholder="Search here..."
+                                  value={search}
+                                  onChange={handleSearchChange}
+                                />
+                              </CInputGroup>
+                            </CCol>
+                          </CRow>
                           <AuthorFormEditBook
-                            form={formGeneral}
-                            errors={errorsAddedBooksInfo}
-                            addedBooks={addedBooks}
-                            handleAddedBookAddition={handleAddedBookAddition}
-                            handleAddedBookRemoval={handleAddedBookRemoval}
-                            handleAddedBookChange={handleAddedBookChange}
-                            handleSubmit={handleAddedBookInfoSubmit}
-                            handlePrevious={handlePrevious}
-                            loading={loading}
+                            columns={columns}
+                            data={books}
+                            handleEdit={handleEdit}
+                            handleDelete={handleDelete}
+                            handleChangeStatus={handleChangeStatus}
                           />
+                          <CPagination className='d-flex justify-content-end mt-2'>
+                            <CPaginationItem
+                              aria-label="Previous"
+                              onClick={() => handlePageChange(currentPage - 1)}
+                              disabled={currentPage === 1}
+                            >
+                              &laquo;
+                            </CPaginationItem>
+                            {[...Array(totalPages)].map((_, index) => (
+                              <CPaginationItem
+                                key={index + 1}
+                                active={index + 1 === currentPage}
+                                onClick={() => handlePageChange(index + 1)}
+                              >
+                                {index + 1}
+                              </CPaginationItem>
+                            ))}
+                            <CPaginationItem
+                              aria-label="Next"
+                              onClick={() => handlePageChange(currentPage + 1)}
+                              disabled={currentPage === totalPages}
+                            >
+                              &raquo;
+                            </CPaginationItem>
+                          </CPagination>
                         </div>
                       )}
                       {activeTab === 'income' && (
