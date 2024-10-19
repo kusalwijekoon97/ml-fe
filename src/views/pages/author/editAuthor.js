@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CCard, CCardBody, CContainer, CRow, CCol, CSpinner, CNavLink, CNavItem, CNav, CPagination, CPaginationItem, CInputGroup, CInputGroupText, CFormInput } from '@coreui/react';
+import { CCard, CCardBody, CButton, CContainer, CRow, CCol, CSpinner, CNavLink, CNavItem, CNav, CPagination, CPaginationItem, CInputGroup, CInputGroupText, CFormInput } from '@coreui/react';
 import axios from 'axios';
 import { AppFooter, AppHeader, AppSidebar } from '../../../components';
 import CardHeaderWithTitleBtn from '../../../components/cards/CardHeaderWithTitleBtn';
@@ -528,6 +528,13 @@ const EditAuthor = () => {
                                 />
                               </CInputGroup>
                             </CCol>
+                            <CCol xs={8} className="text-end">
+    <Link to="/books/create">
+      <CButton color="primary" size="sm">
+        <CIcon icon={cibAddthis} /> Add Book
+      </CButton>
+    </Link>
+  </CCol>
                           </CRow>
                           <AuthorFormEditBook
                             columns={columns}
