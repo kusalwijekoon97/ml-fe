@@ -7,6 +7,7 @@ const LogoPartialTransparent = ({ width, height = "auto", styles }) => {
       <img
         src={logoPartialTransparent}
         alt="Logo"
+        loading="lazy"
         style={{
           width: width,
           height: height,
