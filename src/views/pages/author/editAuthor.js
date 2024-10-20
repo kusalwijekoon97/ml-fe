@@ -1,32 +1,79 @@
 import React, { useState, useEffect } from 'react';
-import {
-  CCard,
-  CCardBody,
-  CContainer,
-  CRow,
-  CCol,
-  CSpinner
-} from '@coreui/react';
+import { CCard, CCardBody, CButton, CContainer, CRow, CCol, CSpinner, CNavLink, CNavItem, CNav, CPagination, CPaginationItem, CInputGroup, CInputGroupText, CFormInput } from '@coreui/react';
 import axios from 'axios';
 import { AppFooter, AppHeader, AppSidebar } from '../../../components';
 import CardHeaderWithTitleBtn from '../../../components/cards/CardHeaderWithTitleBtn';
 import CIcon from '@coreui/icons-react';
-import { cilList } from '@coreui/icons';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { cilList, cibAddthis, cilSearch } from '@coreui/icons';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import base_url from "../../../utils/api/base_url";
 import ResponseAlert from '../../../components/notifications/ResponseAlert';
-import AuthorFormEdit from '../../../components/forms/AuthorFormEdit';
+import AuthorFormEditGeneral from '../../../components/forms/AuthorFormEditGeneral';
+import AuthorFormEditAccount from '../../../components/forms/AuthorFormEditAccount';
+import AuthorFormEditBook from '../../../components/forms/AuthorFormEditBook';
+import alertify from 'alertifyjs';
+import 'alertifyjs/build/css/alertify.css';
+import BooksTable from '../../../components/table/BooksTable';
+import AuthorFormEditIncomeForm from '../../../components/forms/AuthorFormEditIncomeForm';
+import AuthorFormEditIncomeTable from '../../../components/forms/AuthorFormEditIncomeTable';
 
 const EditAuthor = () => {
+  const location = useLocation();
   const navigate = useNavigate();
   const { authorId } = useParams();
+  const [activeTab, setActiveTab] = useState('general');
+
+  const [loading, setLoading] = useState(false);
+  const [alert, setAlert] = useState({ visible: false, type: '', message: '' });
 
   const diedOptions = [
     { value: 'yes', label: 'Yes' },
     { value: 'no', label: 'No' }
   ];
 
-  const [form, setForm] = useState({
+  const incomeStatusOptions = [
+    { value: 'pending', label: 'Pending' },
+    { value: 'completed', label: 'Completed' },
+    { value: 'cancelled', label: 'Cancelled' }
+  ];
+
+  const [authorAccountOptions, setAuthorAccountOptions] = useState([]);
+
+  const [formGeneral, setFormGeneral] = useState({
+    firstname: '',
+    lastname: '',
+    died: '',
+    penName: '',
+    nationality: '',
+    firstPublishDate: '',
+    description: '',
+    profileImage: '',
+    position: ''
+  });
+
+  const [accounts, setAccounts] = useState([{
+    _id: '',
+    name: '',
+    bank: '',
+    branch: '',
+    accountNumber: '',
+    accountType: '',
+    currency: '',
+    swiftCode: '',
+    iban: '',
+    description: ''
+  }]);
+
+  const [formIncome, setFormIncome] = useState({
+    paymentAmount: '',
+    paymentDate: '',
+    paymentAccountId: '',
+    paymentStatus: '',
+    paymentDescription: '',
+    invoice: ''
+  });
+
+  const [errorsGeneralInfo, setErrorsGeneralInfo] = useState({
     firstname: '',
     lastname: '',
     died: '',
@@ -36,75 +83,121 @@ const EditAuthor = () => {
     description: '',
     profileImage: '',
     position: '',
-    income: ''
   });
 
-  const [loading, setLoading] = useState(false);
-  const [alert, setAlert] = useState({ visible: false, type: '', message: '' });
+  const [errorsAccountInfo, setErrorsAccountInfo] = useState([
+    {
+      name: '',
+      bank: '',
+      branch: '',
+      accountNumber: '',
+      accountType: '',
+      currency: '',
+      swiftCode: '',
+      iban: '',
+      description: ''
+    }
+  ]);
 
-  const [errors, setErrors] = useState({
-    firstname: '',
-    lastname: '',
-    died: '',
-    penName: '',
-    nationality: '',
-    firstPublishDate: '',
-    description: '',
-    profileImage: '',
-    position: '',
-    income: ''
+  const [errorsFormIncome, setErrorsFormIncome] = useState({
+    paymentAmount: '',
+    paymentDate: '',
+    paymentAccountId: '',
+    paymentStatus: '',
+    paymentDescription: '',
+    invoice: ''
   });
 
-  useEffect(() => {
-    const fetchAuthorData = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get(`${base_url}/api/authors/${authorId}`);
-        const data = response.data.data;
-        setForm({
-          firstname: data.firstname,
-          lastname: data.lastname,
-          died: data.died,
-          penName: data.penName,
-          nationality: data.nationality,
-          firstPublishDate: data.firstPublishDate,
-          description: data.description,
-          position: data.position,
-          income: data.income,
-          profileImage: data.profileImage
-        });
+  const handleAccountAddition = () => {
+    setAccounts(prevAccounts => [
+      ...prevAccounts,
+      {
+        name: '',
+        bank: '',
+        branch: '',
+        accountNumber: '',
+        accountType: '',
+        currency: '',
+        swiftCode: '',
+        iban: '',
+        description: ''
+      }
+    ]);
+  };
+
+  const handleAccountChange = (index, field, value) => {
+    const updatedAccounts = accounts.map((account, i) =>
+      i === index ? { ...account, [field]: value } : account
+    );
+    setAccounts(updatedAccounts);
+  };
+
+
+  const handleAccountRemoval = (index) => {
+    const updatedAccounts = accounts.filter((_, i) => i !== index);
+    setAccounts(updatedAccounts);
+  };
+
+  const validateAccountInfo = () => {
+    const newErrorsAccountInfo = {};
+
+    // Add your validation logic for each account field if needed
+    setErrorsAccountInfo(newErrorsAccountInfo);
+    return Object.keys(newErrorsAccountInfo).length === 0;
+  };
+
+  const handleAccountInfoSubmit = (e) => {
+    e.preventDefault();
+
+    if (!validateAccountInfo()) return;
+
+    setLoading(true);
+
+    // const formData = new FormData();
+    // formData.append('accounts', JSON.stringify(accounts));
+
+    axios.post(`${base_url}/api/authors/update/account-info/${authorId}`, {
+      accounts: accounts
+    }, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(response => {
         setLoading(false);
-      } catch (error) {
+        navigate("/authors", {
+          state: {
+            alert: {
+              visible: true,
+              type: 'success',
+              message: 'Author account details updated successfully!'
+            }
+          }
+        });
+      })
+      .catch(error => {
         setLoading(false);
         setAlert({
           visible: true,
           type: 'failure',
-          message: 'Failed to load author data. Please try again.'
+          message: 'Author account details update failed. Please try again.'
         });
         console.error(error);
-      }
-    };
-
-    fetchAuthorData();
-  }, [authorId]);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
-    setErrors({ ...errors, [name]: '' });
+      });
   };
 
-  // const handleFileChange = (e) => {
-  //   setForm({ ...form, profileImage: e.target.files[0] });
-  // };
+  const handleGeneralInfoChange = (e) => {
+    const { name, value } = e.target;
+    setFormGeneral({ ...formGeneral, [name]: value });
+    setErrorsGeneralInfo({ ...errorsGeneralInfo, [name]: '' });
+  };
 
   const handleFileChange = (file) => {
-    setForm({ ...form, profileImage: file });
+    setFormGeneral({ ...formGeneral, profileImage: file });
   };
 
-
   const handleDiedChange = (selectedOption) => {
-    handleChange({
+    handleGeneralInfoChange({
       target: {
         name: 'died',
         value: selectedOption ? selectedOption.value : ''
@@ -112,43 +205,41 @@ const EditAuthor = () => {
     });
   };
 
-  const validateForm = () => {
-    const newErrors = {};
+  const validateFormGeneral = () => {
+    const newErrorsGeneralInfo = {};
 
-    if (!form.firstname) newErrors.firstname = 'First name is mandatory.';
-    if (!form.lastname) newErrors.lastname = 'Last name is mandatory.';
-    if (!form.penName) newErrors.penName = 'Pen name is mandatory.';
-    if (!form.nationality) newErrors.nationality = 'Nationality is mandatory.';
-    if (!form.firstPublishDate) newErrors.firstPublishDate = 'First publish date is mandatory.';
-    if (!form.description) newErrors.description = 'Description is mandatory.';
-    if (form.profileImage instanceof File) formData.append('profileImage', form.profileImage); // Only append if it's a File object
-    if (!form.position) newErrors.position = 'Position is mandatory.';
-    if (!form.income) newErrors.income = 'Income is mandatory.';
+    // if (!formGeneral.firstname) newErrorsGeneralInfo.firstname = 'First name is mandatory.';
+    // if (!formGeneral.lastname) newErrorsGeneralInfo.lastname = 'Last name is mandatory.';
+    // if (!formGeneral.penName) newErrorsGeneralInfo.penName = 'Pen name is mandatory.';
+    // if (!formGeneral.nationality) newErrorsGeneralInfo.nationality = 'Nationality is mandatory.';
+    // if (!formGeneral.firstPublishDate) newErrorsGeneralInfo.firstPublishDate = 'First publish date is mandatory.';
+    // if (!formGeneral.description) newErrorsGeneralInfo.description = 'Description is mandatory.';
+    // if (formGeneral.profileImage instanceof File) formData.append('profileImage', formGeneral.profileImage); // Only append if it's a File object
+    // if (!formGeneral.position) newErrorsGeneralInfo.position = 'Position is mandatory.';
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    setErrorsGeneralInfo(newErrorsGeneralInfo);
+    return Object.keys(newErrorsGeneralInfo).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleGeneralInfoSubmit = (e) => {
     e.preventDefault();
 
-    if (!validateForm()) return;
+    if (!validateFormGeneral()) return;
 
     setLoading(true);
 
     const formData = new FormData();
-    formData.append('firstname', form.firstname);
-    formData.append('lastname', form.lastname);
-    formData.append('died', form.died);
-    formData.append('penName', form.penName);
-    formData.append('nationality', form.nationality);
-    formData.append('firstPublishDate', form.firstPublishDate);
-    formData.append('description', form.description);
-    if (form.profileImage) formData.append('profileImage', form.profileImage);
-    formData.append('position', form.position);
-    formData.append('income', form.income);
+    formData.append('firstname', formGeneral.firstname);
+    formData.append('lastname', formGeneral.lastname);
+    formData.append('died', formGeneral.died);
+    formData.append('penName', formGeneral.penName);
+    formData.append('nationality', formGeneral.nationality);
+    formData.append('firstPublishDate', formGeneral.firstPublishDate);
+    formData.append('description', formGeneral.description);
+    if (form.profileImage) formData.append('profileImage', formGeneral.profileImage);
+    formData.append('position', formGeneral.position);
 
-    axios.post(`${base_url}/api/authors/update/${authorId}`, formData, {
+    axios.post(`${base_url}/api/authors/update/general-info/${authorId}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -176,8 +267,295 @@ const EditAuthor = () => {
       });
   };
 
+  const handleIncomeChange = (e) => {
+    const { name, value } = e.target;
+    setFormIncome({ ...formIncome, [name]: value });
+    setErrorsFormIncome({ ...errorsFormIncome, [name]: '' });
+  };
+
+  const handleInvoiceFileChange = (file) => {
+    setFormIncome({ ...formIncome, invoice: file });
+  };
+
+  const handleIncomeStatusChange = (selectedOption) => {
+    handleIncomeChange({
+      target: {
+        name: 'paymentStatus',
+        value: selectedOption ? selectedOption.value : ''
+      }
+    });
+  };
+
+  const handleIncomeAccountChange = (selectedOption) => {
+    handleIncomeChange({
+      target: {
+        name: 'paymentAccountId',
+        value: selectedOption ? selectedOption.value : ''
+      }
+    });
+  };
+
+  const validateFormIncome = () => {
+    const newErrorsFormIncome = {};
+    setErrorsFormIncome(newErrorsFormIncome);
+    return Object.keys(newErrorsFormIncome).length === 0;
+  };
+
+  const handleIncomeSubmit = (e) => {
+    e.preventDefault();
+
+    if (!validateFormIncome()) return;
+
+    setLoading(true);
+
+    const incomeFormData = new FormData();
+    incomeFormData.append('paymentAmount', formIncome.paymentAmount);
+    incomeFormData.append('paymentDate', formIncome.paymentDate);
+    incomeFormData.append('paymentAccountId', formIncome.paymentAccountId);
+    incomeFormData.append('paymentStatus', formIncome.paymentStatus);
+    incomeFormData.append('paymentDescription', formIncome.paymentDescription);
+    incomeFormData.append('description', formIncome.description);
+    // if (formIncome.invoice) incomeFormData.append('invoice', formIncome.invoice);
+
+    console.log("incomeFormData", incomeFormData);
+
+
+    axios.post(`${base_url}/api/authors/store/payment/${authorId}`, incomeFormData
+      , {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+      .then(response => {
+        setLoading(false);
+        navigate("/authors", {
+          state: {
+            alert: {
+              visible: true,
+              type: 'success',
+              message: 'Author payment stored successfully!'
+            }
+          }
+        });
+      })
+      .catch(error => {
+        setLoading(false);
+        setAlert({
+          visible: true,
+          type: 'failure',
+          message: 'Author payment storing failed. Please try again.'
+        });
+        console.error(error);
+      });
+  };
+
+  useEffect(() => {
+    const fetchAuthorData = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(`${base_url}/api/authors/${authorId}`);
+        const data = response.data.data;
+
+        setFormGeneral({
+          firstname: data.generalInfo.firstname,
+          lastname: data.generalInfo.lastname,
+          died: data.generalInfo.died,
+          penName: data.generalInfo.penName,
+          nationality: data.generalInfo.nationality,
+          firstPublishDate: data.generalInfo.firstPublishDate
+            ? new Date(data.generalInfo.firstPublishDate).toISOString().split('T')[0]
+            : '',
+          description: data.generalInfo.description,
+          position: data.generalInfo.position,
+          profileImage: data.generalInfo.profileImage,
+        });
+
+        setAccounts(
+          Array.isArray(data.accountInfo)
+            ? data.accountInfo.map((accountInfo) => ({
+              _id: accountInfo._id,
+              name: accountInfo.name,
+              bank: accountInfo.bank,
+              branch: accountInfo.branch,
+              accountNumber: accountInfo.accountNumber,
+              accountType: accountInfo.accountType,
+              currency: accountInfo.currency,
+              swiftCode: accountInfo.swiftCode,
+              iban: accountInfo.iban,
+              description: accountInfo.description,
+            }))
+            : []
+        );
+
+        setAuthorAccountOptions(
+          Array.isArray(data.accountInfo)
+            ? data.accountInfo.map((accountInfo) => ({
+              value: accountInfo._id,  // Set the value as the account ID
+              label: `${accountInfo.name} - ${accountInfo.bank} (${accountInfo.branch})`
+            }))
+            : []
+        );
+
+        setLoading(false);
+      } catch (error) {
+        setLoading(false);
+        setAlert({
+          visible: true,
+          type: 'failure',
+          message: 'Failed to load author data. Please try again.',
+        });
+        console.error(error);
+      }
+    };
+
+    fetchAuthorData();
+  }, [authorId]);
+
+  // fetching books in table
+  const [books, setBooks] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [search, setSearch] = useState('');
+  const [currentActiveLibrary, setCurrentActiveLibrary] = useState('');
+
+  const columns = ["#", "Name", "ISBN", "Publisher", "Library", "Categories", "Status", "Actions"];
+
+  useEffect(() => {
+    const savedLibrary = sessionStorage.getItem('currentActiveLibrary') || '';
+    setCurrentActiveLibrary(savedLibrary);
+
+    axios.get(`${base_url}/api/authors/books/${authorId}`, {
+      params: {
+        page: currentPage,
+        limit: itemsPerPage,
+        search: search,
+        library: savedLibrary
+      }
+    })
+      .then(response => {
+        if (response.data && response.data.data && Array.isArray(response.data.data)) {
+          setBooks(response.data.data);
+          setTotalPages(response.data.totalPages);
+        } else {
+          console.error('API response is not in the expected format', response.data);
+        }
+      })
+      .catch(error => {
+        console.error('There was an error fetching the books!', error);
+      });
+  }, [currentPage, itemsPerPage, search, currentActiveLibrary]);
+
+  useEffect(() => {
+    if (location.state?.alert) {
+      setAlert(location.state.alert);
+    }
+  }, [location.state]);
+
+  const handleEdit = (id) => {
+    navigate(`/books/${id}/edit`);
+  };
+
+  const handleDelete = (id) => {
+    alertify.confirm(
+      'Confirm Delete',
+      'Are you sure you want to delete this book?',
+      () => {
+        axios.post(`${base_url}/api/books/delete/${id}`)
+          .then(response => {
+            setBooks(books.filter(book => book._id !== id));
+            setAlert({
+              visible: true,
+              type: 'success',
+              message: 'Book deleted successfully!'
+            });
+          })
+          .catch(error => {
+            console.error('There was an error deleting the book!', error);
+            setAlert({
+              visible: true,
+              type: 'failure',
+              message: 'Failed to delete the book. Please try again.'
+            });
+          });
+      },
+      () => { }
+    );
+  };
+
+  const handleChangeStatus = (id) => {
+    alertify.confirm(
+      'Confirm Status Change',
+      'Are you sure you want to change the status of this book?',
+      () => {
+        axios.post(`${base_url}/api/books/change-status/${id}`)
+          .then(response => {
+            setBooks(books.map(book =>
+              book._id === id ? { ...book, is_active: !book.is_active } : book
+            ));
+            setAlert({
+              visible: true,
+              type: 'success',
+              message: 'Book status changed successfully!'
+            });
+          })
+          .catch(error => {
+            console.error('There was an error changing the book status!', error);
+            setAlert({
+              visible: true,
+              type: 'failure',
+              message: 'Failed to change the book status. Please try again.'
+            });
+          });
+      },
+      () => {
+        alertify.message('Status change cancelled');
+      }
+    )
+  };
+
+  const handleSearchChange = (event) => {
+    setSearch(event.target.value);
+    setCurrentPage(1);  // Reset to the first page when a new search is initiated
+  };
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+
+
+  // author income retrieval table
+  const [authorIncomeList, setAuthorIncomeList] = useState([]);
+
+  // Define the columns for the income table
+  const incomeColumns = ["#", "Payment Amount", "Payment Date", "Payment Status", "Payment Description"];
+
+  useEffect(() => {
+    // Fetch author income data from the API
+    axios.get(`${base_url}/api/authors/payments/${authorId}`)
+      .then(response => {
+        if (response.data && response.data.data && Array.isArray(response.data.data)) {
+          setAuthorIncomeList(response.data.data);
+        } else {
+          console.error('API response is not in the expected format', response.data);
+        }
+      })
+      .catch(error => {
+        console.error('There was an error fetching the authorIncomeList!', error);
+      });
+  }, []);
+
+  const handleActiveLibraryChange = (library) => {
+    setCurrentActiveLibrary(library);
+  };
+
   const handlePrevious = () => {
     navigate(-1);
+  };
+
+  const handleTabClick = (tabName) => {
+    setActiveTab(tabName);
   };
 
   return (
@@ -204,17 +582,190 @@ const EditAuthor = () => {
                     linkTo="/authors"
                   />
                   <CCardBody>
-                    <AuthorFormEdit
-                      form={form}
-                      errors={errors}
-                      diedOptions={diedOptions}
-                      handleDiedChange={handleDiedChange}
-                      handleChange={handleChange}
-                      handleFileChange={handleFileChange}
-                      handleSubmit={handleSubmit}
-                      handlePrevious={handlePrevious}
-                      loading={loading}
-                    />
+                    <CNav variant="tabs">
+                      <CNavItem>
+                        <CNavLink
+                          href="#"
+                          active={activeTab === 'general'}
+                          onClick={() => handleTabClick('general')}
+                        >
+                          General Information
+                        </CNavLink>
+                      </CNavItem>
+                      <CNavItem>
+                        <CNavLink
+                          href="#"
+                          active={activeTab === 'book'}
+                          onClick={() => handleTabClick('book')}
+                        >
+                          Book Information
+                        </CNavLink>
+                      </CNavItem>
+                      <CNavItem>
+                        <CNavLink
+                          href="#"
+                          active={activeTab === 'income'}
+                          onClick={() => handleTabClick('income')}
+                        >
+                          Income Information
+                        </CNavLink>
+                      </CNavItem>
+                      <CNavItem>
+                        <CNavLink
+                          href="#"
+                          active={activeTab === 'account'}
+                          onClick={() => handleTabClick('account')}
+                        >
+                          Account Information
+                        </CNavLink>
+                      </CNavItem>
+                      <CNavItem>
+                        <CNavLink
+                          href="#"
+                          active={activeTab === 'social'}
+                          onClick={() => handleTabClick('social')}
+                        >
+                          Social Media
+                        </CNavLink>
+                      </CNavItem>
+                    </CNav>
+
+                    {/* Conditionally render content for each tab */}
+                    <div className="mt-4">
+                      {activeTab === 'general' && (
+                        <div>
+                          {/* Render General Information Content */}
+                          <h5>General Information</h5>
+                          <AuthorFormEditGeneral
+                            form={formGeneral}
+                            errors={errorsGeneralInfo}
+                            diedOptions={diedOptions}
+                            handleDiedChange={handleDiedChange}
+                            handleChange={handleGeneralInfoChange}
+                            handleFileChange={handleFileChange}
+                            handleSubmit={handleGeneralInfoSubmit}
+                            handlePrevious={handlePrevious}
+                            loading={loading}
+                          />
+                        </div>
+                      )}
+                      {activeTab === 'book' && (
+                        <div>
+                          {/* Render Book Information Content */}
+                          <h5>Book Information</h5>
+                          <CRow className='mb-2'>
+                            <CCol xs={4}>
+                              <CInputGroup>
+                                <CInputGroupText>
+                                  <CIcon icon={cilSearch} />
+                                </CInputGroupText>
+                                <CFormInput
+                                  type="text"
+                                  id="_search"
+                                  name="_search"
+                                  placeholder="Search here..."
+                                  value={search}
+                                  onChange={handleSearchChange}
+                                />
+                              </CInputGroup>
+                            </CCol>
+                            <CCol xs={8} className="text-end">
+                              <Link to="/books/create">
+                                <CButton color="primary" size="sm">
+                                  <CIcon icon={cibAddthis} /> Add Book
+                                </CButton>
+                              </Link>
+                            </CCol>
+                          </CRow>
+                          <AuthorFormEditBook
+                            columns={columns}
+                            data={books}
+                            handleEdit={handleEdit}
+                            handleDelete={handleDelete}
+                            handleChangeStatus={handleChangeStatus}
+                          />
+                          <CPagination className='d-flex justify-content-end mt-2'>
+                            <CPaginationItem
+                              aria-label="Previous"
+                              onClick={() => handlePageChange(currentPage - 1)}
+                              disabled={currentPage === 1}
+                            >
+                              &laquo;
+                            </CPaginationItem>
+                            {[...Array(totalPages)].map((_, index) => (
+                              <CPaginationItem
+                                key={index + 1}
+                                active={index + 1 === currentPage}
+                                onClick={() => handlePageChange(index + 1)}
+                              >
+                                {index + 1}
+                              </CPaginationItem>
+                            ))}
+                            <CPaginationItem
+                              aria-label="Next"
+                              onClick={() => handlePageChange(currentPage + 1)}
+                              disabled={currentPage === totalPages}
+                            >
+                              &raquo;
+                            </CPaginationItem>
+                          </CPagination>
+                        </div>
+                      )}
+                      {activeTab === 'income' && (
+                        <>
+                          <div>
+                            {/* Render Income Information Content */}
+                            <h5>New Payment</h5>
+                            <AuthorFormEditIncomeForm
+                              formIncome={formIncome}
+                              errors={errorsGeneralInfo}
+                              incomeStatusOptions={incomeStatusOptions}
+                              authorAccountOptions={authorAccountOptions}
+                              handleChange={handleIncomeChange}
+                              handleIncomeStatusChange={handleIncomeStatusChange}
+                              handleIncomeAccountChange={handleIncomeAccountChange}
+                              handleInvoiceFileChange={handleInvoiceFileChange}
+                              handleSubmit={handleIncomeSubmit}
+                              handlePrevious={handlePrevious}
+                              loading={loading}
+                            />
+                          </div>
+
+                          <div>
+                            {/* Render Book Information Content */}
+                            <h5>Income Information</h5>
+                            <AuthorFormEditIncomeTable
+                              columns={incomeColumns}
+                              data={authorIncomeList}
+                            />
+                          </div>
+                        </>
+                      )}
+                      {activeTab === 'account' && (
+                        <div>
+                          {/* Render Account Information Content */}
+                          <h5>Account Information</h5>
+                          <AuthorFormEditAccount
+                            form={formGeneral}
+                            errors={errorsAccountInfo}
+                            accounts={accounts}
+                            handleAccountAddition={handleAccountAddition}
+                            handleAccountRemoval={handleAccountRemoval}
+                            handleAccountChange={handleAccountChange}
+                            handleSubmit={handleAccountInfoSubmit}
+                            handlePrevious={handlePrevious}
+                            loading={loading}
+                          />
+                        </div>
+                      )}
+                      {activeTab === 'social' && (
+                        <div>
+                          {/* Render Social Media Content */}
+                          <h5>Social Media</h5>
+                          <p>Author's social media profiles and links.</p>
+                        </div>
+                      )}
+                    </div>
                   </CCardBody>
                 </CCard>
               </CCol>
