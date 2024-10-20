@@ -247,13 +247,13 @@ const AuthorForm = ({
                             <div className="mb-3">
                               <CFormLabel htmlFor="library">Library <span className='text-danger'>*</span></CFormLabel>
                               <Select
-                    id="library"
-                    name="library"
-                    options={libraryOptions}
-                    value={form.library}
-                    onChange={handleLibraryChange}
-                    className={errors.library ? 'is-invalid' : ''} />
-                  {errors.library && <CFormFeedback>{errors.library}</CFormFeedback>}
+                                id="library"
+                                name="library"
+                                options={libraryOptions}
+                                value={form.library}
+                                onChange={handleLibraryChange}
+                                className={errors.library ? 'is-invalid' : ''} />
+                              {errors.library && <CFormFeedback>{errors.library}</CFormFeedback>}
                             </div>
                           </CCol>
 

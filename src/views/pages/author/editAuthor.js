@@ -14,6 +14,8 @@ import AuthorFormEditBook from '../../../components/forms/AuthorFormEditBook';
 import alertify from 'alertifyjs';
 import 'alertifyjs/build/css/alertify.css';
 import BooksTable from '../../../components/table/BooksTable';
+import AuthorFormEditIncomeForm from '../../../components/forms/AuthorFormEditIncomeForm';
+import AuthorFormEditIncomeTable from '../../../components/forms/AuthorFormEditIncomeTable';
 
 const EditAuthor = () => {
   const location = useLocation();
@@ -28,6 +30,14 @@ const EditAuthor = () => {
     { value: 'yes', label: 'Yes' },
     { value: 'no', label: 'No' }
   ];
+
+  const incomeStatusOptions = [
+    { value: 'pending', label: 'Pending' },
+    { value: 'completed', label: 'Completed' },
+    { value: 'cancelled', label: 'Cancelled' }
+  ];
+
+  const [authorAccountOptions, setAuthorAccountOptions] = useState([]);
 
   const [formGeneral, setFormGeneral] = useState({
     firstname: '',
@@ -54,6 +64,15 @@ const EditAuthor = () => {
     description: ''
   }]);
 
+  const [formIncome, setFormIncome] = useState({
+    paymentAmount: '',
+    paymentDate: '',
+    paymentAccountId: '',
+    paymentStatus: '',
+    paymentDescription: '',
+    invoice: ''
+  });
+
   const [errorsGeneralInfo, setErrorsGeneralInfo] = useState({
     firstname: '',
     lastname: '',
@@ -79,6 +98,15 @@ const EditAuthor = () => {
       description: ''
     }
   ]);
+
+  const [errorsFormIncome, setErrorsFormIncome] = useState({
+    paymentAmount: '',
+    paymentDate: '',
+    paymentAccountId: '',
+    paymentStatus: '',
+    paymentDescription: '',
+    invoice: ''
+  });
 
   const handleAccountAddition = () => {
     setAccounts(prevAccounts => [
@@ -239,6 +267,89 @@ const EditAuthor = () => {
       });
   };
 
+  const handleIncomeChange = (e) => {
+    const { name, value } = e.target;
+    setFormIncome({ ...formIncome, [name]: value });
+    setErrorsFormIncome({ ...errorsFormIncome, [name]: '' });
+  };
+
+  const handleInvoiceFileChange = (file) => {
+    setFormIncome({ ...formIncome, invoice: file });
+  };
+
+  const handleIncomeStatusChange = (selectedOption) => {
+    handleIncomeChange({
+      target: {
+        name: 'paymentStatus',
+        value: selectedOption ? selectedOption.value : ''
+      }
+    });
+  };
+
+  const handleIncomeAccountChange = (selectedOption) => {
+    handleIncomeChange({
+      target: {
+        name: 'paymentAccountId',
+        value: selectedOption ? selectedOption.value : ''
+      }
+    });
+  };
+
+  const validateFormIncome = () => {
+    const newErrorsFormIncome = {};
+    setErrorsFormIncome(newErrorsFormIncome);
+    return Object.keys(newErrorsFormIncome).length === 0;
+  };
+
+  const handleIncomeSubmit = (e) => {
+    e.preventDefault();
+
+    if (!validateFormIncome()) return;
+
+    setLoading(true);
+
+    const incomeFormData = new FormData();
+    incomeFormData.append('paymentAmount', formIncome.paymentAmount);
+    incomeFormData.append('paymentDate', formIncome.paymentDate);
+    incomeFormData.append('paymentAccountId', formIncome.paymentAccountId);
+    incomeFormData.append('paymentStatus', formIncome.paymentStatus);
+    incomeFormData.append('paymentDescription', formIncome.paymentDescription);
+    incomeFormData.append('description', formIncome.description);
+    // if (formIncome.invoice) incomeFormData.append('invoice', formIncome.invoice);
+
+    console.log("incomeFormData", incomeFormData);
+
+
+    axios.post(`${base_url}/api/authors/store/payment/${authorId}`, incomeFormData
+      , {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+      .then(response => {
+        setLoading(false);
+        navigate("/authors", {
+          state: {
+            alert: {
+              visible: true,
+              type: 'success',
+              message: 'Author payment stored successfully!'
+            }
+          }
+        });
+      })
+      .catch(error => {
+        setLoading(false);
+        setAlert({
+          visible: true,
+          type: 'failure',
+          message: 'Author payment storing failed. Please try again.'
+        });
+        console.error(error);
+      });
+  };
+
   useEffect(() => {
     const fetchAuthorData = async () => {
       try {
@@ -273,6 +384,15 @@ const EditAuthor = () => {
               swiftCode: accountInfo.swiftCode,
               iban: accountInfo.iban,
               description: accountInfo.description,
+            }))
+            : []
+        );
+
+        setAuthorAccountOptions(
+          Array.isArray(data.accountInfo)
+            ? data.accountInfo.map((accountInfo) => ({
+              value: accountInfo._id,  // Set the value as the account ID
+              label: `${accountInfo.name} - ${accountInfo.bank} (${accountInfo.branch})`
             }))
             : []
         );
@@ -405,6 +525,27 @@ const EditAuthor = () => {
   };
 
 
+  // author income retrieval table
+  const [authorIncomeList, setAuthorIncomeList] = useState([]);
+
+  // Define the columns for the income table
+  const incomeColumns = ["#", "Payment Amount", "Payment Date", "Payment Status", "Payment Description"];
+
+  useEffect(() => {
+    // Fetch author income data from the API
+    axios.get(`${base_url}/api/authors/payments/${authorId}`)
+      .then(response => {
+        if (response.data && response.data.data && Array.isArray(response.data.data)) {
+          setAuthorIncomeList(response.data.data);
+        } else {
+          console.error('API response is not in the expected format', response.data);
+        }
+      })
+      .catch(error => {
+        console.error('There was an error fetching the authorIncomeList!', error);
+      });
+  }, []);
+
   const handleActiveLibraryChange = (library) => {
     setCurrentActiveLibrary(library);
   };
@@ -529,12 +670,12 @@ const EditAuthor = () => {
                               </CInputGroup>
                             </CCol>
                             <CCol xs={8} className="text-end">
-    <Link to="/books/create">
-      <CButton color="primary" size="sm">
-        <CIcon icon={cibAddthis} /> Add Book
-      </CButton>
-    </Link>
-  </CCol>
+                              <Link to="/books/create">
+                                <CButton color="primary" size="sm">
+                                  <CIcon icon={cibAddthis} /> Add Book
+                                </CButton>
+                              </Link>
+                            </CCol>
                           </CRow>
                           <AuthorFormEditBook
                             columns={columns}
@@ -571,11 +712,34 @@ const EditAuthor = () => {
                         </div>
                       )}
                       {activeTab === 'income' && (
-                        <div>
-                          {/* Render Income Information Content */}
-                          <h5>Income Information</h5>
-                          <p>Details about the income generated by the author.</p>
-                        </div>
+                        <>
+                          <div>
+                            {/* Render Income Information Content */}
+                            <h5>New Payment</h5>
+                            <AuthorFormEditIncomeForm
+                              formIncome={formIncome}
+                              errors={errorsGeneralInfo}
+                              incomeStatusOptions={incomeStatusOptions}
+                              authorAccountOptions={authorAccountOptions}
+                              handleChange={handleIncomeChange}
+                              handleIncomeStatusChange={handleIncomeStatusChange}
+                              handleIncomeAccountChange={handleIncomeAccountChange}
+                              handleInvoiceFileChange={handleInvoiceFileChange}
+                              handleSubmit={handleIncomeSubmit}
+                              handlePrevious={handlePrevious}
+                              loading={loading}
+                            />
+                          </div>
+
+                          <div>
+                            {/* Render Book Information Content */}
+                            <h5>Income Information</h5>
+                            <AuthorFormEditIncomeTable
+                              columns={incomeColumns}
+                              data={authorIncomeList}
+                            />
+                          </div>
+                        </>
                       )}
                       {activeTab === 'account' && (
                         <div>
