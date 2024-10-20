@@ -228,23 +228,7 @@ const AuthorForm = ({
                           </CButton>
                         </div>
                         <CRow>
-                          <CCol xs={3}>
-                            <div className="mb-3">
-                              <CFormLabel htmlFor="added_book_number">Book Number <span className='text-danger'>*</span></CFormLabel>
-                              <CFormInput
-                                type="text"
-                                id="added_book_number"
-                                name="added_book_number"
-                                placeholder="Enter book number"
-                                value={addedBook.added_book_number || ''}
-                                onChange={(e) => handleAddedBookChange(index, e)}
-                                readOnly
-                              />
-                              <CFormFeedback>{errors.added_book_number}</CFormFeedback>
-                            </div>
-                          </CCol>
-
-                          <CCol xs={9}>
+                          <CCol xs={12}>
                             <div className="mb-3">
                               <CFormLabel htmlFor="added_book_isbn">Book ISBN <span className='text-danger'>*</span></CFormLabel>
                               <CFormInput
@@ -263,13 +247,13 @@ const AuthorForm = ({
                             <div className="mb-3">
                               <CFormLabel htmlFor="library">Library <span className='text-danger'>*</span></CFormLabel>
                               <Select
-                    id="library"
-                    name="library"
-                    options={libraryOptions}
-                    value={form.library}
-                    onChange={handleLibraryChange}
-                    className={errors.library ? 'is-invalid' : ''} />
-                  {errors.library && <CFormFeedback>{errors.library}</CFormFeedback>}
+                                id="library"
+                                name="library"
+                                options={libraryOptions}
+                                value={form.library}
+                                onChange={handleLibraryChange}
+                                className={errors.library ? 'is-invalid' : ''} />
+                              {errors.library && <CFormFeedback>{errors.library}</CFormFeedback>}
                             </div>
                           </CCol>
 

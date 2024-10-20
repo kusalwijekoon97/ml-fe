@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import { Upload, Button, message } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 
-const AuthorFormEdit = ({
+const AuthorFormEditGeneral = ({
   form,
   errors,
   diedOptions,
@@ -244,4 +244,4 @@ const AuthorFormEdit = ({
   );
 };
 
-export default AuthorFormEdit;
+export default AuthorFormEditGeneral;
