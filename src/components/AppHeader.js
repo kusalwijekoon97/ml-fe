@@ -1,18 +1,20 @@
 import React, { useEffect, useRef } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
-import {CContainer,CDropdown,CDropdownItem,CDropdownMenu,CDropdownToggle,CHeader,CHeaderNav,CHeaderToggler,CNavLink,CNavItem,useColorModes} from '@coreui/react'
+import { CContainer, CDropdown, CDropdownItem, CDropdownMenu, CDropdownToggle, CHeader, CHeaderNav, CHeaderToggler, CNavLink, CNavItem, useColorModes } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import {cilBell,cilContrast,cilEnvelopeOpen,cilList,cilMenu,cilMoon,cilSun} from '@coreui/icons'
+import { cilBell, cilContrast, cilEnvelopeOpen, cilList, cilMenu, cilMoon, cilSun } from '@coreui/icons'
 
 import { AppBreadcrumb } from './index'
 import { AppHeaderDropdown } from './header/index'
 import BreadCrumb from './breadcrumb/BreadCrumb'
 
-const AppHeader = ({title}) => {
+const AppHeader = ({ title }) => {
   const headerRef = useRef()
   const { colorMode, setColorMode } = useColorModes('coreui-free-react-admin-template-theme')
-
+  useEffect(() => {
+    setColorMode('light')
+  }, [setColorMode])
   const dispatch = useDispatch()
   const sidebarShow = useSelector((state) => state.sidebarShow)
 
@@ -63,10 +65,10 @@ const AppHeader = ({title}) => {
           </CNavItem>
         </CHeaderNav>
         <CHeaderNav>
-          <li className="nav-item py-1">
+          {/* <li className="nav-item py-1">
             <div className="vr h-100 mx-2 text-body text-opacity-75"></div>
-          </li>
-          <CDropdown variant="nav-item" placement="bottom-end">
+          </li> */}
+          {/* <CDropdown variant="nav-item" placement="bottom-end">
             <CDropdownToggle caret={false}>
               {colorMode === 'dark' ? (
                 <CIcon icon={cilMoon} size="lg" />
@@ -105,7 +107,7 @@ const AppHeader = ({title}) => {
                 <CIcon className="me-2" icon={cilContrast} size="lg" /> Auto
               </CDropdownItem>
             </CDropdownMenu>
-          </CDropdown>
+          </CDropdown> */}
           <li className="nav-item py-1">
             <div className="vr h-100 mx-2 text-body text-opacity-75"></div>
           </li>
@@ -113,7 +115,7 @@ const AppHeader = ({title}) => {
         </CHeaderNav>
       </CContainer>
       <CContainer className="px-4" fluid>
-        <BreadCrumb/>
+        <BreadCrumb />
       </CContainer>
     </CHeader>
   )
